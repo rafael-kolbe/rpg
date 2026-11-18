@@ -1,0 +1,24 @@
+# Development database only. The server runs on the host (`make dev-server`)
+# and the client through Vite (`make dev-web`), both with hot reload.
+# Separate project name and volume: dev data never mixes with `make up` data.
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: rpg_dev_db
+    environment:
+      POSTGRES_USER: rpg
+      POSTGRES_DB: rpg
+      POSTGRES_PASSWORD: rpg
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rpg -d rpg"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata_dev:

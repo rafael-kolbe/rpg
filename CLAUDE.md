@@ -1,0 +1,131 @@
+# CLAUDE.md
+
+Browser RPG with ATB battles (Final Fantasy 7 style). Story Mode (single-player)
+and Online Mode (co-op); every rule runs on the server.
+
+- **Game design (current, in Portuguese):** `PLAN.md`. Read the relevant section
+  before implementing a feature; it is the source of truth for rules.
+- **Why things are the way they are:** `docs/decisions/` (one ADR per decision).
+- **This file:** where things live and how to work here. Keep it current.
+
+## Where things live
+
+One place per concept. Before creating a file, type or function, search for an
+existing one. When a concept is added or moved, update this table in the same
+change.
+
+| Concept | Location |
+| --- | --- |
+| Wire protocol (client ↔ server messages) | `crates/protocol/src/lib.rs` |
+| Generated TS types of the protocol (never edit) | `web/src/protocol/generated/` |
+| Server entry point, CLI commands | `crates/server/src/main.rs` |
+| Server configuration (env vars) | `crates/server/src/config.rs` |
+| HTTP routes (`/api/*`, static client) | `crates/server/src/http.rs` |
+| Docker healthcheck command | `crates/server/src/healthcheck.rs` |
+| UI text and game text, per language | `locales/<locale>/*.ftl` |
+| i18n runtime in the client | `web/src/i18n/` |
+| API calls from the client | `web/src/api/` |
+| Quality scripts used by `make check` | `scripts/`, `web/scripts/` |
+| Database backup job | `scripts/backup.sh` (run by the `backup` service) |
+
+Planned, created by the phase that needs them (see `PLAN.md` §5 and §9):
+`crates/engine` (pure rules), `crates/content` (+ `content-check`),
+`crates/sim` (CLI), `content/` (game data), `sandbox/` (test scenarios),
+`migrations/` (SQLx).
+
+Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
+`server` → all; `engine` never depends on I/O, network, clock or OS randomness.
+
+## Commands
+
+| Command | What |
+| --- | --- |
+| `make check` | Everything that must pass before a task is done |
+| `make fmt` | Format Rust and web code |
+| `make dev-db` / `make dev-server` / `make dev-web` | Local development with hot reload (db on 5433, server on 3000, Vite on 5173) |
+| `make up` / `make up-d` / `make down` | Production-like stack on http://127.0.0.1:8083 (needs `.env`) |
+| `make protocol-types` | Regenerate TS types after changing `crates/protocol` |
+| `make docs` | Build and open rustdoc for the whole workspace |
+
+`cargo` lives in `~/.cargo/bin`; the Makefile adds it to `PATH`. In a bare
+shell, `source ~/.cargo/env` first.
+
+## Conventions
+
+Everything in the repository is in **English**: code, identifiers, content ids,
+comments, commit messages, docs. Exception: `PLAN.md` (design conversation, in
+Portuguese).
+
+| Where | Convention | Example |
+| --- | --- | --- |
+| Rust types, traits, enum variants | `UpperCamelCase` | `Combatant`, `Status::Distracted` |
+| Rust functions, variables, modules, files | `snake_case` | `apply_damage`, `atb_gauge.rs` |
+| Rust constants | `SCREAMING_SNAKE_CASE` | `TICK_MS` |
+| TS variables, functions | `camelCase` | `selectTarget` |
+| React components and TS types | `PascalCase`, component file `PascalCase.tsx` | `BattleScreen.tsx` |
+| Other TS files | `kebab-case` | `fetch-health.ts` |
+| Content ids | `kebab-case`, unique per kind | `iron-sword`, `forest-wolf` |
+| Fluent message ids | `<kind>-<id>` (+ `.attribute`) | `item-iron-sword`, `ui-server-status` |
+| Postgres tables / columns | `snake_case`, tables plural | `recruits`, `created_at` |
+| Protocol fields / enum values | `camelCase` / `snake_case` on the wire | `{"status": "ok"}` |
+| Commits | Conventional Commits | `feat(engine): add distracted status` |
+
+### Rust
+
+- Idiomatic Rust, not simplified Rust: newtypes for ids, enums with data instead
+  of boolean/`Option` combinations, errors as values (`thiserror` in libraries,
+  `anyhow` in binaries). No `unwrap()`/`expect()` outside tests.
+- **No speculative abstraction.** A trait, generic or layer needs a second real
+  use. One use = concrete code.
+- **`unsafe` is denied workspace-wide.** If truly unavoidable: `#[allow(unsafe_code)]`
+  on the smallest block, a `// SAFETY:` comment with the invariants, an ADR in
+  `docs/decisions/` explaining why no safe alternative works, and a safe wrapper
+  with tests.
+- Lints live in `[workspace.lints]` (`Cargo.toml`): clippy `all` + `pedantic`,
+  `missing_docs`. Fix the code; do not add `#[allow]` without a comment saying
+  why the lint is wrong in that spot.
+- Every module starts with `//!` (what it is, why it exists); every public item
+  has `///`. Link items with `` [`Name`] `` — broken links fail `make check`.
+
+### Web
+
+- TypeScript strict + `noUncheckedIndexedAccess`; oxlint, Prettier, knip.
+- **No user-facing string in code.** Every text is a Fluent message in
+  `locales/en-US` (default) and `locales/pt-BR`, used through `t(id, args)`.
+  The server sends ids + arguments, never translated text.
+- State comes from the server; `localStorage` only for per-browser preferences.
+
+### Comments
+
+Explain **why**, never what, never history ("was X", "changed to Y"). History
+goes to `docs/decisions/`; the current design to `PLAN.md`.
+
+### Tests
+
+- Rust unit tests in the same file (`#[cfg(test)] mod tests`): deleting code
+  deletes its tests.
+- A test covers current behavior. Behavior removed → test removed.
+  `#[ignore]`, `.skip`, `.only`, `.todo` fail `make check`.
+- Name tests as the behavior: `rejects_a_port_that_is_not_a_number`.
+
+## When a decision changes
+
+The **same change** removes the old code, tests, content, translations and
+comments; adds an ADR to `docs/decisions/`; and updates `PLAN.md` and this file.
+`make check` (dead code, unused deps and exports, missing translations) must
+prove nothing was left behind.
+
+## Pending wiring (do it when the trigger happens)
+
+- First `sqlx::query!` → add `cargo sqlx prepare --workspace --check` to
+  `check-rust` and commit `.sqlx/`.
+- First table → create `migrations/`, run `sqlx::migrate!` at server startup.
+- First content file → `crates/content` + `content-check` in `make check`.
+- First sandbox scenario → `sandbox` Cargo feature, `/sandbox/*` client routes,
+  Playwright + `make e2e`.
+
+## Done means
+
+1. `make check` is green.
+2. `CLAUDE.md`, `PLAN.md` and ADRs reflect the change.
+3. No leftovers: old code, stale comments, unused files, skipped tests.

@@ -1,0 +1,77 @@
+# Production-like stack: the built image, no source mounts.
+# Use it through the Makefile (`make up`), which fixes the project name `rpg`
+# and creates the shared `proxy_net` network.
+#
+# Contract with the my-server proxy (nginx/conf.d/13-rpg.conf, once published):
+# container name `rpg_app`, internal port 3000, network `proxy_net`.
+# The published port below is only the loopback shortcut for local testing.
+
+services:
+  app:
+    build: .
+    container_name: rpg_app
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://rpg:${POSTGRES_PASSWORD:?set it in .env}@db:5432/rpg
+    ports:
+      - "127.0.0.1:${LOCAL_PORT:-8083}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - proxy_net
+    healthcheck:
+      # Distroless image: no shell or curl, the binary checks itself.
+      test: ["CMD", "/app/rpg-server", "healthcheck"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  db:
+    image: postgres:17-alpine
+    container_name: rpg_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: rpg
+      POSTGRES_DB: rpg
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set it in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - default # never on proxy_net: only the app talks to the database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rpg -d rpg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backup:
+    image: postgres:17-alpine
+    container_name: rpg_backup
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/scripts/backup.sh"]
+    # Run as the host user so the dumps in ./backups are yours, not root's.
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      POSTGRES_USER: rpg
+      POSTGRES_DB: rpg
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set it in .env}
+    volumes:
+      - ./scripts/backup.sh:/scripts/backup.sh:ro
+      # Outside the database volume on purpose: losing pgdata must not take
+      # the backups with it.
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+
+volumes:
+  pgdata:
+
+networks:
+  proxy_net:
+    external: true

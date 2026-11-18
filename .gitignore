@@ -1,0 +1,17 @@
+# Rust
+/target
+
+# Web
+/web/node_modules
+/web/dist
+
+# Local credentials and data
+.env
+/backups
+
+# Editor / OS
+.DS_Store
+*.swp
+
+# Claude Code personal overrides
+.claude/settings.local.json
