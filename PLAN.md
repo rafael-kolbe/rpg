@@ -204,7 +204,7 @@ emboscar a viagem (ex.: um dragão surgindo do nada no meio do caminho).
   em B causa 2×. O inimigo C segue Distraído até ser atingido ou até a ATB dele
   encher.
 - **Chance de ser emboscado:** base da região/trilha (floresta densa > campo
-  aberto), modificada por atributos da party (SPD, LCK) e por itens e habilidades
+  aberto), modificada por atributos da party (Dexterity, Luck) e por itens e habilidades
   (detalhar quando chegarmos em itens e skills).
 
 **Estruturas de dados que isso exige:**
@@ -288,10 +288,12 @@ animação no modo Ativo.
 ### Barra ATB
 
 ```
-ganho por tick = BASE × (SPD + 50) / 100 × mod_status
+ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
 ```
 
-- `BASE = 2,5%` → com SPD 50 a barra enche em **4 s**; com SPD 100, em ~2,7 s.
+- `BASE = 2,5%` → Dexterity 50 enche a barra em **4 s**; Dexterity 100, em
+  ~2,7 s. Valores calibrados no simulador para a faixa real de Dexterity (1 a
+  255).
 - `mod_status`: Haste = 2, Slow = 0,5, Stop/Sono = 0, normal = 1.
 - Ao agir, a barra volta a 0.
 - Início da batalha: barras começam em valor aleatório de 0–30%.
@@ -316,43 +318,79 @@ ganho por tick = BASE × (SPD + 50) / 100 × mod_status
 | Item | Poção, Éter, Antídoto, Pena de Fênix | Item do inventário |
 | Defender | Recebe 50% de dano até a próxima ação | — |
 | Limit | Golpe especial quando a barra de Limit está cheia | Barra de Limit |
-| Fugir | Chance pela SPD média da party contra a dos inimigos | Indisponível contra chefe |
+| Fugir | Chance pela Dexterity média da party contra a dos inimigos | Indisponível contra chefe |
 
 A barra de **Limit** enche com o dano recebido (`dano / HP máx × 100%`). Cheia, o
 comando Atacar vira Limit até ser usado.
 
+### Atributos
+
+**Modelo do FF7**, que já foi desenhado para ATB e turnos. Atributos **não**
+entram na Mastery Tree.
+
+| Atributo primário (1–255) | Alimenta |
+| --- | --- |
+| Strength | Attack = Strength + arma |
+| Dexterity | Velocidade da ATB, acerto e esquiva |
+| Vitality | Defense = Vitality + armadura |
+| Magic | Magic Attack, força de cura |
+| Spirit | Magic Defense = Spirit + armadura |
+| Luck | Chance de crítico, resistência a status, roubo |
+
+- **HP** (até 9999) e **MP** (até 999) crescem pela curva da classe, não por
+  pontos.
+- **Heróis da história:** curvas fixas por classe, sem aleatoriedade.
+- **Guerreiros recrutados:** pontos para distribuir a cada nível, com **custo
+  crescente** (estilo Ragnarok Online): subir um atributo custa mais quanto mais
+  alto ele já está, o que impede jogar tudo num atributo só. O total por nível é
+  calibrado para que um recruta no nível 99 tenha a mesma soma de atributos que
+  um herói.
+- **Sources** (itens que dão +1 permanente num atributo, como no FF7): só no
+  **late game, depois do nível 99**, e com **limite** por atributo e total,
+  calculado para não repetir o "farm até 255 em tudo" do FF7. É uma atividade a
+  mais para o fim do jogo.
+
 ### Dano
 
+Estrutura do FF7, em aritmética inteira:
+
 ```
-dano = (ATK × potência − DEF × 0,5) × variação[0,9 ; 1,1] × elemento × crítico
+físico   base = Attack + ⌊(Attack + Nível) / 32⌋ × ⌊(Attack × Nível) / 32⌋
+mágico   base = 6 × (Magic Attack + Nível)
+dano     = Poder × (512 − Defesa) × base / (16 × 512)
+         × variação [3841..4096] / 4096 × elemento × multiplicador
 ```
 
-- Mágico usa MAG / MDEF no lugar de ATK / DEF.
-- Elemento: fraqueza 2×, resistência 0,5×, imune 0.
-- Crítico: 1,5×, chance `5% + LCK / 4`.
-- Mínimo de 1 de dano. Cura usa `MAG × potência × variação`.
-- **Tudo em inteiros** (porcentagens em pontos-base, ex.: 2,5% = 250/10000) para a
-  simulação ser determinística em qualquer máquina.
+- **Poder:** força da ação (ataque normal = 16; magias e habilidades com valores
+  próprios).
+- **Defesa** (Defense ou Magic Defense) vai de 0 a 511; 512 seria imunidade, e
+  equipamento e status respeitam esse teto.
+- **Elemento:** fraqueza 2×, resistência 0,5×, imune 0.
+- **Multiplicador:** crítico (2×) e Distraído (2×) **não se somam: vale o
+  maior**. Um golpe nunca passa de 2× por esses dois.
+- **Crítico:** chance a partir de Luck, nível do atacante contra o do alvo, e
+  bônus da arma; fontes de crítico em equipamento têm teto (sem empilhar como o
+  Luck Plus do FF7).
+- **Cura:** `Poder × 22 + (Nível + Magic) × 6`, sem defesa.
+- **Gravity** (elemento): dano em **% do HP atual** do alvo; chefes resistem ou
+  são imunes.
+- **Teto de dano: 9999.** Calibrado para que **mesmo com crítico** seja
+  praticamente impossível um personagem chegar a 9999 num monstro. Chefes de
+  raid e monstros muito fortes **podem** causar 9999.
+- **Barrier / Magic Barrier:** reduzem à metade o dano físico / mágico recebido;
+  a defesa contra golpes que matariam de uma vez.
+- **PvP (futuro):** redução de dano em % entre jogadores, para que 9999 de HP
+  faça sentido.
+- Mínimo de 1 de dano. **Tudo em inteiros** (porcentagens em pontos-base, ex.:
+  2,5% = 250/10000) para a simulação ser determinística.
 
-### Atributos e status
+### Status
 
-**Atributos: modelo do FF7**, que já foi desenhado para ATB e turnos (o
-balanceamento de atributos e monstros fica melhor assim):
-
-- **Primários:** Strength, Dexterity, Vitality, Magic, Spirit, Luck, mais HP e
-  MP.
-- **Derivados:** Attack, Defense, Magic Attack, Magic Defense (primário +
-  equipamento).
-- Dexterity governa a velocidade da ATB; Luck, críticos e esquivas.
-- Atributos **não** entram na Mastery Tree.
-
-As fórmulas desta seção ainda usam nomes provisórios (SPD = Dexterity, ATK/DEF =
-derivados) e serão refeitas no tópico de atributos e progressão.
-
-**Status:** Veneno (−5% HP a cada 3 s), Sono (barra para até levar dano),
-Silêncio (sem Magia), Haste, Slow, Proteção (DEF +50%), Regen, **Distraído**
-(próximo golpe recebido causa 2×; acaba ao ser atingido ou com a ATB em 100%;
-aplicado pela emboscada e, no futuro, por habilidades — ex.: inimigo psíquico).
+Veneno (−5% HP a cada 3 s), Sono (barra para até levar dano), Silêncio (sem
+Magia), Haste, Slow, Barrier (dano físico −50%), Magic Barrier (dano mágico
+−50%), Regen, **Distraído** (próximo golpe recebido causa 2×; acaba ao ser
+atingido ou com a ATB em 100%; aplicado pela emboscada e, no futuro, por
+habilidades — ex.: inimigo psíquico).
 
 O efeito visual do Distraído é o avatar virado de costas: como os avatares são
 montados por peças, cada um ganha uma variante "de costas" gerada pelas mesmas
@@ -366,7 +404,7 @@ Cada inimigo tem uma tabela de regras avaliada quando a barra dele enche:
 // exemplo
 [
   { se: "hp < 30%",            faz: "Cura",   alvo: "self" },
-  { se: "heroi com Proteção",  faz: "Dispel", alvo: "esse heroi" },
+  { se: "heroi com Barrier",   faz: "Dispel", alvo: "esse heroi" },
   { peso: 70,                  faz: "Atacar", alvo: "heroi com menos HP" },
   { peso: 30,                  faz: "Fogo",   alvo: "heroi aleatorio" },
 ]
@@ -431,9 +469,9 @@ desenho próprios.
 
 | Classe | Papel | Atributos fortes | Habilidades (nível 1 / 5 / 10) | Limit |
 | --- | --- | --- | --- | --- |
-| Guerreiro | Tanque e dano físico | HP, ATK, DEF | Provocar / Golpe duplo / Quebra-armadura | Lâmina Cruzada: 3 golpes num alvo |
-| Mago | Dano mágico em área | MAG, MP | Fogo, Gelo, Raio / Fogo em área / Silêncio | Meteoro: dano em todos os inimigos |
-| Clérigo | Cura e suporte | MDEF, MAG, SPD | Cura, Proteção / Regen, Esuna / Haste, Reviver | Bênção: cura total da party |
+| Guerreiro | Tanque e dano físico | HP, Strength, Vitality | Provocar / Golpe duplo / Quebra-armadura | Lâmina Cruzada: 3 golpes num alvo |
+| Mago | Dano mágico em área | Magic, MP | Fogo, Gelo, Raio / Fogo em área / Silêncio | Meteoro: dano em todos os inimigos |
+| Clérigo | Cura e suporte | Spirit, Magic, Dexterity | Cura, Barrier / Regen, Esuna / Haste, Reviver | Bênção: cura total da party |
 
 **Inimigos (MVP):** ~8 tipos em 3 famílias (bestas, mortos-vivos, elementais),
 cada um com uma fraqueza elemental e uma regra de IA marcante, mais 1 chefe com 2
@@ -789,7 +827,7 @@ jogo.
   | --- | --- |
   | `battle-basic` | 3v3 simples: ATB, comandos, dano |
   | `ambush-player` / `ambush-enemy` | Emboscadas e o status Distracted |
-  | `atb-speeds` | Combatentes com SPD muito diferentes, Haste/Slow |
+  | `atb-speeds` | Combatentes com Dexterity muito diferente, Haste/Slow |
   | `status-showcase` | Cada status aplicado de uma vez |
   | `boss-phases` | Troca de tabela de IA por fase de HP |
   | `map-fog` | Instância pequena com fog of war e trilhas bloqueadas |
@@ -1042,7 +1080,7 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Penalidade por morte (XP, dinheiro, itens?) — decidir mais tarde.
 - [ ] Modo Online: o que move o jogo (missões da Guilda, exploração livre, chefes, eventos, outros) — detalhar no futuro.
 - [ ] Itens raros encaixáveis em equipamento (estilo cartas do Ragnarok Online): decidir depois do balanceamento.
-- [ ] Atributos no modelo do FF7: fórmulas, curvas de crescimento por classe, pontos por nível dos recrutas — tópico próprio.
+- [ ] Números de atributos (curvas por classe, pontos por nível dos recrutas, tabela de custo, limites de Sources, Poder de cada ação, teto de crítico): calibrar no simulador.
 - [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
