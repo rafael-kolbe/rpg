@@ -22,14 +22,22 @@ ui-sandbox-scenarios = Cenários do sandbox
 ui-battle-connecting = Conectando…
 ui-battle-disconnected = Conexão perdida. Recarregue a página.
 ui-command-attack = Atacar
-ui-command-limit = Limit
 ui-command-magic = Magia
-ui-command-ability = Habilidade
+ui-command-technic = Técnica
 ui-command-item = Item
-ui-command-defend = Defender
 ui-command-back = Voltar
 ui-command-choose-target = Escolha um alvo
 ui-command-waiting = Aguardando um turno…
+ui-battle-keys = ↑↓ escolher · Enter/Z confirmar (segurar: repetir a última) · Esc/X voltar · ← defender · Tab próximo herói · M memória
+ui-battle-sound = Som: { $state ->
+    [on] ligado
+   *[off] desligado
+}
+ui-battle-memory = Memória de ação: { $state ->
+    [on] ligada
+   *[off] desligada
+}
+ui-intent-defend = Defender
 ui-stat-hp = HP
 ui-stat-mp = MP
 ui-mp-cost = { $cost } MP
@@ -80,6 +88,7 @@ ui-debug-speed = Velocidade
 ui-debug-time-mode = Tempo
 ui-time-active = Ativo
 ui-time-wait = Espera
+ui-time-turn = Por turno
 ui-debug-auto = Batalha automática
 ui-debug-restart = Reiniciar
 ui-debug-fill = ATB
@@ -108,7 +117,6 @@ ui-log-status-lose = { $target } perde { $status }
 ui-log-resist = { $target } resiste a { $status }
 ui-log-immune = { $target } é imune a { $status }
 ui-log-defend = { $actor } defende
-ui-log-limit = { $actor }: Limit pronto
 ui-log-knocked-out = { $target } foi nocauteado
 ui-log-failed = { $actor } falha em { $action }
 ui-log-cancelled = { $actor } cancela { $action }

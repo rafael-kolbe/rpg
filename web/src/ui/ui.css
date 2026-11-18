@@ -59,8 +59,12 @@
   background: #d6d9e8;
 }
 
-.gauge--limit > span {
-  background: #d36ad1;
+.gauge--hp > span {
+  background: #5fc46a;
+}
+
+.gauge--mp > span {
+  background: #5d8fe0;
 }
 
 .gauge--highlight > span {
@@ -77,6 +81,11 @@
   cursor: pointer;
 }
 
+.button--pressed {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
 .button:disabled {
   color: var(--color-muted);
   cursor: default;
@@ -90,4 +99,12 @@
 
 .field__label {
   color: var(--color-muted);
+}
+
+.menu-list__entry--cursor {
+  background: rgb(255 255 255 / 12%);
+}
+
+.menu-list__entry--cursor > span:first-child::before {
+  content: '▶ ';
 }

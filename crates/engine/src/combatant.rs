@@ -5,12 +5,11 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use crate::action::{Affinity, Element};
-use crate::ai::AiProfile;
-use crate::atb::ATB_FULL;
+use crate::ai::{AiProfile, Intent};
 use crate::ids::{ActionId, CombatantId, Side};
 use crate::setup::CombatantSetup;
 use crate::stats::Stats;
-use crate::status::{ActiveStatus, StatusKind};
+use crate::status::{ActiveStatus, StatusKind, StatusTimer};
 use utils::numbers::saturating_u16;
 
 /// Where a combatant is in its turn cycle.
@@ -35,7 +34,6 @@ pub struct Combatant {
     pub(crate) stats: Stats,
     pub(crate) attack: ActionId,
     pub(crate) actions: Vec<ActionId>,
-    pub(crate) limit: Option<ActionId>,
     pub(crate) affinities: BTreeMap<Element, Affinity>,
     pub(crate) status_immunities: Vec<StatusKind>,
     pub(crate) ai: Option<AiProfile>,
@@ -45,11 +43,11 @@ pub struct Combatant {
     pub(crate) mp: u16,
     /// ATB gauge, `0..=ATB_FULL`.
     pub(crate) atb: u32,
-    /// Limit gauge, `0..=ATB_FULL`.
-    pub(crate) limit_gauge: u32,
     pub(crate) state: TurnState,
     pub(crate) statuses: Vec<ActiveStatus>,
     pub(crate) defending: bool,
+    /// Engine-controlled only: the command chosen for its next turn.
+    pub(crate) intent: Option<Intent>,
 }
 
 impl Combatant {
@@ -68,16 +66,15 @@ impl Combatant {
             stats: setup.stats,
             attack: setup.attack,
             actions: setup.actions,
-            limit: setup.limit,
             affinities: setup.affinities,
             status_immunities: setup.status_immunities,
             ai: setup.ai,
             player_controlled,
             atb: 0,
-            limit_gauge: 0,
             state: TurnState::Charging,
             statuses: Vec::new(),
             defending: false,
+            intent: None,
         }
     }
 
@@ -117,12 +114,6 @@ impl Combatant {
         &self.actions
     }
 
-    /// Its Limit, if it has one.
-    #[must_use]
-    pub fn limit_action(&self) -> Option<&ActionId> {
-        self.limit.as_ref()
-    }
-
     /// Current HP.
     #[must_use]
     pub fn hp(&self) -> u16 {
@@ -135,16 +126,10 @@ impl Combatant {
         self.mp
     }
 
-    /// ATB gauge, `0..=`[`ATB_FULL`].
+    /// ATB gauge, `0..=`[`ATB_FULL`](crate::ATB_FULL).
     #[must_use]
     pub fn atb(&self) -> u32 {
         self.atb
-    }
-
-    /// Limit gauge, `0..=`[`ATB_FULL`]. Always 0 for combatants without a Limit.
-    #[must_use]
-    pub fn limit_gauge(&self) -> u32 {
-        self.limit_gauge
     }
 
     /// Where it is in its turn cycle.
@@ -159,9 +144,11 @@ impl Combatant {
         self.defending
     }
 
-    /// Statuses currently on it.
-    pub fn statuses(&self) -> impl Iterator<Item = StatusKind> + '_ {
-        self.statuses.iter().map(|status| status.kind)
+    /// Statuses currently on it, with the time left on timed ones.
+    pub fn statuses(&self) -> impl Iterator<Item = (StatusKind, Option<StatusTimer>)> + '_ {
+        self.statuses
+            .iter()
+            .map(|status| (status.kind, status.timer))
     }
 
     /// Whether it has the given status.
@@ -187,10 +174,6 @@ impl Combatant {
     pub(crate) fn hp_percent(&self) -> u16 {
         let percent = u32::from(self.hp) * 100;
         saturating_u16(u64::from(percent.div_ceil(u32::from(self.stats.max_hp))))
-    }
-
-    pub(crate) fn has_full_limit(&self) -> bool {
-        self.limit.is_some() && self.limit_gauge >= ATB_FULL
     }
 
     /// Back to an empty gauge after acting, defending or falling asleep.

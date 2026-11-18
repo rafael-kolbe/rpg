@@ -95,7 +95,8 @@ pub enum ServerMessage {
     },
 }
 
-/// Active or Wait (see `PLAN.md` §3 "Modos de tempo").
+/// How time flows around the player's choices (see `PLAN.md` §3 "Modos de
+/// tempo"). Wait and Turn are single-player only.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "snake_case")]
 #[ts(export)]
@@ -103,8 +104,10 @@ pub enum TimeMode {
     /// Time never stops.
     #[default]
     Active,
-    /// Time stops while the player is in a submenu (single-player only).
+    /// Time stops while the player is in a submenu.
     Wait,
+    /// Time stops whenever a hero waits for the player's command.
+    Turn,
 }
 
 /// Sandbox debug tools.

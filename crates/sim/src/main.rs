@@ -180,7 +180,6 @@ fn describe(battle: &Battle, event: &BattleEvent) -> Option<String> {
         } => {
             format!("{} cancels {action} ({reason:?})", n(*actor))
         }
-        BattleEvent::LimitReady { combatant } => format!("{} limit ready", n(*combatant)),
         BattleEvent::KnockedOut { combatant } => format!("{} is knocked out", n(*combatant)),
         BattleEvent::BattleEnded { outcome } => format!("battle ended: {outcome:?}"),
         BattleEvent::TurnReady { .. } | BattleEvent::ActionQueued { .. } => return None,

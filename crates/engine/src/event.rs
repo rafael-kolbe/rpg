@@ -158,11 +158,6 @@ pub enum BattleEvent {
         /// Why it ended.
         reason: StatusEndReason,
     },
-    /// The Limit gauge filled: the next Attack is the Limit.
-    LimitReady {
-        /// Who.
-        combatant: CombatantId,
-    },
     /// HP reached 0. Statuses are cleared and queued actions cancelled.
     KnockedOut {
         /// Who.

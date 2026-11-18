@@ -7,9 +7,11 @@ import type { CommandKind } from '../protocol/generated/CommandKind.ts'
 import { useTranslation } from '../i18n/use-translation.ts'
 import { MenuList, type MenuEntry } from '../ui/MenuList.tsx'
 import { Window } from '../ui/Window.tsx'
+import { rememberedEntry, type RememberedCommand } from './action-memory.ts'
+import { usableAction } from './commands.ts'
 
 /** Where the player is in the command menu. */
-export type MenuLevel = 'root' | 'magic' | 'ability' | 'item'
+export type MenuLevel = 'root' | 'magic' | 'technic' | 'item'
 
 /** A command waiting for its target. */
 export interface PendingCommand {
@@ -23,15 +25,21 @@ interface Props {
   catalog: Catalog
   level: MenuLevel
   pending: PendingCommand | null
+  /** Action memory: where the cursor starts. */
+  remembered: RememberedCommand | null
   onLevel: (level: MenuLevel) => void
   onChoose: (kind: CommandKind, action: ActionInfo | null) => void
   onCancel: () => void
 }
 
-/** The command window (bottom left): Attack, Magic, Ability, Item, Defend. */
+/**
+ * The command window (bottom left): Attack, Magic, Technic, Item. Defend has
+ * no entry: it is the ← key on the root menu.
+ * The keyboard drives it except while a target is being chosen.
+ */
 export function CommandMenu(props: Props) {
   const { t } = useTranslation()
-  const { actor, pending, level, onCancel, onLevel } = props
+  const { actor, pending, level, remembered, catalog, onCancel, onLevel } = props
 
   if (actor === null) {
     return <Window className="command-menu--idle">{t('ui-command-waiting')}</Window>
@@ -45,10 +53,10 @@ export function CommandMenu(props: Props) {
   let entries: MenuEntry[]
   if (pending !== null) {
     entries = [{ ...back, onSelect: onCancel }]
-  } else if (level === 'magic' || level === 'ability') {
+  } else if (level === 'magic' || level === 'technic') {
     entries = [...actionEntries(props, actor, level, t), back]
   } else if (level === 'item') {
-    entries = [...itemEntries(props, t), back]
+    entries = [...itemEntries(props, actor, t), back]
   } else {
     entries = rootEntries(props, actor, t)
   }
@@ -56,7 +64,13 @@ export function CommandMenu(props: Props) {
   return (
     <Window testId="command-menu">
       {pending !== null && <p>{t('ui-command-choose-target')}</p>}
-      <MenuList entries={entries} />
+      <MenuList
+        key={`${actor.id}-${level}-${pending === null ? 'menu' : 'target'}`}
+        entries={entries}
+        keyboard={pending === null}
+        onCancel={level === 'root' ? undefined : () => onLevel('root')}
+        initialKey={rememberedEntry(remembered, level, catalog)}
+      />
     </Window>
   )
 }
@@ -65,16 +79,14 @@ type Translate = ReturnType<typeof useTranslation>['t']
 
 function rootEntries(props: Props, actor: CombatantState, t: Translate): MenuEntry[] {
   const { catalog, onChoose, onLevel } = props
-  const limitReady = actor.limit !== null && actor.limit >= actor.atbFull
-  const attackId = limitReady && actor.limitAction ? actor.limitAction : actor.attack
-  const attack = catalog.actions[attackId]
+  const attack = catalog.actions[actor.attack]
   const knows = (category: ActionInfo['category']) =>
     actor.actions.some((id) => catalog.actions[id]?.category === category)
 
   const entries: MenuEntry[] = [
     {
       key: 'attack',
-      label: limitReady ? t('ui-command-limit') : t('ui-command-attack'),
+      label: t('ui-command-attack'),
       disabled: !attack,
       onSelect: () => attack && onChoose({ type: 'attack' }, attack),
     },
@@ -82,56 +94,53 @@ function rootEntries(props: Props, actor: CombatantState, t: Translate): MenuEnt
   if (knows('magic')) {
     entries.push({ key: 'magic', label: t('ui-command-magic'), onSelect: () => onLevel('magic') })
   }
-  if (knows('ability')) {
+  if (knows('technic')) {
     entries.push({
-      key: 'ability',
-      label: t('ui-command-ability'),
-      onSelect: () => onLevel('ability'),
+      key: 'technic',
+      label: t('ui-command-technic'),
+      onSelect: () => onLevel('technic'),
     })
   }
-  entries.push(
-    { key: 'item', label: t('ui-command-item'), onSelect: () => onLevel('item') },
-    {
-      key: 'defend',
-      label: t('ui-command-defend'),
-      onSelect: () => onChoose({ type: 'defend' }, null),
-    },
-  )
+  entries.push({ key: 'item', label: t('ui-command-item'), onSelect: () => onLevel('item') })
   return entries
 }
 
 function actionEntries(
-  { catalog, onChoose }: Props,
+  { state, catalog, onChoose }: Props,
   actor: CombatantState,
-  category: 'magic' | 'ability',
+  category: 'magic' | 'technic',
   t: Translate,
 ): MenuEntry[] {
-  const silenced = category === 'magic' && actor.statuses.includes('silence')
   return actor.actions.flatMap((id: ActionId) => {
     const action = catalog.actions[id]
     if (action?.category !== category) return []
+    const kind: CommandKind = { type: 'action', id }
     return [
       {
         key: id,
         label: t(`action-${id}`),
         detail: action.mpCost > 0 ? t('ui-mp-cost', { cost: action.mpCost }) : undefined,
-        disabled: silenced || action.mpCost > actor.mp,
-        onSelect: () => onChoose({ type: 'action', id }, action),
+        disabled: usableAction(kind, actor, state, catalog) === null,
+        onSelect: () => onChoose(kind, action),
       },
     ]
   })
 }
 
-function itemEntries({ state, catalog, onChoose }: Props, t: Translate): MenuEntry[] {
+function itemEntries(
+  { state, catalog, onChoose }: Props,
+  actor: CombatantState,
+  t: Translate,
+): MenuEntry[] {
   return state.inventory.map(({ item, count }) => {
-    const info = catalog.items[item]
-    const action = info ? catalog.actions[info.action] : undefined
+    const kind: CommandKind = { type: 'item', id: item }
+    const action = usableAction(kind, actor, state, catalog)
     return {
       key: item,
       label: t(`item-${item}`),
       detail: t('ui-item-count', { count }),
-      disabled: count === 0 || !action,
-      onSelect: () => action && onChoose({ type: 'item', id: item }, action),
+      disabled: action === null,
+      onSelect: () => action && onChoose(kind, action),
     }
   })
 }

@@ -53,9 +53,12 @@ impl Session {
 
     /// Whether time flows on this tick.
     pub(crate) fn running(&self) -> bool {
-        self.battle.outcome().is_none()
-            && !self.paused
-            && !(self.time_mode == TimeMode::Wait && self.held)
+        let waiting_for_player = match self.time_mode {
+            TimeMode::Active => false,
+            TimeMode::Wait => self.held,
+            TimeMode::Turn => self.battle.awaiting_command().next().is_some(),
+        };
+        self.battle.outcome().is_none() && !self.paused && !waiting_for_player
     }
 
     pub(crate) fn state(&self) -> BattleState {
@@ -428,6 +431,25 @@ mod tests {
 
         connection.handle(&state, ClientMessage::Hold { held: false });
         assert!(connection.tick().is_some());
+    }
+
+    #[tokio::test]
+    async fn turn_mode_stops_time_while_a_hero_waits_for_a_command() {
+        let state = sandbox_state();
+        let mut connection = Connection::new();
+        start(&mut connection, &state);
+        connection.handle(
+            &state,
+            ClientMessage::SetTimeMode {
+                mode: TimeMode::Turn,
+            },
+        );
+
+        let session = connection.session.as_mut().unwrap();
+        while session.battle.awaiting_command().next().is_none() {
+            session.battle.step();
+        }
+        assert!(connection.tick().is_none());
     }
 
     #[tokio::test]

@@ -102,7 +102,7 @@ Mapa-múndi  ──clica na cidade──▶  Mapa da cidade  ──clica na Loja
 | Mapa da cidade | Visão detalhada da cidade, ainda de cima | Locais clicáveis: Loja de Armas, Loja de Poções, Guilda de Aventureiros, Hotel, Casas, entrada de Calabouço… cada um abre uma janela de interface ou uma cena de diálogo |
 | Instância (campo, floresta, calabouço, zona de exploração…) | A área daquela peça do mapa-múndi vista de perto | Pontos ligados por trilhas **tracejadas**, algumas bloqueadas até ter um item, quest ou evento; pontos de batalha, baú, NPC, saída, chefe |
 | Cena de diálogo | Fundo do local (interior da casa, caverna, floresta) + avatar do NPC num canto + caixa de diálogo embaixo, estilo visual novel | O avatar do jogador **nunca** aparece; escolhas de resposta na própria caixa |
-| Batalha | Party de um lado, inimigos do outro, avatares estáticos; menu embaixo no estilo FF7 (design próprio) | Comandos no menu; barras ATB ao lado de cada herói |
+| Batalha | Party de um lado, inimigos do outro, avatares estáticos; menu embaixo no estilo FF7 (design próprio) | Comandos no menu, por teclado ou mouse; barras de HP/MP/ATB de heróis e inimigos |
 | Janelas de menu | Abrem por cima do mapa: Status/Atributos, Habilidades, Inventário, Equipamento | Interface pura; disponíveis fora de batalha |
 
 ### Mundo, instâncias e fog of war
@@ -221,16 +221,64 @@ emboscar a viagem (ex.: um dragão surgindo do nada no meio do caminho).
 ```
 ┌──────────────────────────────────────────────────────────┐
 │   [avatar] Lobo                           Kael [avatar]   │
-│            ▓▓▓▓▓▓░░                   ▓▓▓▓▓▓▓▓            │
+│   HP ▓▓▓▓▓▓░░ ATB ▓▓░░                                    │
 │   [avatar] Lobo         ⚔ ← corte     Lyra [avatar]       │
 │   [avatar] Serpente                  Doran [avatar]       │
 ├──────────────────────┬───────────────────────────────────┤
 │ ▶ Atacar             │ Kael   HP 312/400  MP 20  [ATB▓▓▓░] │
-│   Habilidade         │ Lyra   HP 180/220  MP 64  [ATB▓▓▓▓] │
-│   Item               │ Doran  HP 410/410  MP 12  [ATB▓░░░] │
-│   Defender           │                                     │
+│   Magia              │ Lyra   HP 180/220  MP 64  [ATB▓▓▓▓] │
+│   Técnica            │ Doran  HP 410/410  MP 12  [ATB▓░░░] │
+│   Item               │                                     │
 └──────────────────────┴───────────────────────────────────┘
 ```
+
+Os números de HP/MP da party têm uma barra logo abaixo. **Inimigos mostram HP,
+MP (quando têm) e ATB**, números e barras, embaixo do avatar.
+
+**Números** (dano, cura, MP) nascem no centro do avatar, sobem e somem de uma
+vez, sem fade, com contorno preto grosso. Cor pelo que causou: branco físico,
+vermelho crítico, laranja fogo, azul-claro gelo (o gelo é o
+elemento água; não haverá um "água" separado), amarelo raio, roxo escuro
+gravidade (trevas), roxo veneno, verde cura, azul MP. Elementos futuros:
+verde-claro vento, marrom-claro terra, amarelo-claro luz.
+
+**Status** aparecem embaixo do avatar como **ícones SVG próprios** em quadradinhos
+(o nome fica no tooltip). Em todo status com duração, a **borda do quadrado é
+um relógio**: começa cheia e vai sumindo em sentido horário a partir do topo
+conforme o tempo acaba. Positivos têm borda azul; negativos, vermelha. Status
+sem duração (Distraído) ficam com a borda cheia.
+
+**Controles:** teclado e mouse, os dois sempre válidos. Teclado: ↑↓ move o
+cursor do menu, Enter/Z confirma, Esc/X volta, Tab passa para o próximo herói
+pronto; na escolha de alvo as setas trocam o alvo (curas começam no próprio
+herói, ataques no primeiro inimigo vivo).
+
+**Memória de ação** (opção na tela de batalha, botão ou tecla M; preferência do
+navegador): cada herói lembra o último comando e alvo. Ligada, o menu do herói
+abre com o cursor nesse comando, o submenu no mesmo feitiço/item e a seleção de
+alvo no mesmo alvo (ou no primeiro válido, se ele caiu). **Segurar Z/Enter**
+repete o último comando de uma vez, alvo incluído; segurando direto, cada herói
+que fica pronto repete o seu. Desligada, segurar não faz nada.
+
+**Intenção do inimigo:** cada inimigo escolhe a próxima ação **assim que
+começa a carregar a ATB** e a anuncia por inteiro: o **nome da ação** aparece
+embaixo dele ("Mordida", "Fogo", "Poção") e uma **linha vermelha tracejada**
+corre dele até cada alvo (uma por alvo numa ação em área; nenhuma quando o alvo
+é ele mesmo). Nada fica em surpresa: saber o golpe pesa mais na decisão do que
+adivinhar. Se a
+escolha deixa de ser possível no meio do caminho (alvo caiu, MP acabou), ele
+escolhe de novo. Ao encher a ATB, executa o que anunciou. Dá ao jogador tempo
+de reagir: curar, defender o alvo, derrubar o inimigo antes.
+
+**Sons:** cada tipo de ação tem seu efeito sonoro, sintetizado no navegador
+(sem arquivos): golpe, crítico, errou, fogo, gelo, raio, gravidade, veneno,
+cura, reviver, status, defender, item, nocaute, turno do herói, vitória e
+derrota. Opção liga/desliga na tela de batalha (preferência do navegador).
+
+**Fila de turnos:** o menu atende os heróis na ordem em que a ATB deles encheu.
+Quem fica pronto depois espera na fila (a barra fica destacada no painel) e
+nunca toma o menu de quem está escolhendo; só Tab, ou o clique no painel, passa
+para outro herói pronto.
 
 Avatares **não se movem**. Os únicos efeitos são de ataque e habilidade,
 desenhados **sobre o avatar alvo**: corte de espada, flecha cravando, chamas,
@@ -288,12 +336,13 @@ animação no modo Ativo.
 ### Barra ATB
 
 ```
-ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
+ganho por tick = BASE × (min(Dexterity, 255) + 155) / 205 × mod_status
 ```
 
-- `BASE = 2,5%` → Dexterity 50 enche a barra em **4 s**; Dexterity 100, em
-  ~2,7 s. Valores calibrados no simulador para a faixa real de Dexterity (1 a
-  255).
+- `BASE = 1,25%` → Dexterity 50 enche a barra em **8 s**; Dexterity 100, em
+  ~6,5 s; Dexterity 1, em ~10,6 s. **Teto: Dexterity 255 enche em 4 s**, e nada
+  acima disso acelera mais (com Haste, 2 s). Vale igual para heróis e inimigos:
+  tempo de sobra para decidir sem a batalha arrastar.
 - `mod_status`: Haste = 2, Slow = 0,5, Stop/Sono = 0, normal = 1.
 - Ao agir, a barra volta a 0.
 - Início da batalha: barras começam em valor aleatório de 0–30%.
@@ -306,6 +355,11 @@ ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
 - **Ativo:** o tempo nunca para, nem com menu aberto. Único modo do multiplayer.
 - **Espera:** o tempo pausa enquanto o jogador navega em submenus (Magia, Item).
   Só no single-player — online, um jogador não pode congelar a party.
+- **Por turno:** o tempo pausa sempre que um herói está pronto esperando o
+  comando do jogador; nada anda (barras, fila de ações) até ele confirmar. Para
+  quem quer pensar com calma. Só no Modo História (no sandbox é uma opção do
+  painel); online fica fora pelo mesmo motivo da Espera, e porque o desafio do
+  online é justamente decidir sob pressão junto com os outros.
 - **Velocidade:** multiplicador global de 0,5× a 2× nas opções (só no Modo História).
 
 ### Comandos
@@ -314,15 +368,18 @@ ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
 | --- | --- | --- |
 | Atacar | Dano físico num alvo | — |
 | Magia | Dano elemental, cura ou status | MP |
-| Habilidade | Técnica da classe (Provocar, Roubar, Golpe duplo…) | MP ou cooldown |
+| Técnica | Habilidade física da classe (Provocar, Roubar, Golpe Gêmeo…) | MP ou cooldown |
 | Item | Poção, Éter, Antídoto, Pena de Fênix | Item do inventário |
-| Defender | Recebe 50% de dano até a próxima ação | — |
-| Limit | Golpe especial quando a barra de Limit está cheia | Barra de Limit |
+| Defender | Recebe 50% de dano até a próxima ação. **Fora do menu:** tecla ← no menu principal (atalho de quem sabe; quase nunca vale um turno) | — |
 
 **Não existe fuga:** toda batalha vai até a vitória ou a derrota.
 
-A barra de **Limit** enche com o dano recebido (`dano / HP máx × 100%`). Cheia, o
-comando Atacar vira Limit até ser usado.
+**Item esgotado:** durante a batalha ele continua na lista do comando Item com
+`×0` (desabilitado), como aviso de que acabou. Ao salvar o inventário depois da
+batalha, itens com 0 saem da lista e não aparecem na próxima.
+
+Não existe Limit (ver `docs/decisions/0003-no-limit-technic-command.md`); um
+golpe especial próprio fica para desenhar depois.
 
 ### Atributos
 
@@ -485,11 +542,11 @@ desenho próprios.
 
 ### Classes iniciais (rascunho)
 
-| Classe | Papel | Atributos fortes | Habilidades (nível 1 / 5 / 10) | Limit |
-| --- | --- | --- | --- | --- |
-| Guerreiro | Tanque e dano físico | HP, Strength, Vitality | Provocar / Golpe duplo / Quebra-armadura | Lâmina Cruzada: 3 golpes num alvo |
-| Mago | Dano mágico em área | Magic, MP | Fogo, Gelo, Raio / Fogo em área / Silêncio | Meteoro: dano em todos os inimigos |
-| Clérigo | Cura e suporte | Spirit, Magic, Dexterity | Cura, Barrier / Regen, Esuna / Haste, Reviver | Bênção: cura total da party |
+| Classe | Papel | Atributos fortes | Técnicas e magias (nível 1 / 5 / 10) |
+| --- | --- | --- | --- |
+| Guerreiro | Tanque e dano físico | HP, Strength, Vitality | Provocar / Golpe Gêmeo / Quebra-armadura |
+| Mago | Dano mágico em área | Magic, MP | Fogo, Gelo, Raio / Fogo em área / Silêncio |
+| Clérigo | Cura e suporte | Spirit, Magic, Dexterity | Cura, Barrier / Regen, Esuna / Haste, Reviver |
 
 **Inimigos (MVP):** ~8 tipos em 3 famílias (bestas, mortos-vivos, elementais),
 cada um com uma fraqueza elemental e uma regra de IA marcante, mais 1 chefe com 2
@@ -1118,5 +1175,6 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
+- [ ] Golpe especial próprio no lugar do Limit (que foi removido): desenhar uma mecânica nossa.
 - [ ] Nome do jogo.
 - [ ] Contas (necessárias desde o Modo História): login próprio, magic link por e-mail, login com Google/Discord?

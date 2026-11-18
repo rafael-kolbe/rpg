@@ -12,10 +12,10 @@ interface Props {
   send: (message: ClientMessage) => void
 }
 
-/** Pause, step, speed and Active/Wait. */
+/** Pause, step, speed and time mode (Active, Wait, Turn). */
 export function TimeControls({ state, send }: Props) {
   const { t } = useTranslation()
-  const modes: TimeMode[] = ['active', 'wait']
+  const modes: TimeMode[] = ['active', 'wait', 'turn']
   return (
     <div className="debug-panel__row">
       <Button

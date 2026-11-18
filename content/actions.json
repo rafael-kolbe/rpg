@@ -68,14 +68,15 @@
     "effect": { "type": "apply_status", "status": "haste", "durationTicks": 300 }
   },
   "poison-fang": {
-    "category": "ability",
+    "category": "technic",
     "target": "single_enemy",
     "durationTicks": 10,
     "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 80 }
   },
   "twin-cleave": {
-    "category": "limit",
+    "category": "technic",
     "target": "single_enemy",
+    "mpCost": 6,
     "durationTicks": 20,
     "effect": { "type": "physical_damage", "power": 48 }
   },

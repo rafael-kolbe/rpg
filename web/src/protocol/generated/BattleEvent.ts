@@ -185,11 +185,7 @@ status: StatusKind,
 /**
  * Why it ended.
  */
-reason: StatusEndReason, } | { "type": "limit_ready", 
-/**
- * Who.
- */
-combatant: CombatantId, } | { "type": "knocked_out", 
+reason: StatusEndReason, } | { "type": "knocked_out", 
 /**
  * Who.
  */

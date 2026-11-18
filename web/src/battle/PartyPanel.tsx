@@ -4,6 +4,7 @@ import { useTranslation } from '../i18n/use-translation.ts'
 import { Gauge } from '../ui/Gauge.tsx'
 import { Window } from '../ui/Window.tsx'
 import { classNames } from '../utils/class-names.ts'
+import { Vitals } from './Vitals.tsx'
 
 interface Props {
   party: CombatantState[]
@@ -11,7 +12,7 @@ interface Props {
   onSelect: (id: CombatantId) => void
 }
 
-/** HP, MP, ATB and Limit of each party member (bottom right). */
+/** HP, MP and ATB of each party member (bottom right). */
 export function PartyPanel({ party, active, onSelect }: Props) {
   return (
     <Window className="party-panel">
@@ -44,17 +45,9 @@ function PartyRow({ member, active, onSelect }: RowProps) {
       onClick={onSelect}
     >
       <span className="party-row__name">{t(member.name)}</span>
-      <span>
-        {t('ui-stat-hp')} {member.hp}/{member.maxHp}
-      </span>
-      <span>
-        {t('ui-stat-mp')} {member.mp}/{member.maxMp}
-      </span>
+      <Vitals combatant={member} />
       <span className="party-row__gauges">
         <Gauge value={member.atb} max={member.atbFull} variant="atb" highlight={ready} />
-        {member.limit !== null && (
-          <Gauge value={member.limit} max={member.atbFull} variant="limit" />
-        )}
       </span>
     </button>
   )

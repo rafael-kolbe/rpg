@@ -63,8 +63,6 @@ export function describeEvent(
       })
     case 'defending':
       return t('ui-log-defend', { actor: name(event.combatant) })
-    case 'limit_ready':
-      return t('ui-log-limit', { actor: name(event.combatant) })
     case 'knocked_out':
       return t('ui-log-knocked-out', { target: name(event.combatant) })
     case 'action_failed':

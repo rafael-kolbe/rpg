@@ -16,6 +16,8 @@
 }
 
 .battle__side {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -55,6 +57,23 @@
   display: grid;
   grid-template-columns: minmax(180px, 1fr) 2fr;
   gap: 12px;
+  /* Fixed: a long spell list scrolls inside its window instead of pushing
+     the screen around. Fits the root menu (4 entries) and 3 party rows. */
+  height: 11.5rem;
+}
+
+.battle__hud > .window {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Only the list scrolls: the window padding stays put, so nothing seems to
+   hide above the first entry. */
+.battle__hud .menu-list {
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* --- combatant ------------------------------------------------------------ */
@@ -134,44 +153,113 @@
   min-height: 1.1em;
 }
 
-.status {
-  padding: 0 4px;
-  border-radius: 4px;
-  font-size: 0.65rem;
-  background: rgb(255 255 255 / 15%);
+.status-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.status-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.status-icon__track {
+  fill: rgb(0 0 0 / 45%);
+  stroke: rgb(255 255 255 / 12%);
+  stroke-width: 2;
+}
+
+.status-icon__border {
+  fill: none;
+  stroke: #7fb4ff;
+  stroke-width: 2;
+  transition: stroke-dashoffset 100ms linear;
+}
+
+.status-icon--harmful .status-icon__border {
+  stroke: #e0675a;
+}
+
+.status-icon__glyph {
+  fill: #e8ebf5;
+  stroke: none;
+}
+
+.status-icon__line {
+  fill: none;
+  stroke: #e8ebf5;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Holes cut into a filled glyph. */
+.status-icon__cut {
+  fill: #1b2133;
+}
+
+.status-icon__cross {
+  stroke: #e0675a;
 }
 
 /* --- effects -------------------------------------------------------------- */
 
 .popup {
   position: absolute;
-  top: 0;
+  /* Born at the avatar's center, then rises. */
+  top: 26px;
   left: 50%;
-  font-weight: 800;
-  font-size: 1.3rem;
-  text-shadow: 0 2px 0 #000;
+  font-weight: 900;
+  font-size: 1.4rem;
+  color: #fff;
+  -webkit-text-stroke: 5px #000;
+  paint-order: stroke fill;
   pointer-events: none;
   animation: float-up 1200ms ease-out forwards;
 }
 
+/* Colors by what hit: white physical, red critical, then by element. */
 .popup--critical {
-  color: var(--color-warning);
-  font-size: 1.6rem;
+  color: #ff3b30;
+  font-size: 1.75rem;
+}
+
+.popup--fire {
+  color: #ff8a1f;
+}
+
+.popup--ice {
+  color: #8fdcff;
+}
+
+.popup--lightning {
+  color: #ffe23d;
+}
+
+.popup--gravity {
+  color: #8a3ffc;
+}
+
+.popup--poison {
+  color: #d07ae6;
 }
 
 .popup--heal {
-  color: var(--color-ok);
+  color: #4cff7a;
 }
 
 .popup--mp {
-  color: #7fb4ff;
+  color: #4f8dff;
 }
 
 .popup--miss,
 .popup--resist,
 .popup--immune {
-  color: var(--color-muted);
-  font-size: 1rem;
+  color: #d9dce6;
+  font-size: 1.05rem;
 }
 
 .strike {
@@ -197,14 +285,14 @@
   animation: burst 500ms ease-out forwards;
 }
 
+/* Rises fast, holds at full color, then is removed at once (no fade). */
 @keyframes float-up {
   from {
     transform: translate(-50%, 0);
-    opacity: 1;
   }
+  60%,
   to {
-    transform: translate(-50%, -40px);
-    opacity: 0;
+    transform: translate(-50%, -48px);
   }
 }
 
@@ -268,4 +356,84 @@
 
 .party-row--active .party-row__name {
   color: var(--color-warning);
+}
+
+.combatant--cursor::before {
+  content: '▶';
+  position: absolute;
+  top: 26px;
+  left: -14px;
+  color: var(--color-warning);
+}
+
+.combatant__vitals {
+  display: grid;
+  width: 100%;
+  font-size: 0.7rem;
+  text-align: left;
+}
+
+.stat-bar {
+  display: grid;
+}
+
+.stat-bar__text {
+  line-height: 1.1;
+}
+
+.stat-bar__label {
+  color: var(--color-muted);
+}
+
+.battle__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.battle__keys {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.combatant__intent {
+  margin-top: 2px;
+  color: #ff9a8a;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Behind the combatants: z-index puts the sides above it. */
+.target-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.target-lines line {
+  stroke: #ff3b30;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 12 8;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px rgb(255 59 48 / 70%));
+  /* Dashes run from the enemy toward its target. */
+  animation: target-line-run 0.6s linear infinite;
+}
+
+@keyframes target-line-run {
+  from {
+    stroke-dashoffset: 20;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
 }

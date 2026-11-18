@@ -29,14 +29,13 @@ pub(crate) fn stats(level: u8, dexterity: u16) -> Stats {
     }
 }
 
-/// Level 10, 300 HP, knows Fire and Cure, has a Limit, attacks when AI-driven.
+/// Level 10, 300 HP, knows Fire and Cure, attacks when AI-driven.
 pub(crate) fn fighter(name: &str) -> CombatantSetup {
     CombatantSetup {
         name: name.to_owned(),
         stats: stats(10, 50),
         attack: ActionId::new("attack"),
         actions: vec![ActionId::new("fire"), ActionId::new("cure")],
-        limit: Some(ActionId::new("twin-cleave")),
         affinities: BTreeMap::new(),
         status_immunities: Vec::new(),
         ai: Some(AiProfile {
@@ -109,18 +108,6 @@ pub(crate) fn catalog_setup(
                     status: StatusKind::Haste,
                     duration_ticks: Some(300),
                     accuracy: 100,
-                },
-            ),
-        ),
-        (
-            ActionId::new("twin-cleave"),
-            action(
-                C::Limit,
-                T::SingleEnemy,
-                0,
-                Effect::PhysicalDamage {
-                    power: 48,
-                    element: None,
                 },
             ),
         ),

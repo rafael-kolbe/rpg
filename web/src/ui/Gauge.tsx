@@ -4,7 +4,7 @@ import { percentOf } from '../utils/percent.ts'
 interface Props {
   value: number
   max: number
-  variant: 'atb' | 'limit'
+  variant: 'atb' | 'hp' | 'mp'
   /** Full and actionable (e.g. a ready ATB gauge). */
   highlight?: boolean
 }

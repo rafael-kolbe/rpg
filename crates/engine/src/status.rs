@@ -34,6 +34,15 @@ pub enum StatusKind {
 }
 
 impl StatusKind {
+    /// Whether the status hurts whoever has it (shown with its time left).
+    #[must_use]
+    pub fn is_harmful(self) -> bool {
+        match self {
+            Self::Poison | Self::Sleep | Self::Silence | Self::Slow | Self::Distracted => true,
+            Self::Regen | Self::Haste | Self::Barrier | Self::MagicBarrier => false,
+        }
+    }
+
     /// Whether the status must be given a duration when applied.
     #[must_use]
     pub fn needs_duration(self) -> bool {
@@ -41,12 +50,23 @@ impl StatusKind {
     }
 }
 
+/// Time left on a timed status.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct StatusTimer {
+    /// Ticks until it ends.
+    pub remaining_ticks: u16,
+    /// Ticks it lasted when applied (or last refreshed).
+    pub duration_ticks: u16,
+}
+
 /// A status currently on a combatant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ActiveStatus {
     pub(crate) kind: StatusKind,
     /// `None` for statuses that end on an event rather than a timer.
-    pub(crate) remaining_ticks: Option<u16>,
+    pub(crate) timer: Option<StatusTimer>,
     /// Ticks since the last Poison/Regen pulse.
     pub(crate) pulse_ticks: u16,
 }
@@ -55,7 +75,10 @@ impl ActiveStatus {
     pub(crate) fn new(kind: StatusKind, duration_ticks: Option<u16>) -> Self {
         Self {
             kind,
-            remaining_ticks: duration_ticks,
+            timer: duration_ticks.map(|ticks| StatusTimer {
+                remaining_ticks: ticks,
+                duration_ticks: ticks,
+            }),
             pulse_ticks: 0,
         }
     }

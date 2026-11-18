@@ -67,13 +67,9 @@ pub struct CombatantSetup {
     pub stats: Stats,
     /// The action the Attack command performs (category `attack`).
     pub attack: ActionId,
-    /// Spells and abilities it knows (categories `magic` and `ability`).
+    /// Spells and technics it knows (categories `magic` and `technic`).
     #[serde(default)]
     pub actions: Vec<ActionId>,
-    /// Its Limit, if it has one (category `limit`). Combatants without a
-    /// Limit do not fill a Limit gauge.
-    #[serde(default)]
-    pub limit: Option<ActionId>,
     /// Elemental weaknesses and resistances.
     #[serde(default)]
     pub affinities: BTreeMap<Element, Affinity>,
@@ -227,13 +223,9 @@ impl BattleSetup {
                 name,
                 id,
                 action,
-                &[ActionCategory::Magic, ActionCategory::Ability],
-                "a spell or ability",
+                &[ActionCategory::Magic, ActionCategory::Technic],
+                "a spell or technic",
             )?;
-        }
-        if let Some(id) = &member.limit {
-            let action = self.action(name, id)?;
-            expect_category(name, id, action, &[ActionCategory::Limit], "limit")?;
         }
 
         match &member.ai {

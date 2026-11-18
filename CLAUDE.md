@@ -21,7 +21,7 @@ change.
 | Damage and healing formulas (pure math) | `crates/engine/src/damage.rs` |
 | ATB gauge speed | `crates/engine/src/atb.rs` |
 | Status kinds and timers | `crates/engine/src/status.rs` |
-| Enemy / auto-battle AI rules | `crates/engine/src/ai.rs` |
+| Enemy / auto-battle AI rules and intents (announced targets) | `crates/engine/src/ai.rs` |
 | Attributes and derived stats | `crates/engine/src/stats.rs` |
 | Action, effect, element, item definitions | `crates/engine/src/action.rs` |
 | Battle setup and its validation | `crates/engine/src/setup.rs` |
@@ -49,9 +49,10 @@ change.
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
 | Generic TypeScript helpers (classNames, percentOf, fetchJson…) | `web/src/utils/` |
-| Shared UI components (Window, MenuList, Gauge, Button, Select…) | `web/src/ui/` |
+| Shared UI components (Window, MenuList, Gauge, Button, Select…) and menu keyboard keys (`useMenuKeys`) | `web/src/ui/` |
 | App-level components (language picker) | `web/src/components/` |
-| Battle screen, command menu, party panel, WebSocket hook | `web/src/battle/` |
+| Battle screen, command menu, party panel, HP/MP bars, enemy intents and target lines, which sound each event plays, WebSocket hook | `web/src/battle/` |
+| Sound synthesizer and the sound definitions | `web/src/audio/` |
 | Sandbox page and debug panel | `web/src/sandbox/` |
 | Pages and routing | `web/src/pages/`, `web/src/App.tsx` |
 | Browser tests (Playwright) | `web/e2e/` |

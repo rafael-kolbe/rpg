@@ -6,7 +6,6 @@
 //! result last, then the 9999 cap applies.
 
 use crate::action::{Affinity, Effect, Element};
-use crate::atb::ATB_FULL;
 use crate::battle::Battle;
 use crate::damage::{
     self, CRITICAL_BP, DISTRACTED_BP, HALF_BP, MAX_DAMAGE, WEAK_BP, after_defense, critical_chance,
@@ -213,7 +212,7 @@ impl Battle {
     }
 
     /// HP loss from an action, and everything a hit triggers: Distracted and
-    /// Sleep end, the Limit gauge fills, a knockout at 0 HP.
+    /// Sleep end, a knockout at 0 HP.
     fn take_damage(
         &mut self,
         target: CombatantId,
@@ -243,14 +242,6 @@ impl Battle {
                     status,
                     reason: StatusEndReason::Hit,
                 });
-            }
-        }
-
-        if combatant.limit.is_some() && combatant.limit_gauge < ATB_FULL {
-            let gained = u32::from(lost) * ATB_FULL / u32::from(combatant.stats.max_hp);
-            combatant.limit_gauge = (combatant.limit_gauge + gained).min(ATB_FULL);
-            if combatant.limit_gauge == ATB_FULL {
-                events.push(BattleEvent::LimitReady { combatant: target });
             }
         }
 
@@ -392,7 +383,7 @@ mod tests {
     }
 
     #[test]
-    fn a_hit_wakes_a_sleeping_target_and_fills_its_limit_gauge() {
+    fn a_hit_wakes_a_sleeping_target() {
         let mut battle = battle();
         let hero = CombatantId(0);
         let mut events = Vec::new();
@@ -400,9 +391,12 @@ mod tests {
 
         battle.take_damage(hero, 30, false, Modifiers::default(), &mut events);
 
-        let hero = battle.combatant(hero).unwrap();
-        assert!(!hero.has_status(StatusKind::Sleep));
-        assert_eq!(hero.limit_gauge(), 30 * ATB_FULL / 300);
+        assert!(
+            !battle
+                .combatant(hero)
+                .unwrap()
+                .has_status(StatusKind::Sleep)
+        );
     }
 
     #[test]
@@ -414,7 +408,12 @@ mod tests {
         battle.apply_status(hero, StatusKind::Slow, Some(100), &mut events);
         battle.apply_status(hero, StatusKind::Haste, Some(100), &mut events);
 
-        let statuses: Vec<_> = battle.combatant(hero).unwrap().statuses().collect();
+        let statuses: Vec<_> = battle
+            .combatant(hero)
+            .unwrap()
+            .statuses()
+            .map(|(kind, _)| kind)
+            .collect();
         assert_eq!(statuses, vec![StatusKind::Haste]);
     }
 

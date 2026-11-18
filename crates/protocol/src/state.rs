@@ -6,8 +6,8 @@
 use std::collections::BTreeMap;
 
 use engine::{
-    ATB_FULL, ActionCategory, ActionId, Battle, CombatantId, ItemId, Outcome, Side, StatusKind,
-    TargetRule, TurnState,
+    ATB_FULL, ActionCategory, ActionId, AnnouncedIntent, Battle, CombatantId, Element, ItemId,
+    Outcome, Side, StatusKind, StatusTimer, TargetRule, TurnState,
 };
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -58,22 +58,21 @@ pub struct CombatantState {
     pub max_mp: u16,
     /// ATB gauge, `0..=atbFull`.
     pub atb: u32,
-    /// Limit gauge, `0..=atbFull`; `None` without a Limit.
-    pub limit: Option<u32>,
     /// Value of a full gauge.
     pub atb_full: u32,
     /// Turn cycle.
     pub turn: TurnState,
     /// Active statuses.
-    pub statuses: Vec<StatusKind>,
+    pub statuses: Vec<StatusState>,
     /// Halving damage with Defend.
     pub defending: bool,
     /// Commands come from the player.
     pub player_controlled: bool,
+    /// Engine-controlled only: its next action and who it will hit,
+    /// announced while its gauge charges.
+    pub intent: Option<AnnouncedIntent>,
     /// What its Attack command does.
     pub attack: ActionId,
-    /// Its Limit, if any.
-    pub limit_action: Option<ActionId>,
     /// Spells and abilities it knows.
     pub actions: Vec<ActionId>,
 }
@@ -114,6 +113,8 @@ pub struct ActionInfo {
     pub mp_cost: u16,
     /// Aimed at knocked-out allies (revival).
     pub targets_knocked_out: bool,
+    /// Element of its damage, if any (picks its sound and visual).
+    pub element: Option<Element>,
 }
 
 /// The menu-relevant part of an item.
@@ -123,6 +124,19 @@ pub struct ActionInfo {
 pub struct ItemInfo {
     /// The action it performs.
     pub action: ActionId,
+}
+
+/// One status on a combatant.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export)]
+pub struct StatusState {
+    /// Which status.
+    pub kind: StatusKind,
+    /// Hurts its bearer (drawn in red).
+    pub harmful: bool,
+    /// Time left; `None` for statuses that end on an event.
+    pub timer: Option<StatusTimer>,
 }
 
 /// Body of `GET /api/sandbox`: scenario names (file names without `.json`).
@@ -151,14 +165,20 @@ impl BattleState {
                 mp: c.mp(),
                 max_mp: c.stats().max_mp,
                 atb: c.atb(),
-                limit: c.limit_action().map(|_| c.limit_gauge()),
                 atb_full: ATB_FULL,
                 turn: c.state(),
-                statuses: c.statuses().collect(),
+                statuses: c
+                    .statuses()
+                    .map(|(kind, timer)| StatusState {
+                        kind,
+                        harmful: kind.is_harmful(),
+                        timer,
+                    })
+                    .collect(),
                 defending: c.is_defending(),
                 player_controlled: c.is_player_controlled(),
+                intent: battle.announced_intent(c.id()),
                 attack: c.attack_action().clone(),
-                limit_action: c.limit_action().cloned(),
                 actions: c.known_actions().to_vec(),
             })
             .collect();
@@ -196,13 +216,13 @@ impl Catalog {
                         target: def.target,
                         mp_cost: def.mp_cost,
                         targets_knocked_out: def.effect.targets_knocked_out(),
+                        element: def.effect.element(),
                     },
                 );
             }
         };
         for c in battle.combatants() {
             add(c.attack_action());
-            c.limit_action().into_iter().for_each(&mut add);
             c.known_actions().iter().for_each(&mut add);
         }
 

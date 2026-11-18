@@ -53,11 +53,11 @@ pub struct Command {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum CommandKind {
-    /// Basic attack, or the Limit when the Limit gauge is full.
+    /// Basic attack.
     Attack,
     /// Halve damage taken until the next action; spends the turn at once.
     Defend,
-    /// A known spell or ability.
+    /// A known spell or technic.
     Action {
         /// The action.
         id: ActionId,
@@ -84,7 +84,7 @@ pub enum CommandError {
     /// The combatant's gauge is not full, or it already has a command queued.
     #[error("{0} is not waiting for a command")]
     NotAwaitingCommand(CombatantId),
-    /// The combatant does not know this spell or ability.
+    /// The combatant does not know this spell or technic.
     #[error("{actor} does not know `{action}`")]
     UnknownAction {
         /// Who.
@@ -294,8 +294,9 @@ impl Battle {
 
     /// Advances the battle by one tick (100 ms), in a fixed order:
     /// 1. status timers and Poison/Regen pulses;
-    /// 2. ATB gauges fill; full gauges become turns (the AI decides at once,
-    ///    the player is asked through [`BattleEvent::TurnReady`]);
+    /// 2. ATB gauges fill; the AI keeps its intent for the coming turn
+    ///    current while charging; full gauges become turns (the AI acts on its
+    ///    intent, the player is asked through [`BattleEvent::TurnReady`]);
     /// 3. the action queue runs: one action at a time, each occupying the
     ///    queue for its `durationTicks` while every gauge keeps filling;
     /// 4. the battle ends when one side has no combatant standing.
@@ -335,10 +336,7 @@ impl Battle {
             return Ok(());
         }
 
-        let (action, item) = self.resolve_command(actor, kind)?;
-        let def = &self.actions[&action];
-        self.check_usable(actor, def)?;
-        self.check_target(actor, def, target)?;
+        let (action, item) = self.validate(actor, kind, target)?;
 
         if let Some(item) = &item
             && let Some(count) = self.inventory.get_mut(item)
@@ -360,6 +358,31 @@ impl Battle {
         Ok(())
     }
 
+    /// Whether the command would be accepted right now.
+    pub(crate) fn can_perform(
+        &self,
+        actor: CombatantId,
+        kind: &CommandKind,
+        target: Option<CombatantId>,
+    ) -> bool {
+        *kind == CommandKind::Defend || self.validate(actor, kind, target).is_ok()
+    }
+
+    /// Every check of a queued command: known action, item in stock, MP,
+    /// Silence and target. Returns the action and the item it consumes.
+    fn validate(
+        &self,
+        actor: CombatantId,
+        kind: &CommandKind,
+        target: Option<CombatantId>,
+    ) -> Result<(ActionId, Option<ItemId>), CommandError> {
+        let (action, item) = self.resolve_command(actor, kind)?;
+        let def = &self.actions[&action];
+        self.check_usable(actor, def)?;
+        self.check_target(actor, def, target)?;
+        Ok((action, item))
+    }
+
     /// The action a command runs, and the item it consumes.
     pub(crate) fn resolve_command(
         &self,
@@ -368,13 +391,7 @@ impl Battle {
     ) -> Result<(ActionId, Option<ItemId>), CommandError> {
         let combatant = &self.combatants[usize::from(actor.0)];
         match kind {
-            CommandKind::Attack => {
-                let action = match &combatant.limit {
-                    Some(limit) if combatant.has_full_limit() => limit.clone(),
-                    _ => combatant.attack.clone(),
-                };
-                Ok((action, None))
-            }
+            CommandKind::Attack => Ok((combatant.attack.clone(), None)),
             CommandKind::Action { id } => {
                 if combatant.actions.contains(id) {
                     Ok((id.clone(), None))
@@ -499,16 +516,16 @@ impl Battle {
                         regen |= status.kind == StatusKind::Regen;
                     }
                 }
-                if let Some(remaining) = &mut status.remaining_ticks {
-                    *remaining = remaining.saturating_sub(1);
-                    if *remaining == 0 {
+                if let Some(timer) = &mut status.timer {
+                    timer.remaining_ticks = timer.remaining_ticks.saturating_sub(1);
+                    if timer.remaining_ticks == 0 {
                         expired.push(status.kind);
                     }
                 }
             }
             combatant
                 .statuses
-                .retain(|status| status.remaining_ticks != Some(0));
+                .retain(|status| status.timer.is_none_or(|timer| timer.remaining_ticks > 0));
 
             let id = combatant.id;
             for status in expired {
@@ -556,10 +573,14 @@ impl Battle {
 
     fn fill_gauges(&mut self, events: &mut Vec<BattleEvent>) {
         for index in 0..self.combatants.len() {
-            let combatant = &mut self.combatants[index];
+            let combatant = &self.combatants[index];
             if combatant.is_knocked_out() || combatant.state != TurnState::Charging {
                 continue;
             }
+            if !combatant.player_controlled {
+                self.refresh_intent(combatant.id);
+            }
+            let combatant = &mut self.combatants[index];
 
             let speed = if combatant.has_status(StatusKind::Sleep) {
                 Speed::Stopped
@@ -589,7 +610,10 @@ impl Battle {
             events.push(BattleEvent::TurnReady { combatant: id });
 
             if !player_controlled {
-                let (kind, target) = self.decide(id);
+                let (kind, target) = match self.combatants[index].intent.take() {
+                    Some(intent) => (intent.kind, intent.target),
+                    None => self.decide(id),
+                };
                 if self.perform(id, &kind, target, events).is_err() {
                     // The AI only proposes validated choices; if one still
                     // fails, defending is always legal and keeps the battle moving.
@@ -656,9 +680,6 @@ impl Battle {
         }
 
         combatant.mp -= def.mp_cost;
-        if def.category == ActionCategory::Limit {
-            combatant.limit_gauge = 0;
-        }
         events.push(BattleEvent::ActionStarted {
             actor,
             action,
@@ -717,6 +738,7 @@ impl Battle {
         combatant.hp = 0;
         combatant.statuses.clear();
         combatant.defending = false;
+        combatant.intent = None;
         combatant.reset_turn();
         events.push(BattleEvent::KnockedOut { combatant: id });
         self.cancel_queued(id, CancelReason::ActorKnockedOut, events);
@@ -763,6 +785,7 @@ impl Battle {
 mod tests {
     use super::*;
     use crate::action::Effect;
+    use crate::status::StatusTimer;
     use crate::test_support::{catalog_setup, fighter, run_until, until_turn};
 
     fn player_battle(seed: u64) -> Battle {
@@ -922,6 +945,24 @@ mod tests {
     }
 
     #[test]
+    fn a_used_up_item_stays_in_the_inventory_at_zero() {
+        let mut battle = player_battle(1);
+        let potion = ItemId::new("potion");
+        battle.inventory.insert(potion.clone(), 1);
+        until_turn(&mut battle, HERO);
+
+        battle
+            .submit(&Command {
+                actor: HERO,
+                kind: CommandKind::Item { id: potion.clone() },
+                target: Some(HERO),
+            })
+            .unwrap();
+
+        assert_eq!(battle.inventory().get(&potion), Some(&0));
+    }
+
+    #[test]
     fn a_knockout_cancels_queued_actions_and_returns_items() {
         let mut battle = player_battle(1);
         until_turn(&mut battle, HERO);
@@ -1040,6 +1081,31 @@ mod tests {
     }
 
     #[test]
+    fn a_status_timer_counts_down_and_keeps_its_duration() {
+        let mut battle = player_battle(1);
+        battle
+            .combatant_mut(HERO)
+            .statuses
+            .push(ActiveStatus::new(StatusKind::Silence, Some(50)));
+
+        for _ in 0..20 {
+            battle.step();
+        }
+
+        let timers: Vec<_> = battle.combatant(HERO).unwrap().statuses().collect();
+        assert_eq!(
+            timers,
+            vec![(
+                StatusKind::Silence,
+                Some(StatusTimer {
+                    remaining_ticks: 30,
+                    duration_ticks: 50
+                })
+            )]
+        );
+    }
+
+    #[test]
     fn sleep_stops_the_gauge() {
         let mut battle = player_battle(1);
         battle
@@ -1051,26 +1117,6 @@ mod tests {
         battle.step();
 
         assert_eq!(battle.combatant(HERO).unwrap().atb(), before);
-    }
-
-    #[test]
-    fn a_full_limit_gauge_turns_attack_into_the_limit() {
-        let mut battle = player_battle(1);
-        battle.combatant_mut(HERO).limit_gauge = ATB_FULL;
-        until_turn(&mut battle, HERO);
-
-        let events = battle
-            .submit(&Command {
-                actor: HERO,
-                kind: CommandKind::Attack,
-                target: Some(WOLF),
-            })
-            .unwrap();
-
-        assert!(matches!(
-            &events[..],
-            [BattleEvent::ActionQueued { action, .. }] if action.as_str() == "twin-cleave"
-        ));
     }
 
     #[test]

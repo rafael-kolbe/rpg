@@ -3,4 +3,4 @@
 /**
  * The command family an action belongs to.
  */
-export type ActionCategory = "attack" | "magic" | "ability" | "item" | "limit";
+export type ActionCategory = "attack" | "magic" | "technic" | "item";

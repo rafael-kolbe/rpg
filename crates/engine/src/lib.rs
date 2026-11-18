@@ -39,7 +39,6 @@
 //!     },
 //!     attack: attack.clone(),
 //!     actions: Vec::new(),
-//!     limit: None,
 //!     affinities: BTreeMap::new(),
 //!     status_immunities: Vec::new(),
 //!     // Enemies are always engine-controlled, so they need an AI.
@@ -102,7 +101,10 @@ mod status;
 mod test_support;
 
 pub use action::{ActionCategory, ActionDef, Affinity, Effect, Element, ItemDef, TargetRule};
-pub use ai::{AiAct, AiPhase, AiProfile, AiRule, Condition, TargetPick};
+pub use ai::{
+    AiAct, AiPhase, AiProfile, AiRule, AnnouncedIntent, Condition, IntentCommand, IntentTarget,
+    TargetPick,
+};
 pub use atb::{ATB_FULL, TICK_MS};
 pub use battle::{Battle, Command, CommandError, CommandKind, Outcome, PartyControl};
 pub use combatant::{Combatant, TurnState};
@@ -110,4 +112,4 @@ pub use event::{BattleEvent, CancelReason, FailReason, StatusEndReason};
 pub use ids::{ActionId, CombatantId, ItemId, Side};
 pub use setup::{BattleSetup, CombatantSetup, Encounter, Opening, SetupError};
 pub use stats::{Attributes, Equipment, Stats};
-pub use status::StatusKind;
+pub use status::{StatusKind, StatusTimer};

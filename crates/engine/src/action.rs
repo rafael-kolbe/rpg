@@ -33,12 +33,11 @@ pub enum ActionCategory {
     Attack,
     /// A spell (the Magic command). Blocked by Silence.
     Magic,
-    /// A class technique (the Ability command).
-    Ability,
+    /// A physical class technique (the Technic command). Not blocked by
+    /// Silence.
+    Technic,
     /// What an item does when used (the Item command).
     Item,
-    /// A Limit: replaces Attack while the Limit gauge is full.
-    Limit,
 }
 
 /// Who an action can be aimed at, relative to the user.
@@ -154,6 +153,22 @@ impl Effect {
     #[must_use]
     pub fn targets_knocked_out(&self) -> bool {
         matches!(self, Self::Revive { .. })
+    }
+
+    /// The element of a damaging effect, if any.
+    #[must_use]
+    pub fn element(&self) -> Option<Element> {
+        match self {
+            Self::PhysicalDamage { element, .. }
+            | Self::MagicalDamage { element, .. }
+            | Self::PercentCurrentHp { element, .. } => *element,
+            Self::Heal { .. }
+            | Self::RestoreHp { .. }
+            | Self::RestoreMp { .. }
+            | Self::Revive { .. }
+            | Self::ApplyStatus { .. }
+            | Self::RemoveStatus { .. } => None,
+        }
     }
 }
 

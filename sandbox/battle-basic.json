@@ -12,7 +12,7 @@
         "equipment": { "weaponAttack": 18, "armorDefense": 10, "armorMagicDefense": 6 }
       },
       "attack": "attack",
-      "limit": "twin-cleave",
+      "actions": ["twin-cleave"],
       "ai": {
         "phases": [
           {
