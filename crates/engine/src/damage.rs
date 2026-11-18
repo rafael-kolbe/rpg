@@ -57,6 +57,32 @@ pub(crate) fn critical_chance(luck: u16, level: u8, target_level: u8, bonus: u8)
     u8::try_from(raw.clamp(0, 100)).unwrap_or(100)
 }
 
+/// Lowest hit chance of a physical attack: never impossible.
+const MIN_HIT_PERCENT: i32 = 25;
+/// Lowest chance of a hostile status taking hold.
+const MIN_STATUS_PERCENT: i32 = 5;
+
+/// Physical hit chance in percent:
+/// `weapon accuracy + (attacker Dexterity − target Dexterity) / 4 − evasion`,
+/// clamped to 25..=100.
+pub(crate) fn hit_chance(
+    weapon_accuracy: u8,
+    attacker_dex: u16,
+    target_dex: u16,
+    evasion: u8,
+) -> u8 {
+    let raw = i32::from(weapon_accuracy) + (i32::from(attacker_dex) - i32::from(target_dex)) / 4
+        - i32::from(evasion);
+    u8::try_from(raw.clamp(MIN_HIT_PERCENT, 100)).unwrap_or(100)
+}
+
+/// Chance of a hostile status taking hold, in percent:
+/// `status accuracy − target Luck / 4`, clamped to 5..=100.
+pub(crate) fn status_chance(accuracy: u8, target_luck: u16) -> u8 {
+    let raw = i32::from(accuracy) - i32::from(target_luck) / 4;
+    u8::try_from(raw.clamp(MIN_STATUS_PERCENT, 100)).unwrap_or(100)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -99,6 +125,25 @@ mod tests {
     fn critical_then_distracted_multiply() {
         let critical = scale(1000, CRITICAL_BP);
         assert_eq!(scale(critical, DISTRACTED_BP), 1950);
+    }
+
+    #[test]
+    fn hit_chance_compares_dexterity_and_subtracts_evasion() {
+        assert_eq!(hit_chance(95, 50, 50, 0), 95);
+        assert_eq!(hit_chance(95, 50, 90, 5), 80);
+    }
+
+    #[test]
+    fn hit_chance_never_drops_below_25_or_exceeds_100() {
+        assert_eq!(hit_chance(100, 120, 40, 0), 100);
+        assert_eq!(hit_chance(80, 1, 255, 50), 25);
+    }
+
+    #[test]
+    fn status_chance_is_resisted_by_luck() {
+        assert_eq!(status_chance(70, 20), 65);
+        assert_eq!(status_chance(70, 100), 45);
+        assert_eq!(status_chance(10, 255), 5);
     }
 
     #[test]

@@ -44,7 +44,7 @@
     "target": "single_enemy",
     "mpCost": 5,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "sleep", "durationTicks": 200 }
+    "effect": { "type": "apply_status", "status": "sleep", "durationTicks": 200, "accuracy": 70 }
   },
   "cure": {
     "category": "magic",
@@ -71,7 +71,7 @@
     "category": "ability",
     "target": "single_enemy",
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600 }
+    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 80 }
   },
   "twin-cleave": {
     "category": "limit",

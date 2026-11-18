@@ -332,9 +332,13 @@ fn validate_action(id: &ActionId, action: &ActionDef) -> Result<(), SetupError> 
         Effect::Revive { .. } if !action.target.on_own_side() => {
             invalid("revive must target the user's side")
         }
+        Effect::ApplyStatus { accuracy, .. } if !(1..=100).contains(accuracy) => {
+            invalid("accuracy must be 1..=100")
+        }
         Effect::ApplyStatus {
             status,
             duration_ticks,
+            ..
         } => match (status.needs_duration(), duration_ticks) {
             (true, None | Some(0)) => invalid("this status needs a durationTicks above 0"),
             (false, Some(_)) => invalid("distracted takes no durationTicks"),
@@ -450,6 +454,7 @@ mod tests {
         haste.effect = Effect::ApplyStatus {
             status: StatusKind::Haste,
             duration_ticks: None,
+            accuracy: 100,
         };
 
         assert!(matches!(

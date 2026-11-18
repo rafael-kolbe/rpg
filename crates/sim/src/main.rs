@@ -151,6 +151,10 @@ fn describe(battle: &Battle, event: &BattleEvent) -> Option<String> {
         BattleEvent::StatusApplied { target, status } => {
             format!("  {} gains {status:?}", n(*target))
         }
+        BattleEvent::StatusImmune { target, status } => {
+            format!("  {} is immune to {status:?}", n(*target))
+        }
+        BattleEvent::Missed { target } => format!("  miss on {}", n(*target)),
         BattleEvent::StatusResisted { target, status } => {
             format!("  {} resists {status:?}", n(*target))
         }

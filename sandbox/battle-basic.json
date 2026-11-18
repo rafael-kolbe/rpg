@@ -84,7 +84,7 @@
         "maxHp": 260,
         "maxMp": 0,
         "attributes": { "strength": 22, "dexterity": 55, "vitality": 12, "magic": 5, "spirit": 8, "luck": 10 },
-        "equipment": { "weaponAttack": 10 }
+        "equipment": { "weaponAttack": 10, "evasion": 5 }
       },
       "attack": "bite",
       "affinities": { "fire": "weak" },
@@ -97,7 +97,7 @@
         "maxHp": 260,
         "maxMp": 0,
         "attributes": { "strength": 22, "dexterity": 55, "vitality": 12, "magic": 5, "spirit": 8, "luck": 10 },
-        "equipment": { "weaponAttack": 10 }
+        "equipment": { "weaponAttack": 10, "evasion": 5 }
       },
       "attack": "bite",
       "affinities": { "fire": "weak" },

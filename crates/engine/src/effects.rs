@@ -10,7 +10,7 @@ use crate::atb::ATB_FULL;
 use crate::battle::Battle;
 use crate::damage::{
     self, CRITICAL_BP, DISTRACTED_BP, HALF_BP, MAX_DAMAGE, WEAK_BP, after_defense, critical_chance,
-    heal, magical_base, physical_base, with_variance,
+    heal, hit_chance, magical_base, physical_base, status_chance, with_variance,
 };
 use crate::event::{BattleEvent, CancelReason, StatusEndReason};
 use crate::ids::CombatantId;
@@ -117,7 +117,8 @@ impl Battle {
             Effect::ApplyStatus {
                 status,
                 duration_ticks,
-            } => self.apply_status(target, *status, *duration_ticks, events),
+                accuracy,
+            } => self.inflict(actor, target, *status, *duration_ticks, *accuracy, events),
             Effect::RemoveStatus { statuses } => {
                 for &status in statuses {
                     if self.combatant_mut(target).remove_status(status) {
@@ -170,6 +171,21 @@ impl Battle {
             barrier,
             distracted: defender.has_status(StatusKind::Distracted),
         };
+
+        if matches!(kind, DamageKind::Physical) {
+            // Turned away or asleep: no chance to evade.
+            let can_evade = !modifiers.distracted && !defender.has_status(StatusKind::Sleep);
+            let chance = hit_chance(
+                attacker.equipment.weapon_accuracy,
+                attacker.attributes.dexterity,
+                defender.stats.attributes.dexterity,
+                defender.stats.equipment.evasion,
+            );
+            if can_evade && !self.rng.chance_percent(chance) {
+                events.push(BattleEvent::Missed { target });
+                return;
+            }
+        }
 
         let raw = with_variance(raw, self.rng.below(256));
         if matches!(kind, DamageKind::Physical) {
@@ -253,6 +269,30 @@ impl Battle {
         });
     }
 
+    /// A status from an action: immunity first, then, against an opponent,
+    /// the accuracy roll resisted by Luck. Allies always receive it.
+    fn inflict(
+        &mut self,
+        actor: CombatantId,
+        target: CombatantId,
+        status: StatusKind,
+        duration_ticks: Option<u16>,
+        accuracy: u8,
+        events: &mut Vec<BattleEvent>,
+    ) {
+        let defender = &self.combatants[usize::from(target.0)];
+        let hostile = defender.side != self.combatants[usize::from(actor.0)].side;
+        let immune = defender.status_immunities.contains(&status);
+        if hostile && !immune {
+            let chance = status_chance(accuracy, defender.stats.attributes.luck);
+            if !self.rng.chance_percent(chance) {
+                events.push(BattleEvent::StatusResisted { target, status });
+                return;
+            }
+        }
+        self.apply_status(target, status, duration_ticks, events);
+    }
+
     fn apply_status(
         &mut self,
         target: CombatantId,
@@ -262,7 +302,7 @@ impl Battle {
     ) {
         let combatant = self.combatant_mut(target);
         if combatant.status_immunities.contains(&status) {
-            events.push(BattleEvent::StatusResisted { target, status });
+            events.push(BattleEvent::StatusImmune { target, status });
             return;
         }
 
@@ -391,10 +431,104 @@ mod tests {
 
         assert_eq!(
             events,
-            vec![BattleEvent::StatusResisted {
+            vec![BattleEvent::StatusImmune {
                 target: wolf,
                 status: StatusKind::Sleep
             }]
+        );
+    }
+
+    #[test]
+    fn a_distracted_target_cannot_evade() {
+        let mut battle = battle();
+        let wolf = CombatantId(1);
+        battle.combatant_mut(wolf).stats.equipment.evasion = 100;
+        battle
+            .combatant_mut(wolf)
+            .statuses
+            .push(ActiveStatus::new(StatusKind::Distracted, None));
+        let mut events = Vec::new();
+
+        battle.strike(
+            CombatantId(0),
+            wolf,
+            DamageKind::Physical,
+            16,
+            None,
+            &mut events,
+        );
+
+        assert!(matches!(
+            events.first(),
+            Some(BattleEvent::Damaged {
+                distracted: true,
+                ..
+            })
+        ));
+    }
+
+    #[test]
+    fn evasion_makes_physical_attacks_miss_but_not_spells() {
+        let mut battle = battle();
+        let wolf = CombatantId(1);
+        battle.combatant_mut(wolf).stats.equipment.evasion = 100;
+        let mut physical_misses = 0;
+        let mut spell_misses = 0;
+
+        for _ in 0..200 {
+            let mut events = Vec::new();
+            battle.strike(
+                CombatantId(0),
+                wolf,
+                DamageKind::Physical,
+                1,
+                None,
+                &mut events,
+            );
+            physical_misses += usize::from(matches!(events[..], [BattleEvent::Missed { .. }]));
+            events.clear();
+            battle.strike(
+                CombatantId(0),
+                wolf,
+                DamageKind::Magical,
+                1,
+                None,
+                &mut events,
+            );
+            spell_misses += usize::from(matches!(events[..], [BattleEvent::Missed { .. }]));
+            battle.combatant_mut(wolf).hp = 300;
+        }
+
+        // Evasion 100 leaves the 25% hit floor: about 150 misses out of 200.
+        assert!(
+            (120..=180).contains(&physical_misses),
+            "{physical_misses} misses"
+        );
+        assert_eq!(spell_misses, 0);
+    }
+
+    #[test]
+    fn hostile_statuses_can_be_resisted_but_buffs_always_land() {
+        let mut battle = battle();
+        let (hero, wolf) = (CombatantId(0), CombatantId(1));
+        battle.combatant_mut(wolf).stats.attributes.luck = 255; // 5% floor
+        let mut events = Vec::new();
+
+        for _ in 0..20 {
+            battle.inflict(hero, wolf, StatusKind::Silence, Some(10), 10, &mut events);
+        }
+        battle.inflict(hero, hero, StatusKind::Haste, Some(100), 1, &mut events);
+
+        let resisted = events
+            .iter()
+            .filter(|e| matches!(e, BattleEvent::StatusResisted { .. }))
+            .count();
+        assert!(resisted >= 15, "{resisted} resisted");
+        assert!(
+            battle
+                .combatant(hero)
+                .unwrap()
+                .has_status(StatusKind::Haste)
         );
     }
 

@@ -108,6 +108,7 @@ pub(crate) fn catalog_setup(
                 Effect::ApplyStatus {
                     status: StatusKind::Haste,
                     duration_ticks: Some(300),
+                    accuracy: 100,
                 },
             ),
         ),

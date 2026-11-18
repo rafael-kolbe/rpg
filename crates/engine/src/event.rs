@@ -78,7 +78,7 @@ pub enum BattleEvent {
     Damaged {
         /// Who took it.
         target: CombatantId,
-        /// HP lost (0 when immune).
+        /// HP lost (0 when an elemental immunity cancels it, shown as "0").
         amount: u16,
         /// Whether it was a critical hit.
         critical: bool,
@@ -129,8 +129,20 @@ pub enum BattleEvent {
         /// The status.
         status: StatusKind,
     },
-    /// A status did not take hold: the target is immune.
+    /// A physical attack did not land (shown as "Miss").
+    Missed {
+        /// Who was aimed at.
+        target: CombatantId,
+    },
+    /// A hostile status failed against the target's Luck (shown as "Resist").
     StatusResisted {
+        /// Who was aimed at.
+        target: CombatantId,
+        /// The status.
+        status: StatusKind,
+    },
+    /// A status did not take hold: the target is immune (shown as "Immune").
+    StatusImmune {
         /// Who.
         target: CombatantId,
         /// The status.

@@ -380,6 +380,18 @@ final    = dano × 150% se o alvo está Distraído   (aplicado por último)
 - **Cura:** `Poder × 22 + (Nível + Magic) × 6`, sem defesa.
 - **Gravity** (elemento): dano em **% do HP atual** do alvo; chefes resistem ou
   são imunes.
+- **Acerto (ataques físicos):**
+  `precisão da arma + (Dexterity do atacante − Dexterity do alvo) / 4 − esquiva do alvo`,
+  entre **25% e 100%**. Precisão padrão da arma: 95%; esquiva vem de armadura e
+  escudo. Alvo **Distraído ou dormindo não esquiva**. O crítico só é sorteado
+  depois do acerto; ataques em área sorteiam por alvo.
+- **Magias de dano, cura e itens sempre acertam.**
+- **Status hostis:** `precisão do status − Luck do alvo / 4`, entre **5% e
+  100%**. Imunidade é absoluta e separada. Status benéficos em aliados sempre
+  funcionam.
+- **Na tela:** **Miss** (ataque físico errou), **Resist** (status falhou pela
+  Luck), **Immune** (imunidade a status), **0** (dano totalmente anulado, em
+  geral magia contra afinidade imune).
 - **Teto de dano: 9999.** Calibrado para que **mesmo com crítico** seja
   praticamente impossível um personagem chegar a 9999 num monstro. Chefes de
   raid e monstros muito fortes **podem** causar 9999.
@@ -1086,7 +1098,6 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Penalidade por morte (XP, dinheiro, itens?) — decidir mais tarde.
 - [ ] Modo Online: o que move o jogo (missões da Guilda, exploração livre, chefes, eventos, outros) — detalhar no futuro.
 - [ ] Itens raros encaixáveis em equipamento (estilo cartas do Ragnarok Online): decidir depois do balanceamento.
-- [ ] Acerto e esquiva: fórmula (Dexterity, precisão da arma, esquiva da armadura). A engine da fase 1 ainda não tem erro de golpe — todo ataque acerta.
 - [ ] Números de atributos (curvas por classe, pontos por nível dos recrutas, tabela de custo, limites de Sources, Poder de cada ação, teto de chance e de dano de crítico): calibrar no simulador.
 - [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.

@@ -13,6 +13,8 @@ pub(crate) const MAX_MP: u16 = 999;
 /// Highest Defense / Magic Defense. 512 would mean immunity in the damage
 /// formula, so it is never reachable.
 pub(crate) const MAX_DEFENSE: u16 = 511;
+/// Weapon accuracy when the equipment does not say otherwise.
+pub(crate) const DEFAULT_WEAPON_ACCURACY: u8 = 95;
 
 /// Primary attributes, each in `1..=255`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -33,11 +35,17 @@ pub struct Attributes {
 }
 
 /// What equipped gear adds to a combatant.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields, default)]
 pub struct Equipment {
     /// Added to Strength to form Attack.
     pub weapon_attack: u16,
+    /// Base hit chance of physical attacks, in percent (`1..=100`; 95 by
+    /// default, light weapons higher, heavy ones lower).
+    pub weapon_accuracy: u8,
+    /// Chance subtracted from physical attacks aimed at the wearer, in
+    /// percent (`0..=100`; armor and shields).
+    pub evasion: u8,
     /// Added to Vitality to form Defense.
     pub armor_defense: u16,
     /// Added to Spirit to form Magic Defense.
@@ -47,6 +55,20 @@ pub struct Equipment {
     /// Extra critical damage, in basis points on top of the 130% base
     /// (e.g. `1000` makes criticals deal 140%).
     pub critical_damage: u16,
+}
+
+impl Default for Equipment {
+    fn default() -> Self {
+        Self {
+            weapon_attack: 0,
+            weapon_accuracy: DEFAULT_WEAPON_ACCURACY,
+            evasion: 0,
+            armor_defense: 0,
+            armor_magic_defense: 0,
+            critical_chance: 0,
+            critical_damage: 0,
+        }
+    }
 }
 
 /// Everything about a combatant that the damage and ATB formulas read.
@@ -119,6 +141,14 @@ impl Stats {
         }
         if self.max_mp > MAX_MP {
             return Some(format!("maxMp must be 0..={MAX_MP}, got {}", self.max_mp));
+        }
+        let gear = &self.equipment;
+        if !(1..=100).contains(&gear.weapon_accuracy) {
+            let accuracy = gear.weapon_accuracy;
+            return Some(format!("weaponAccuracy must be 1..=100, got {accuracy}"));
+        }
+        if gear.evasion > 100 {
+            return Some(format!("evasion must be 0..=100, got {}", gear.evasion));
         }
         attributes
             .iter()

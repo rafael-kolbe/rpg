@@ -131,12 +131,20 @@ pub enum Effect {
         /// which ends on a hit or a full ATB gauge instead.
         #[serde(default)]
         duration_ticks: Option<u16>,
+        /// Chance to take hold on an opponent, in percent (`1..=100`), before
+        /// the target's Luck resistance. Ignored on allies: buffs always land.
+        #[serde(default = "full_accuracy")]
+        accuracy: u8,
     },
     /// Removes statuses (antidotes, Esuna).
     RemoveStatus {
         /// Statuses removed, when present.
         statuses: Vec<StatusKind>,
     },
+}
+
+fn full_accuracy() -> u8 {
+    100
 }
 
 impl Effect {
