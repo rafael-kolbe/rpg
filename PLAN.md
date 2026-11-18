@@ -359,7 +359,9 @@ Estrutura do FF7, em aritmética inteira:
 físico   base = Attack + ⌊(Attack + Nível) / 32⌋ × ⌊(Attack × Nível) / 32⌋
 mágico   base = 6 × (Magic Attack + Nível)
 dano     = Poder × (512 − Defesa) × base / (16 × 512)
-         × variação [3841..4096] / 4096 × elemento × multiplicador
+         × variação [3841..4096] / 4096 × elemento × crítico
+final    = dano × 150% se o alvo está Distraído   (aplicado por último)
+         → limitado a 9999
 ```
 
 - **Poder:** força da ação (ataque normal = 16; magias e habilidades com valores
@@ -367,9 +369,10 @@ dano     = Poder × (512 − Defesa) × base / (16 × 512)
 - **Defesa** (Defense ou Magic Defense) vai de 0 a 511; 512 seria imunidade, e
   equipamento e status respeitam esse teto.
 - **Elemento:** fraqueza 2×, resistência 0,5×, imune 0.
-- **Multiplicador:** crítico e Distraído **se acumulam somando os bônus**:
-  `1 + bônus de crítico + bônus de Distraído`. Base: crítico **130%** (+30%),
-  Distraído **150%** (+50%); os dois juntos, **180%**.
+- **Ordem:** o dano é calculado por inteiro (incluindo elemento e crítico) e,
+  **por último**, recebe o multiplicador de 150% do Distraído. Os dois se
+  acumulam de forma multiplicativa: crítico base 130% × Distraído 150% =
+  **195%**. O teto de 9999 vale sobre o resultado final.
 - **Crítico:** dano base 130%, aumentado por equipamento (e, no futuro, talvez
   cartas). Chance a partir de Luck, nível do atacante contra o do alvo, e bônus
   da arma; fontes de crítico em equipamento têm teto (sem empilhar como o
