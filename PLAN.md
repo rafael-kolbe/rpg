@@ -18,7 +18,7 @@ O jogo é em inglês (padrão), com tradução para português nas configuraçõ
 | Trilha | `Trail` | Ligação tracejada entre dois nodes; pode estar bloqueada (item, quest, evento) |
 | Safe zone | `SafeZone` | Zona de instância com 0% de chance de batalha |
 | Emboscada | `Ambush` | Ataque de surpresa: ATB cheia para quem embosca; o lado emboscado começa **Distraído**. Funciona dos dois lados |
-| Distraído | `Distracted` | Status: o próximo golpe recebido causa 2×. Termina ao levar esse golpe ou quando a própria ATB chega a 100%. Visual: avatar virado de costas |
+| Distraído | `Distracted` | Status: o próximo golpe recebido causa 150% de dano. Termina ao levar esse golpe ou quando a própria ATB chega a 100%. Visual: avatar virado de costas |
 | Modo História | `StoryMode` | Campanha single-player com os heróis fixos da história |
 | Modo Online | `OnlineMode` | Multiplayer, com Guerreiros recrutados na Guilda |
 | Herói | `Hero` | Personagem fixo da história: classe, habilidades e crescimento definidos pelo jogo |
@@ -196,12 +196,12 @@ emboscar a viagem (ex.: um dragão surgindo do nada no meio do caminho).
 - **Status Distraído (Distracted)** (vale para os dois lados): cada combatente
   emboscado fica Distraído — avatar virado de costas — até o que acontecer
   primeiro:
-  1. levar um golpe — esse golpe causa 2× de dano e ele se vira;
+  1. levar um golpe — esse golpe causa 150% de dano e ele se vira;
   2. a própria ATB chegar a 100% — ele se vira sozinho, sem ter sido atingido.
 
   Ex.: num 3v3, dois heróis atacam o inimigo A e o terceiro ataca o B. O
-  primeiro golpe em A causa 2× e A se vira, então o segundo já é normal; o golpe
-  em B causa 2×. O inimigo C segue Distraído até ser atingido ou até a ATB dele
+  primeiro golpe em A causa 150% e A se vira, então o segundo já é normal; o golpe
+  em B causa 150%. O inimigo C segue Distraído até ser atingido ou até a ATB dele
   encher.
 - **Chance de ser emboscado:** base da região/trilha (floresta densa > campo
   aberto), modificada por atributos da party (Dexterity, Luck) e por itens e habilidades
@@ -298,7 +298,7 @@ ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
 - Ao agir, a barra volta a 0.
 - Início da batalha: barras começam em valor aleatório de 0–30%.
   **Emboscada** (seção 2): quem embosca começa com ATB 100%; o lado emboscado
-  começa com ATB **0%** e **Distraído** — o próximo golpe em cada um causa 2×, até ser atingido ou a
+  começa com ATB **0%** e **Distraído** — o próximo golpe em cada um causa 150%, até ser atingido ou a
   própria ATB encher. Vale para os dois lados.
 
 ### Modos de tempo
@@ -318,7 +318,8 @@ ganho por tick = BASE × (Dexterity + 50) / 100 × mod_status
 | Item | Poção, Éter, Antídoto, Pena de Fênix | Item do inventário |
 | Defender | Recebe 50% de dano até a próxima ação | — |
 | Limit | Golpe especial quando a barra de Limit está cheia | Barra de Limit |
-| Fugir | Chance pela Dexterity média da party contra a dos inimigos | Indisponível contra chefe |
+
+**Não existe fuga:** toda batalha vai até a vitória ou a derrota.
 
 A barra de **Limit** enche com o dano recebido (`dano / HP máx × 100%`). Cheia, o
 comando Atacar vira Limit até ser usado.
@@ -366,10 +367,12 @@ dano     = Poder × (512 − Defesa) × base / (16 × 512)
 - **Defesa** (Defense ou Magic Defense) vai de 0 a 511; 512 seria imunidade, e
   equipamento e status respeitam esse teto.
 - **Elemento:** fraqueza 2×, resistência 0,5×, imune 0.
-- **Multiplicador:** crítico (2×) e Distraído (2×) **não se somam: vale o
-  maior**. Um golpe nunca passa de 2× por esses dois.
-- **Crítico:** chance a partir de Luck, nível do atacante contra o do alvo, e
-  bônus da arma; fontes de crítico em equipamento têm teto (sem empilhar como o
+- **Multiplicador:** crítico e Distraído **se acumulam somando os bônus**:
+  `1 + bônus de crítico + bônus de Distraído`. Base: crítico **130%** (+30%),
+  Distraído **150%** (+50%); os dois juntos, **180%**.
+- **Crítico:** dano base 130%, aumentado por equipamento (e, no futuro, talvez
+  cartas). Chance a partir de Luck, nível do atacante contra o do alvo, e bônus
+  da arma; fontes de crítico em equipamento têm teto (sem empilhar como o
   Luck Plus do FF7).
 - **Cura:** `Poder × 22 + (Nível + Magic) × 6`, sem defesa.
 - **Gravity** (elemento): dano em **% do HP atual** do alvo; chefes resistem ou
@@ -388,7 +391,7 @@ dano     = Poder × (512 − Defesa) × base / (16 × 512)
 
 Veneno (−5% HP a cada 3 s), Sono (barra para até levar dano), Silêncio (sem
 Magia), Haste, Slow, Barrier (dano físico −50%), Magic Barrier (dano mágico
-−50%), Regen, **Distraído** (próximo golpe recebido causa 2×; acaba ao ser
+−50%), Regen, **Distraído** (próximo golpe recebido causa 150% de dano; acaba ao ser
 atingido ou com a ATB em 100%; aplicado pela emboscada e, no futuro, por
 habilidades — ex.: inimigo psíquico).
 
@@ -1080,7 +1083,7 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Penalidade por morte (XP, dinheiro, itens?) — decidir mais tarde.
 - [ ] Modo Online: o que move o jogo (missões da Guilda, exploração livre, chefes, eventos, outros) — detalhar no futuro.
 - [ ] Itens raros encaixáveis em equipamento (estilo cartas do Ragnarok Online): decidir depois do balanceamento.
-- [ ] Números de atributos (curvas por classe, pontos por nível dos recrutas, tabela de custo, limites de Sources, Poder de cada ação, teto de crítico): calibrar no simulador.
+- [ ] Números de atributos (curvas por classe, pontos por nível dos recrutas, tabela de custo, limites de Sources, Poder de cada ação, teto de chance e de dano de crítico): calibrar no simulador.
 - [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
