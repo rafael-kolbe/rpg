@@ -19,8 +19,8 @@ O jogo é em inglês (padrão), com tradução para português nas configuraçõ
 | Safe zone | `SafeZone` | Zona de instância com 0% de chance de batalha |
 | Emboscada | `Ambush` | Ataque de surpresa: ATB cheia para quem embosca; o lado emboscado começa **Distraído**. Funciona dos dois lados |
 | Distraído | `Distracted` | Status: o próximo golpe recebido causa 150% de dano. Termina ao levar esse golpe ou quando a própria ATB chega a 100%. Visual: avatar virado de costas |
-| Modo História | `StoryMode` | Campanha single-player com os heróis fixos da história |
-| Modo Online | `OnlineMode` | Multiplayer, com Guerreiros recrutados na Guilda |
+| Modo História | `Campaign` | Campanha single-player com os heróis fixos da história; no menu: **Campaign** / **Campanha** |
+| Modo Online | `Multiplayer` | Multiplayer, com Guerreiros recrutados na Guilda; no menu: **Multiplayer** |
 | Herói | `Hero` | Personagem fixo da história: classe, habilidades e crescimento definidos pelo jogo |
 | Guerreiro recrutado | `Recruit` | Personagem criado pelo jogador na Guilda de Aventureiros, só para o Modo Online |
 | Mastery Tree | `MasteryTree` | Grade de habilidades: libera casas vizinhas com pontos de Mastery; a casa dá a permissão, o item/magia ainda precisa ser obtido |
@@ -818,6 +818,13 @@ protocol ──▶ engine ◀── content
   sandbox continua aberto, sem conta). Trocar a senha pela recovery key
   derruba todas as sessões.
 - Telas: `/signup`, `/login`, `/recover`; a home mostra quem está conectado.
+- **Depois do login, o jogador escolhe o modo:** Campaign (Modo História) ou
+  Multiplayer (Modo Online; bloqueado, com o motivo visível, até o ponto da
+  história que o libera).
+- **Cada modo tem o próprio save de posição** (peça, instância, node), mesmo
+  sendo o mesmo mapa: andar no Multiplayer não move o jogador na Campaign, e
+  vice-versa. A party também é por modo (heróis × Guerreiros recrutados);
+  itens Untradeable continuam valendo nos dois modos (ver Modos de jogo).
 - Tentativas de login limitadas por username e por IP.
 - **E-mail fica para depois** (confirmação de conta, recuperação por e-mail):
   entra quando houver motivo e um provedor SMTP; até lá, nenhum dado pessoal é
