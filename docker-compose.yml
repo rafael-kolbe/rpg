@@ -8,7 +8,10 @@
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        SANDBOX: ${SANDBOX:-false}
     container_name: rpg_app
     restart: unless-stopped
     environment:

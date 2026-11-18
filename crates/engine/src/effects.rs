@@ -293,7 +293,7 @@ impl Battle {
         self.apply_status(target, status, duration_ticks, events);
     }
 
-    fn apply_status(
+    pub(crate) fn apply_status(
         &mut self,
         target: CombatantId,
         status: StatusKind,

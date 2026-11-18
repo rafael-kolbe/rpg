@@ -1,5 +1,5 @@
-//! HTTP routes: the JSON API under `/api` and the built web client for
-//! everything else.
+//! HTTP routes: the JSON API under `/api`, the battle WebSocket on `/ws`, and
+//! the built web client for everything else.
 //!
 //! The web client is a single-page app, so any non-API path that is not a file
 //! (e.g. `/sandbox/battle-basic`) is answered with `index.html` and the client
@@ -24,17 +24,21 @@ const DATABASE_PING_TIMEOUT: Duration = Duration::from_secs(2);
 #[derive(Clone)]
 pub(crate) struct AppState {
     pub(crate) db: PgPool,
+    #[cfg(feature = "sandbox")]
+    pub(crate) sandbox: std::sync::Arc<crate::sandbox::Sandbox>,
 }
 
 /// Builds the full HTTP router.
 pub(crate) fn router(state: AppState, web_dir: &Path) -> Router {
-    let api = Router::new()
-        .route("/health", get(health))
-        .fallback(|| async { StatusCode::NOT_FOUND });
+    let api = Router::new().route("/health", get(health));
+    #[cfg(feature = "sandbox")]
+    let api = api.route("/sandbox", get(sandbox_list));
+    let api = api.fallback(|| async { StatusCode::NOT_FOUND });
 
     let web = ServeDir::new(web_dir).fallback(ServeFile::new(web_dir.join("index.html")));
 
     Router::new()
+        .route("/ws", get(crate::ws::upgrade))
         .nest("/api", api)
         .fallback_service(web)
         .layer(TraceLayer::new_for_http())
@@ -64,6 +68,14 @@ async fn health(State(state): State<AppState>) -> (StatusCode, Json<HealthRespon
     (code, Json(body))
 }
 
+/// `GET /api/sandbox`: names of the sandbox scenarios.
+#[cfg(feature = "sandbox")]
+async fn sandbox_list(State(state): State<AppState>) -> Json<protocol::SandboxList> {
+    Json(protocol::SandboxList {
+        scenarios: state.sandbox.scenarios.keys().cloned().collect(),
+    })
+}
+
 async fn ping_database(db: &PgPool) -> bool {
     let ping = async {
         let mut connection = db.acquire().await?;
@@ -84,7 +96,7 @@ async fn ping_database(db: &PgPool) -> bool {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use axum::body::{Body, to_bytes};
     use axum::http::Request;
     use sqlx::postgres::PgPoolOptions;
@@ -93,7 +105,7 @@ mod tests {
     use super::*;
 
     /// A pool pointing at a port where nothing listens: every ping fails fast.
-    fn unreachable_database() -> PgPool {
+    pub(crate) fn unreachable_database() -> PgPool {
         PgPoolOptions::new()
             .acquire_timeout(Duration::from_millis(500))
             .connect_lazy("postgres://rpg@127.0.0.1:1/rpg")
@@ -111,13 +123,32 @@ mod tests {
     fn app_with_web_dir() -> (Router, tempfile::TempDir) {
         let web_dir = tempfile::tempdir().unwrap();
         std::fs::write(web_dir.path().join("index.html"), "<html>game</html>").unwrap();
-        let app = router(
-            AppState {
-                db: unreachable_database(),
-            },
-            web_dir.path(),
-        );
+        let app = router(test_state(), web_dir.path());
         (app, web_dir)
+    }
+
+    #[cfg(not(feature = "sandbox"))]
+    fn test_state() -> AppState {
+        AppState {
+            db: unreachable_database(),
+        }
+    }
+
+    #[cfg(feature = "sandbox")]
+    fn test_state() -> AppState {
+        sandbox_state()
+    }
+
+    /// State with the repository's real content and sandbox scenarios.
+    #[cfg(feature = "sandbox")]
+    pub(crate) fn sandbox_state() -> AppState {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let sandbox =
+            crate::sandbox::Sandbox::load(&root.join("content"), &root.join("sandbox")).unwrap();
+        AppState {
+            db: unreachable_database(),
+            sandbox: std::sync::Arc::new(sandbox),
+        }
     }
 
     #[tokio::test]

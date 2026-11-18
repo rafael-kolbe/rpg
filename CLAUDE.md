@@ -33,7 +33,12 @@ change.
 | Battle simulator CLI | `crates/sim/src/main.rs` |
 | Actions and items (data) | `content/actions.json`, `content/items.json` |
 | Sandbox scenarios (data) | `sandbox/*.json` |
-| Wire protocol (client ↔ server messages) | `crates/protocol/src/lib.rs` |
+| Sandbox-only engine tools (KO, apply status, fill gauge) | `crates/engine/src/debug.rs` |
+| Wire protocol: WebSocket messages | `crates/protocol/src/messages.rs` |
+| Wire protocol: battle state as the client sees it | `crates/protocol/src/state.rs` |
+| Wire protocol: `/api/health` | `crates/protocol/src/health.rs` |
+| Battle session per WebSocket connection (`/ws`) | `crates/server/src/ws.rs` |
+| Sandbox scenarios loaded by the server | `crates/server/src/sandbox.rs` |
 | Generated TS types of the protocol (never edit) | `web/src/protocol/generated/` |
 | Server entry point, CLI commands | `crates/server/src/main.rs` |
 | Server configuration (env vars) | `crates/server/src/config.rs` |
@@ -42,6 +47,12 @@ change.
 | UI text and game text, per language | `locales/<locale>/*.ftl` |
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
+| Shared UI components (Window, MenuList, Gauge, Button, Select…) | `web/src/ui/` |
+| App-level components (language picker) | `web/src/components/` |
+| Battle screen, command menu, party panel, WebSocket hook | `web/src/battle/` |
+| Sandbox page and debug panel | `web/src/sandbox/` |
+| Pages and routing | `web/src/pages/`, `web/src/App.tsx` |
+| Browser tests (Playwright) | `web/e2e/` |
 | Quality scripts used by `make check` | `scripts/`, `web/scripts/` |
 | Database backup job | `scripts/backup.sh` (run by the `backup` service) |
 
@@ -62,6 +73,8 @@ Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
 | `make protocol-types` | Regenerate TS types after changing `crates/protocol` |
 | `make docs` | Build and open rustdoc for the whole workspace |
 | `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`) |
+| `make e2e` | Build the client and run the Playwright browser tests (starts its own sandbox server) |
+| Sandbox in the browser | `make dev-server` + `make dev-web`, open `/sandbox/battle-basic` (`?seed=42&auto=1&speed=400`) |
 
 `cargo` lives in `~/.cargo/bin`; the Makefile adds it to `PATH`. In a bare
 shell, `source ~/.cargo/env` first.
@@ -110,6 +123,16 @@ Portuguese).
   `locales/en-US` (default) and `locales/pt-BR`, used through `t(id, args)`.
   The server sends ids + arguments, never translated text.
 - State comes from the server; `localStorage` only for per-browser preferences.
+- **Componentize; never repeat markup.** Generic pieces live in `web/src/ui/`
+  (Window, MenuList, Gauge, Button, Select, Checkbox, TextInput) and are used
+  everywhere; a screen composes them. When the same markup or styling shows up
+  twice, it becomes a component. Keep files small: one component per file,
+  split a component when it grows past one clear job.
+- Shared component styles in `web/src/ui/ui.css`; screen styles beside the
+  screen (`battle/battle.css`).
+- React rules enforced by oxlint: no `setState` synchronously inside effects;
+  react to server events through `subscribe` from `useBattle`.
+- Every interactive element tests need gets a `data-testid`.
 
 ### Comments
 
@@ -136,11 +159,18 @@ prove nothing was left behind.
 - First `sqlx::query!` → add `cargo sqlx prepare --workspace --check` to
   `check-rust` and commit `.sqlx/`.
 - First table → create `migrations/`, run `sqlx::migrate!` at server startup.
-- Sandbox in the browser (phase 2) → `sandbox` Cargo feature on `server`,
-  `/sandbox/*` client routes, Playwright + `make e2e`.
 - People start editing content by hand → generate JSON Schemas from the engine
   types (`schemars`) for editor autocomplete, checked for staleness like the
   protocol types.
+
+## Sandbox
+
+- Built only with the `sandbox` Cargo feature (`server/sandbox` → `engine/sandbox`).
+  `make dev-server` and `make e2e` enable it; Docker builds it when `.env` has
+  `SANDBOX=true` (fine on localhost, **never** in a published image).
+- A new scenario is a JSON file in `sandbox/`; the server and `content-check`
+  validate it at startup / check time. Prefer a scenario over manual setup when
+  testing a mechanic.
 
 ## Content rules
 

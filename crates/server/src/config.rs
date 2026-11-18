@@ -7,6 +7,8 @@
 //! | `WEB_DIR`      | `web/dist` | Built web client served as static files   |
 //! | `LOG_FORMAT`   | `text`     | `text` for terminals, `json` in containers |
 //! | `RUST_LOG`     | `info`     | Log filter (`tracing` env-filter syntax)  |
+//! | `CONTENT_DIR`  | `content`  | Game data (sandbox builds only)           |
+//! | `SANDBOX_DIR`  | `sandbox`  | Sandbox scenarios (sandbox builds only)   |
 
 use std::path::PathBuf;
 
@@ -19,6 +21,10 @@ pub(crate) struct Config {
     pub(crate) database_url: String,
     pub(crate) web_dir: PathBuf,
     pub(crate) log_format: LogFormat,
+    #[cfg(feature = "sandbox")]
+    pub(crate) content_dir: PathBuf,
+    #[cfg(feature = "sandbox")]
+    pub(crate) sandbox_dir: PathBuf,
 }
 
 /// How log lines are written.
@@ -61,6 +67,12 @@ impl Config {
             database_url,
             web_dir,
             log_format,
+            #[cfg(feature = "sandbox")]
+            content_dir: lookup("CONTENT_DIR")
+                .map_or_else(|| PathBuf::from("content"), PathBuf::from),
+            #[cfg(feature = "sandbox")]
+            sandbox_dir: lookup("SANDBOX_DIR")
+                .map_or_else(|| PathBuf::from("sandbox"), PathBuf::from),
         })
     }
 }
@@ -83,15 +95,10 @@ mod tests {
     fn applies_defaults_when_only_the_database_is_set() {
         let config = config_from(&[("DATABASE_URL", "postgres://localhost/rpg")]).unwrap();
 
-        assert_eq!(
-            config,
-            Config {
-                port: 3000,
-                database_url: "postgres://localhost/rpg".to_owned(),
-                web_dir: PathBuf::from("web/dist"),
-                log_format: LogFormat::Text,
-            }
-        );
+        assert_eq!(config.port, 3000);
+        assert_eq!(config.database_url, "postgres://localhost/rpg");
+        assert_eq!(config.web_dir, PathBuf::from("web/dist"));
+        assert_eq!(config.log_format, LogFormat::Text);
     }
 
     #[test]

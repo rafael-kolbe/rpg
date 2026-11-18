@@ -8,6 +8,7 @@ pub(crate) const PULSE_INTERVAL_TICKS: u16 = 30;
 pub(crate) const PULSE_PERCENT: u16 = 5;
 
 /// A status condition.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum StatusKind {

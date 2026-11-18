@@ -10,9 +10,20 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+# TypeScript bindings for the types the protocol sends (enabled by `protocol`).
+ts = ["dep:ts-rs"]
+# Debug tools for sandbox scenarios (enabled by `server/sandbox`). Never in
+# production builds.
+sandbox = []
+
 [dependencies]
 serde = { version = "1.0.229", features = ["derive"] }
 thiserror = "2.0.21"
+# Warnings about serde attributes ts-rs does not need (deny_unknown_fields,
+# transparent) are noise: the generated types are checked by `make check`.
+ts-rs = { version = "12.0.1", optional = true, features = ["no-serde-warnings"] }
 
 [dev-dependencies]
 serde_json = "1.0.154"
+

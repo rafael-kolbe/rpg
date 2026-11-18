@@ -12,6 +12,9 @@
 mod config;
 mod healthcheck;
 mod http;
+#[cfg(feature = "sandbox")]
+mod sandbox;
+mod ws;
 
 use std::net::{Ipv4Addr, SocketAddr};
 
@@ -43,7 +46,21 @@ async fn serve(config: Config) -> anyhow::Result<()> {
         .connect_lazy(&config.database_url)
         .context("invalid DATABASE_URL")?;
 
-    let app = http::router(http::AppState { db }, &config.web_dir);
+    #[cfg(feature = "sandbox")]
+    let sandbox = {
+        let sandbox = sandbox::Sandbox::load(&config.content_dir, &config.sandbox_dir)?;
+        tracing::warn!(
+            scenarios = sandbox.scenarios.len(),
+            "SANDBOX ENABLED: never publish this build"
+        );
+        std::sync::Arc::new(sandbox)
+    };
+    let state = http::AppState {
+        db,
+        #[cfg(feature = "sandbox")]
+        sandbox,
+    };
+    let app = http::router(state, &config.web_dir);
     let address = SocketAddr::from((Ipv4Addr::UNSPECIFIED, config.port));
     let listener = TcpListener::bind(address)
         .await

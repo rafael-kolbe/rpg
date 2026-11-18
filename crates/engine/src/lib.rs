@@ -88,6 +88,8 @@ mod atb;
 mod battle;
 mod combatant;
 mod damage;
+#[cfg(feature = "sandbox")]
+mod debug;
 mod effects;
 mod event;
 mod ids;

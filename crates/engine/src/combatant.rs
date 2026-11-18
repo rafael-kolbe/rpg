@@ -13,6 +13,7 @@ use crate::stats::Stats;
 use crate::status::{ActiveStatus, StatusKind};
 
 /// Where a combatant is in its turn cycle.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TurnState {
@@ -101,6 +102,24 @@ impl Combatant {
     #[must_use]
     pub fn stats(&self) -> &Stats {
         &self.stats
+    }
+
+    /// The action its Attack command performs.
+    #[must_use]
+    pub fn attack_action(&self) -> &ActionId {
+        &self.attack
+    }
+
+    /// Spells and abilities it knows.
+    #[must_use]
+    pub fn known_actions(&self) -> &[ActionId] {
+        &self.actions
+    }
+
+    /// Its Limit, if it has one.
+    #[must_use]
+    pub fn limit_action(&self) -> Option<&ActionId> {
+        self.limit.as_ref()
     }
 
     /// Current HP.

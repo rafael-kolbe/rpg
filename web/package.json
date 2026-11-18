@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "knip": "knip",
     "check:locales": "node --experimental-strip-types --no-warnings scripts/check-locales.ts",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run knip && npm run check:locales"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run knip && npm run check:locales",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@fluent/syntax": "^0.19.0",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

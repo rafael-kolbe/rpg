@@ -1,0 +1,93 @@
+/* Shared UI components (web/src/ui). Screen-specific styles live beside their screens. */
+
+.window {
+  padding: 12px;
+  border: 2px solid #8a93b8;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #23306a 0%, #121a3d 100%);
+}
+
+.menu-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu-list__entry {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-list__entry:hover:not(:disabled),
+.menu-list__entry:focus-visible {
+  background: rgb(255 255 255 / 12%);
+}
+
+.menu-list__entry:disabled {
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.gauge {
+  display: block;
+  height: 8px;
+  margin: 2px 0;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 40%);
+  overflow: hidden;
+}
+
+.gauge > span {
+  display: block;
+  height: 100%;
+  transition: width 100ms linear;
+}
+
+.gauge--atb > span {
+  background: #d6d9e8;
+}
+
+.gauge--limit > span {
+  background: #d36ad1;
+}
+
+.gauge--highlight > span {
+  background: var(--color-warning);
+}
+
+.button {
+  padding: 4px 10px;
+  border: 1px solid #8a93b8;
+  border-radius: 4px;
+  background: var(--color-panel);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: var(--color-muted);
+  cursor: default;
+}
+
+.field {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.field__label {
+  color: var(--color-muted);
+}

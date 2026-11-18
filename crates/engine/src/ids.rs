@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 /// A combatant's position in a battle: party members first, then enemies, in
 /// the order of the [`Encounter`](crate::Encounter).
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct CombatantId(pub u8);
@@ -17,6 +18,7 @@ impl fmt::Display for CombatantId {
 }
 
 /// The side a combatant fights on.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Side {
@@ -38,6 +40,7 @@ impl Side {
 }
 
 /// Content id of an action (`attack`, `fire`, `potion`…).
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ActionId(String);
@@ -63,6 +66,7 @@ impl fmt::Display for ActionId {
 }
 
 /// Content id of an item (`potion`, `revive-feather`…).
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ItemId(String);

@@ -9,6 +9,7 @@ use crate::status::StatusKind;
 
 /// One change in a battle. The client animates these; it never recomputes
 /// rules from them.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(
     tag = "type",
@@ -175,6 +176,7 @@ pub enum BattleEvent {
 }
 
 /// Why a queued action was dropped.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum CancelReason {
@@ -185,6 +187,7 @@ pub enum CancelReason {
 }
 
 /// Why a queued action could not run.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum FailReason {
@@ -197,6 +200,7 @@ pub enum FailReason {
 }
 
 /// Why a status ended.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum StatusEndReason {

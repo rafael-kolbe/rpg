@@ -21,7 +21,7 @@ export HOST_GID := $(shell id -g)
 .PHONY: help network require-env up up-d down logs ps build \
         dev-db dev-db-down dev-server dev-web \
         check check-rust check-content check-web check-protocol check-skipped-tests \
-        fmt docs protocol-types sim
+        fmt docs protocol-types sim e2e
 
 help:
 	@echo "Run (production-like, http://127.0.0.1:8083):"
@@ -41,6 +41,7 @@ help:
 	@echo "  make check         everything that must pass before a change is done"
 	@echo "  make fmt           format Rust and web code"
 	@echo "  make docs          build and open the code documentation"
+	@echo "  make e2e           build the client and run the browser tests (Playwright)"
 	@echo "  make protocol-types  regenerate TypeScript types from crates/protocol"
 	@echo ""
 	@echo "Battle simulator (AI vs AI on a sandbox scenario):"
@@ -83,7 +84,7 @@ dev-db-down:
 	$(DEV) down
 
 dev-server:
-	DATABASE_URL=$(DEV_DATABASE_URL) WEB_DIR=web/dist cargo run --bin rpg-server
+	DATABASE_URL=$(DEV_DATABASE_URL) WEB_DIR=web/dist cargo run --features sandbox --bin rpg-server
 
 dev-web:
 	cd web && npm run dev
@@ -97,9 +98,10 @@ check: check-rust check-content check-protocol check-web check-skipped-tests
 check-rust:
 	cargo fmt --all --check
 	cargo clippy --workspace --all-targets --locked -- -D warnings
-	cargo test --workspace --locked --quiet
+	cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+	cargo test --workspace --all-features --locked --quiet
 	cargo machete
-	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --document-private-items --locked --quiet
+	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps --document-private-items --locked --quiet
 
 check-content:
 	cargo run --quiet --locked -p content --bin content-check
@@ -112,6 +114,10 @@ check-web:
 
 check-skipped-tests:
 	./scripts/check-no-skipped-tests.sh
+
+# Browser tests: Playwright starts the server with the sandbox feature itself.
+e2e:
+	cd web && npm run --silent build && npx playwright test
 
 fmt:
 	cargo fmt --all

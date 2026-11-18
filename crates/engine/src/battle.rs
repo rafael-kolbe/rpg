@@ -24,6 +24,7 @@ pub enum PartyControl {
 }
 
 /// How a battle ended.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Outcome {
@@ -34,6 +35,7 @@ pub enum Outcome {
 }
 
 /// A player's choice for a combatant whose turn is ready.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Command {
@@ -47,6 +49,7 @@ pub struct Command {
 }
 
 /// The battle menu commands.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum CommandKind {
@@ -236,6 +239,18 @@ impl Battle {
     #[must_use]
     pub fn combatant(&self, id: CombatantId) -> Option<&Combatant> {
         self.combatants.get(usize::from(id.0))
+    }
+
+    /// Definition of an action.
+    #[must_use]
+    pub fn action(&self, id: &ActionId) -> Option<&ActionDef> {
+        self.actions.get(id)
+    }
+
+    /// Definition of an item.
+    #[must_use]
+    pub fn item(&self, id: &ItemId) -> Option<&ItemDef> {
+        self.items.get(id)
     }
 
     /// Items left, by id (items reserved by queued actions excluded).

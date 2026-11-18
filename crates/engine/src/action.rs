@@ -25,6 +25,7 @@ pub struct ActionDef {
 }
 
 /// The command family an action belongs to.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ActionCategory {
@@ -41,6 +42,7 @@ pub enum ActionCategory {
 }
 
 /// Who an action can be aimed at, relative to the user.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TargetRule {
@@ -156,6 +158,7 @@ impl Effect {
 }
 
 /// Elemental property of an attack.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Element {
@@ -170,6 +173,7 @@ pub enum Element {
 }
 
 /// How a combatant reacts to an element.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Affinity {

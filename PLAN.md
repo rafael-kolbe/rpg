@@ -622,7 +622,7 @@ prever e suavizar a tela).
 | Protocolo | WebSocket com JSON, tipos definidos em Rust e **gerados** para TS (`ts-rs`) | Uma única definição; o TypeScript acusa quando o servidor muda |
 | Cliente | Vite + React + TypeScript (SPA, sem SSR) | O jogo vive atrás de login, numa conexão WebSocket; SSR não traria nada |
 | Mapas | SVG dentro do React | Nodes e trilhas são elementos clicáveis; sem engine de jogo |
-| Efeitos de batalha | PixiJS por cima da tela de batalha | Partículas e cortes leves |
+| Efeitos de batalha | CSS (cortes, brilho de magia, números flutuantes); PixiJS só se os efeitos pedirem mais | Leve e sem dependência enquanto CSS bastar |
 | Conteúdo | Arquivos JSON validados por JSON Schema gerado do Rust (`schemars`) | Editável sem recompilar regras; autocomplete e validação no editor |
 | Traduções | Project Fluent (`.ftl`), `en-US` padrão e `pt-BR` | Plural e gênero tratados; mesma biblioteca existe em Rust e JS |
 
@@ -642,7 +642,7 @@ rpg/
 │   ├── en-US/*.ftl         textos do jogo (padrão)
 │   └── pt-BR/*.ftl         tradução
 ├── migrations/             SQL versionado (SQLx)
-├── web/                    Vite + React + TS + PixiJS
+├── web/                    Vite + React + TS
 │   └── src/protocol/generated/   tipos gerados — nunca editados à mão
 ├── docs/decisions/         um arquivo curto por decisão (ADR)
 ├── Dockerfile              multi-stage: build Rust + build web → imagem distroless
@@ -692,8 +692,11 @@ protocol ──▶ engine ◀── content
 
 ### Cliente
 
-- React para telas, janelas, HUD e menus; SVG para os mapas; PixiJS para os
-  efeitos de batalha.
+- React para telas, janelas, HUD e menus; SVG para os mapas; CSS para os
+  efeitos de batalha (PixiJS só se os efeitos pedirem mais).
+- Componentes de UI reutilizáveis em `web/src/ui/` (janela, lista de menu,
+  barra, botão, select…); as telas só compõem esses componentes, sem repetir
+  marcação.
 - O estado de jogo vem do servidor; o cliente guarda só preferências (idioma,
   volume, velocidade de texto).
 - Barras ATB interpoladas entre ticks para ficarem lisas a 60 fps.
@@ -1063,7 +1066,7 @@ serviço gerenciado.
 | --- | --- | --- |
 | 0. Esqueleto e padrões ✅ | Git local, workspace Rust, `web/`, Dockerfile, compose (app + db), Makefile, `make check` completo, `make docs`, `CLAUDE.md`, hook, backup do banco | `/api/health` respondendo em `localhost:8083`; `make check` verde |
 | 1. Engine headless ✅ | ATB, fila, comandos, fórmulas, status (incl. Distracted), emboscadas, IA por regras, PRNG com seed, conteúdo provisório em `content/`, primeiro cenário `sandbox/battle-basic.json` | Testes de replay passando; `make sim` roda uma batalha 3×3 até o fim e dá o mesmo resultado sempre |
-| 2. Cliente + servidor | Sala de um jogador, tela de batalha, barras, menus, alvos, efeitos básicos, modos Active/Wait, i18n `en-US`/`pt-BR`, sandbox com `battle-basic` e ferramentas de debug, primeiro teste e2e | `localhost:8083/sandbox/battle-basic` jogável do início ao fim, nos dois idiomas; e2e verde |
+| 2. Cliente + servidor ✅ | Sala de um jogador, tela de batalha, barras, menus, alvos, efeitos básicos, modos Active/Wait, i18n `en-US`/`pt-BR`, sandbox com `battle-basic` e ferramentas de debug, primeiro teste e2e | `localhost:8083/sandbox/battle-basic` jogável do início ao fim, nos dois idiomas; e2e verde |
 | 3. Conteúdo e progressão | Mapa-múndi, 1ª cidade, 1 zona de exploração, 1 calabouço com chefe, diálogos, fog of war, ~8 inimigos, XP/nível, loja, save | Região jogável do início ao chefe; save sobrevive a recarregar a página |
 | 4. Multiplayer | Guilda e Guerreiros recrutados, party, controle por jogador, validação, snapshots, reconexão | 3 navegadores em redes diferentes vencem uma batalha juntos via subdomínio; derrubar o Wi-Fi de um por 30 s e ele volta aos mesmos Guerreiros |
 | 5. Polimento | Chat e moderação, trocas, balanceamento, sons, mais conteúdo | A definir ao fim da fase 4 |
