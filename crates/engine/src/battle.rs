@@ -475,11 +475,7 @@ impl Battle {
             TargetRule::User => eligible.into_iter().filter(|&id| id == actor).collect(),
             TargetRule::SingleEnemy | TargetRule::SingleAlly => match requested {
                 Some(id) if eligible.contains(&id) => vec![id],
-                _ if eligible.is_empty() => Vec::new(),
-                _ => {
-                    let index = self.rng.below(eligible.len() as u64);
-                    vec![eligible[usize::try_from(index).unwrap_or(0)]]
-                }
+                _ => self.rng.pick(&eligible).into_iter().collect(),
             },
         }
     }

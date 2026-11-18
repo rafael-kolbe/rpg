@@ -15,6 +15,7 @@ use crate::damage::{
 use crate::event::{BattleEvent, CancelReason, StatusEndReason};
 use crate::ids::CombatantId;
 use crate::status::{ActiveStatus, StatusKind};
+use utils::numbers::saturating_u16;
 
 /// Everything that changes a hit after the raw formula.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -107,7 +108,7 @@ impl Battle {
             Effect::Revive { hp_percent } => {
                 let combatant = self.combatant_mut(target);
                 let hp = u32::from(combatant.stats.max_hp) * u32::from(*hp_percent) / 100;
-                combatant.hp = u16::try_from(hp).unwrap_or(combatant.stats.max_hp).max(1);
+                combatant.hp = saturating_u16(u64::from(hp)).max(1);
                 combatant.reset_turn();
                 events.push(BattleEvent::Revived {
                     target,
@@ -222,7 +223,7 @@ impl Battle {
         events: &mut Vec<BattleEvent>,
     ) {
         let combatant = self.combatant_mut(target);
-        let lost = u16::try_from(amount).unwrap_or(u16::MAX).min(combatant.hp);
+        let lost = saturating_u16(amount).min(combatant.hp);
         combatant.hp -= lost;
         events.push(BattleEvent::Damaged {
             target,
@@ -261,7 +262,7 @@ impl Battle {
     fn restore_hp(&mut self, target: CombatantId, amount: u64, events: &mut Vec<BattleEvent>) {
         let combatant = self.combatant_mut(target);
         let missing = combatant.stats.max_hp - combatant.hp;
-        let restored = u16::try_from(amount).unwrap_or(u16::MAX).min(missing);
+        let restored = saturating_u16(amount).min(missing);
         combatant.hp += restored;
         events.push(BattleEvent::Healed {
             target,

@@ -20,7 +20,7 @@ export HOST_GID := $(shell id -g)
 
 .PHONY: help network require-env up up-d down logs ps build \
         dev-db dev-db-down dev-server dev-web \
-        check check-rust check-content check-web check-protocol check-skipped-tests \
+        check check-rust check-content check-web check-protocol check-skipped-tests check-utils-docs \
         fmt docs protocol-types sim e2e
 
 help:
@@ -91,7 +91,7 @@ dev-web:
 
 # --- Quality ------------------------------------------------------------------
 
-check: check-rust check-content check-protocol check-web check-skipped-tests
+check: check-rust check-content check-protocol check-web check-skipped-tests check-utils-docs
 	@echo ""
 	@echo "make check: all green."
 
@@ -114,6 +114,9 @@ check-web:
 
 check-skipped-tests:
 	./scripts/check-no-skipped-tests.sh
+
+check-utils-docs:
+	./scripts/check-utils-docs.sh
 
 # Browser tests: Playwright starts the server with the sandbox feature itself.
 e2e:

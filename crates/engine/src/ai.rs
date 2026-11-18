@@ -252,11 +252,7 @@ impl Battle {
             TargetPick::LowestHpOpponent | TargetPick::LowestHpAlly | TargetPick::User => {
                 candidates.first().copied()
             }
-            _ if candidates.is_empty() => None,
-            _ => {
-                let index = self.rng.below(candidates.len() as u64);
-                candidates.get(usize::try_from(index).unwrap_or(0)).copied()
-            }
+            _ => self.rng.pick(&candidates),
         }
     }
 }

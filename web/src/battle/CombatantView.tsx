@@ -1,6 +1,7 @@
 import type { CombatantState } from '../protocol/generated/CombatantState.ts'
 import { useTranslation } from '../i18n/use-translation.ts'
-import { classNames } from '../ui/class-names.ts'
+import { classNames } from '../utils/class-names.ts'
+import { initialsOf } from '../utils/initials.ts'
 import type { Popup, Strike } from './popups.ts'
 
 interface Props {
@@ -9,15 +10,6 @@ interface Props {
   strikes: Strike[]
   targetable: boolean
   onTarget: () => void
-}
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((word) => word[0] ?? '')
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
 }
 
 /** Avatar placeholder, name, statuses and floating numbers of one combatant. */
@@ -46,7 +38,7 @@ export function CombatantView({ combatant, popups, strikes, targetable, onTarget
         <svg viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="30" />
           <text x="32" y="39" textAnchor="middle">
-            {initials(name)}
+            {initialsOf(name)}
           </text>
         </svg>
         {strikes.map((strike) => (

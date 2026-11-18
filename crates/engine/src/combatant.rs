@@ -11,6 +11,7 @@ use crate::ids::{ActionId, CombatantId, Side};
 use crate::setup::CombatantSetup;
 use crate::stats::Stats;
 use crate::status::{ActiveStatus, StatusKind};
+use utils::numbers::saturating_u16;
 
 /// Where a combatant is in its turn cycle.
 #[cfg_attr(feature = "ts", derive(ts_rs::TS))]
@@ -185,7 +186,7 @@ impl Combatant {
     /// combatant is never at 0%.
     pub(crate) fn hp_percent(&self) -> u16 {
         let percent = u32::from(self.hp) * 100;
-        u16::try_from(percent.div_ceil(u32::from(self.stats.max_hp))).unwrap_or(100)
+        saturating_u16(u64::from(percent.div_ceil(u32::from(self.stats.max_hp))))
     }
 
     pub(crate) fn has_full_limit(&self) -> bool {

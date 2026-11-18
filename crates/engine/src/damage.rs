@@ -3,6 +3,8 @@
 //! Pure integer functions. Multipliers are basis points: 10 000 = 100%.
 //! [`crate::effects`] decides which of them apply to a given hit.
 
+use utils::numbers::clamp_to_u8;
+
 /// The damage cap.
 pub(crate) const MAX_DAMAGE: u64 = 9999;
 /// 100% in basis points.
@@ -54,13 +56,13 @@ pub(crate) fn scale(value: u64, bp: u64) -> u64 {
 /// `(Luck + Level − target Level) / 4 + equipment bonus`, clamped to 0..=100.
 pub(crate) fn critical_chance(luck: u16, level: u8, target_level: u8, bonus: u8) -> u8 {
     let raw = (i32::from(luck) + i32::from(level) - i32::from(target_level)) / 4 + i32::from(bonus);
-    u8::try_from(raw.clamp(0, 100)).unwrap_or(100)
+    clamp_to_u8(raw, 0, 100)
 }
 
 /// Lowest hit chance of a physical attack: never impossible.
-const MIN_HIT_PERCENT: i32 = 25;
+const MIN_HIT_PERCENT: u8 = 25;
 /// Lowest chance of a hostile status taking hold.
-const MIN_STATUS_PERCENT: i32 = 5;
+const MIN_STATUS_PERCENT: u8 = 5;
 
 /// Physical hit chance in percent:
 /// `weapon accuracy + (attacker Dexterity − target Dexterity) / 4 − evasion`,
@@ -73,14 +75,14 @@ pub(crate) fn hit_chance(
 ) -> u8 {
     let raw = i32::from(weapon_accuracy) + (i32::from(attacker_dex) - i32::from(target_dex)) / 4
         - i32::from(evasion);
-    u8::try_from(raw.clamp(MIN_HIT_PERCENT, 100)).unwrap_or(100)
+    clamp_to_u8(raw, MIN_HIT_PERCENT, 100)
 }
 
 /// Chance of a hostile status taking hold, in percent:
 /// `status accuracy − target Luck / 4`, clamped to 5..=100.
 pub(crate) fn status_chance(accuracy: u8, target_luck: u16) -> u8 {
     let raw = i32::from(accuracy) - i32::from(target_luck) / 4;
-    u8::try_from(raw.clamp(MIN_STATUS_PERCENT, 100)).unwrap_or(100)
+    clamp_to_u8(raw, MIN_STATUS_PERCENT, 100)
 }
 
 #[cfg(test)]

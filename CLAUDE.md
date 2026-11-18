@@ -34,6 +34,7 @@ change.
 | Actions and items (data) | `content/actions.json`, `content/items.json` |
 | Sandbox scenarios (data) | `sandbox/*.json` |
 | Sandbox-only engine tools (KO, apply status, fill gauge) | `crates/engine/src/debug.rs` |
+| Generic Rust helpers (numbers, text…) | `crates/utils/src/` |
 | Wire protocol: WebSocket messages | `crates/protocol/src/messages.rs` |
 | Wire protocol: battle state as the client sees it | `crates/protocol/src/state.rs` |
 | Wire protocol: `/api/health` | `crates/protocol/src/health.rs` |
@@ -47,6 +48,7 @@ change.
 | UI text and game text, per language | `locales/<locale>/*.ftl` |
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
+| Generic TypeScript helpers (classNames, percentOf, fetchJson…) | `web/src/utils/` |
 | Shared UI components (Window, MenuList, Gauge, Button, Select…) | `web/src/ui/` |
 | App-level components (language picker) | `web/src/components/` |
 | Battle screen, command menu, party panel, WebSocket hook | `web/src/battle/` |
@@ -60,7 +62,8 @@ Planned, created by the phase that needs them (see `PLAN.md` §5 and §9):
 `migrations/` (SQLx).
 
 Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
-`server` → all; `engine` never depends on I/O, network, clock or OS randomness.
+`server` → all; `engine` never depends on I/O, network, clock or OS randomness;
+`utils` depends on nothing and anyone may use it.
 
 ## Commands
 
@@ -118,7 +121,8 @@ Portuguese).
 
 ### Web
 
-- TypeScript strict + `noUncheckedIndexedAccess`; oxlint, Prettier, knip.
+- TypeScript strict + `noUncheckedIndexedAccess`; oxlint, Prettier, knip;
+  unit tests with Vitest (`*.test.ts` next to the code).
 - **No user-facing string in code.** Every text is a Fluent message in
   `locales/en-US` (default) and `locales/pt-BR`, used through `t(id, args)`.
   The server sends ids + arguments, never translated text.
@@ -162,6 +166,30 @@ prove nothing was left behind.
 - People start editing content by hand → generate JSON Schemas from the engine
   types (`schemars`) for editor autocomplete, checked for staleness like the
   protocol types.
+
+## Utils
+
+Generic helpers live in **`crates/utils`** (Rust) and **`web/src/utils/`**
+(TypeScript). Reuse before writing:
+
+1. **Before writing any helper, read the utils folder.** If something close
+   exists, use it or extend it; never write a second function that does the
+   same job.
+2. **What goes there** (the usual criteria): a small, pure (or thin
+   platform-wrapper) function that knows nothing about the game — no
+   combatants, items, ticks, rules — and is needed in two or more places, or is
+   a well-known general operation. Game logic stays in its domain module even
+   when short (damage formulas stay in `engine/src/damage.rs`).
+3. **No dumping ground:** one file/module per topic (`numbers`, `text`,
+   `storage`, `fetch-json`), never `misc` or `helpers`.
+4. **Descriptive names** that say what comes out: `clamp_to_u8`,
+   `saturating_u16`, `percentOf`, `initialsOf`.
+5. **Documentation is mandatory:** what it does, how (edge cases), and an
+   example — Rust `# Examples` (a doctest, run by `cargo test`), TypeScript
+   JSDoc `@example`. `make check` fails without them
+   (`scripts/check-utils-docs.sh`, `web/scripts/check-utils-docs.ts`).
+6. **Tested:** Rust by its doctests (plus unit tests when needed); TypeScript
+   in `web/src/utils/*.test.ts` (Vitest).
 
 ## Sandbox
 

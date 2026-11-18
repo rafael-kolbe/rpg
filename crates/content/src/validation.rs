@@ -10,6 +10,8 @@ use std::path::Path;
 use engine::{Battle, PartyControl};
 use fluent_syntax::ast::Entry;
 
+use utils::text::is_kebab_case;
+
 use crate::{Content, load_encounter};
 
 /// What a successful check covered.
@@ -99,14 +101,7 @@ pub fn check(root: &Path) -> Result<Summary, Vec<String>> {
 
 /// Content ids are lowercase kebab-case: `iron-sword`, `forest-wolf`.
 fn check_id(kind: &str, id: &str, problems: &mut Vec<String>) {
-    let valid = !id.is_empty()
-        && !id.starts_with('-')
-        && !id.ends_with('-')
-        && !id.contains("--")
-        && id
-            .chars()
-            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-');
-    if !valid {
+    if !is_kebab_case(id) {
         problems.push(format!("{kind} id `{id}` is not lowercase kebab-case"));
     }
 }

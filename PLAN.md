@@ -779,6 +779,19 @@ antigas é **detectado pela máquina**, não pela memória de quem programa.
      quando aplicável).
 - TS em modo estrito, com `noUncheckedIndexedAccess`.
 
+### Utils
+
+- Funções genéricas ficam em **`crates/utils`** (Rust) e **`web/src/utils/`**
+  (TypeScript), um arquivo por tema, com nomes descritivos.
+- **Antes de criar uma função, olhar a pasta utils** e reutilizar ou estender o
+  que existe; nunca duas funções fazendo a mesma coisa.
+- Critério (o usual na literatura): pequena, pura, sem conhecimento do jogo, e
+  usada em mais de um lugar ou uma operação geral conhecida. Regra de jogo fica
+  no seu módulo, mesmo curta.
+- Documentação obrigatória com descrição, funcionamento e **exemplo de uso**
+  (doctest no Rust, `@example` no TypeScript); o `make check` reprova sem isso.
+- Testadas: doctests no Rust, Vitest no TypeScript.
+
 ### Um lugar para cada coisa
 
 - O `CLAUDE.md` do projeto mapeia onde mora cada conceito (ex.: "status de

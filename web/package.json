@@ -12,8 +12,10 @@
     "format:check": "prettier --check .",
     "knip": "knip",
     "check:locales": "node --experimental-strip-types --no-warnings scripts/check-locales.ts",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run knip && npm run check:locales",
-    "e2e": "playwright test"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run knip && npm run check:locales && npm run check:utils-docs && npm run test",
+    "e2e": "playwright test",
+    "test": "vitest run",
+    "check:utils-docs": "node --experimental-strip-types --no-warnings scripts/check-utils-docs.ts"
   },
   "dependencies": {
     "@fluent/bundle": "^0.19.1",
@@ -31,7 +33,8 @@
     "oxlint": "^1.90.0",
     "prettier": "^3.10.1",
     "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=22"

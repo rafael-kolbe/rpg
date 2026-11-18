@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { classNames } from './class-names.ts'
+import { classNames } from '../utils/class-names.ts'
 
 interface Props {
   children: ReactNode

@@ -3,7 +3,7 @@ import type { CombatantState } from '../protocol/generated/CombatantState.ts'
 import { useTranslation } from '../i18n/use-translation.ts'
 import { Gauge } from '../ui/Gauge.tsx'
 import { Window } from '../ui/Window.tsx'
-import { classNames } from '../ui/class-names.ts'
+import { classNames } from '../utils/class-names.ts'
 
 interface Props {
   party: CombatantState[]

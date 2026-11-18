@@ -1,4 +1,5 @@
-import { classNames } from './class-names.ts'
+import { classNames } from '../utils/class-names.ts'
+import { percentOf } from '../utils/percent.ts'
 
 interface Props {
   value: number
@@ -10,10 +11,9 @@ interface Props {
 
 /** A thin horizontal bar; width changes animate between server ticks. */
 export function Gauge({ value, max, variant, highlight = false }: Props) {
-  const percent = max > 0 ? Math.min(100, (value * 100) / max) : 0
   return (
     <span className={classNames('gauge', `gauge--${variant}`, highlight && 'gauge--highlight')}>
-      <span style={{ width: `${percent}%` }} />
+      <span style={{ width: `${percentOf(value, max)}%` }} />
     </span>
   )
 }

@@ -38,6 +38,15 @@ impl Rng {
         }
     }
 
+    /// A uniformly chosen element of `items`, or `None` when it is empty.
+    pub(crate) fn pick<T: Copy>(&mut self, items: &[T]) -> Option<T> {
+        if items.is_empty() {
+            return None;
+        }
+        let index = self.below(items.len() as u64);
+        items.get(usize::try_from(index).ok()?).copied()
+    }
+
     /// `true` with probability `percent` / 100 (clamped to 0..=100).
     pub(crate) fn chance_percent(&mut self, percent: u8) -> bool {
         self.below(100) < u64::from(percent.min(100))
@@ -73,6 +82,14 @@ mod tests {
         let mut rng = Rng::new(7);
 
         assert!((0..1000).all(|_| rng.below(3) < 3));
+    }
+
+    #[test]
+    fn pick_returns_an_element_or_none() {
+        let mut rng = Rng::new(7);
+
+        assert_eq!(rng.pick::<u8>(&[]), None);
+        assert!((0..100).all(|_| rng.pick(&[3, 5]).is_some_and(|x| x == 3 || x == 5)));
     }
 
     #[test]
