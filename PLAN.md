@@ -23,6 +23,7 @@ O jogo é em inglês (padrão), com tradução para português nas configuraçõ
 | Modo Online | `OnlineMode` | Multiplayer, com Guerreiros recrutados na Guilda |
 | Herói | `Hero` | Personagem fixo da história: classe, habilidades e crescimento definidos pelo jogo |
 | Guerreiro recrutado | `Recruit` | Personagem criado pelo jogador na Guilda de Aventureiros, só para o Modo Online |
+| Mastery Tree | `MasteryTree` | Grade de habilidades: libera casas vizinhas com pontos de Mastery; a casa dá a permissão, o item/magia ainda precisa ser obtido |
 | Templo | `Temple` | Prédio de cidade onde o jogador salva o ponto de ressurreição (de graça) |
 | Untradeable / Tradeable / Temporário | `Untradeable` / `Tradeable` / `Temporary` | Origem do item: história, Online, ou item com prazo |
 
@@ -335,8 +336,18 @@ dano = (ATK × potência − DEF × 0,5) × variação[0,9 ; 1,1] × elemento ×
 
 ### Atributos e status
 
-**Atributos:** HP, MP, ATK, DEF, MAG, MDEF, SPD, LCK — oito números, todos
-visíveis no menu de status.
+**Atributos: modelo do FF7**, que já foi desenhado para ATB e turnos (o
+balanceamento de atributos e monstros fica melhor assim):
+
+- **Primários:** Strength, Dexterity, Vitality, Magic, Spirit, Luck, mais HP e
+  MP.
+- **Derivados:** Attack, Defense, Magic Attack, Magic Defense (primário +
+  equipamento).
+- Dexterity governa a velocidade da ATB; Luck, críticos e esquivas.
+- Atributos **não** entram na Mastery Tree.
+
+As fórmulas desta seção ainda usam nomes provisórios (SPD = Dexterity, ATK/DEF =
+derivados) e serão refeitas no tópico de atributos e progressão.
 
 **Status:** Veneno (−5% HP a cada 3 s), Sono (barra para até levar dano),
 Silêncio (sem Magia), Haste, Slow, Proteção (DEF +50%), Regen, **Distraído**
@@ -378,16 +389,43 @@ código da engine.
 
 ### Heróis e Guerreiros recrutados
 
-- **Heróis da história (Modo História):** personagens fixos, cada um com classe,
-  habilidades e árvore de habilidades próprias. Evoluem em ritmo idêntico e fixo,
-  conforme a classe. Um NPC da história pode entrar na party temporariamente (até
-  4 membros).
+- **Heróis da história (Modo História):** personagens fixos, cada um com classe
+  e Mastery Tree próprias. Os **atributos evoluem sozinhos**, em ritmo fixo
+  conforme a classe; a **ordem das casas da Mastery Tree o jogador escolhe**. Um
+  NPC da história pode entrar na party temporariamente (até 4 membros).
 - **Guerreiros recrutados (Modo Online):** criados na Guilda de Aventureiros.
-  Classe e habilidades escolhidas no recrutamento e fixas depois disso. A cada
-  nível, o jogador distribui os pontos de atributo — mesma escala de poder dos
-  heróis, só muda a customização.
-- **Sistema de habilidades/magia:** a decidir (algo como Materia do FF7, como as
-  magias do FF8, ou algo próprio).
+  Classe escolhida no recrutamento e fixa depois disso. A cada nível, o jogador
+  distribui os pontos de atributo — mesma escala de poder dos heróis, só muda a
+  customização.
+
+### Mastery Tree
+
+Sistema de habilidades em grade, inspirado no License Board do FF12, com nome e
+desenho próprios.
+
+- **Casas em grade:** libera-se uma casa **vizinha** de outra já liberada,
+  gastando 1 ponto de Mastery por casa (custos maiores por casa, se o
+  balanceamento pedir).
+- **Casas visíveis e desabilitadas** (no FF12 ficavam escondidas), para o
+  jogador planejar o caminho.
+- **A casa só libera; ainda é preciso obter.** Uma casa de magia ou de
+  equipamento dá a **permissão** de usar; a magia ou o item ainda precisam ser
+  comprados, dropados ou ganhos. Segura a inflação e impede builds que correm
+  atrás da magia mais forte cedo (ex.: Ultima no nível 20): magias de alto nível
+  vêm de chefes ou de lojas de cidades avançadas na história.
+- **Heróis da história:** uma Mastery Tree própria por personagem.
+- **Guerreiros recrutados:** uma Mastery Tree única e grande, compartilhada. A
+  classe define **dois pontos de partida**: um na área de equipamentos e outro
+  na de magias.
+- **Contra builds iguais:**
+  - **Teto de pontos** (80 no máximo, ver Progressão): ninguém libera a árvore
+    inteira; a escolha é o build.
+  - **Algumas áreas exclusivas de classe.**
+  - **Pouquíssimos pares exclusivos:** casas em que só faz sentido ter uma; liberar
+    uma bloqueia a outra.
+- **Reset da árvore inteira:** recrutas, com itens especiais de evento; heróis,
+  com um NPC específico.
+- Validação no servidor: vizinhança, pontos, exclusividades e classe.
 
 ### Classes iniciais (rascunho)
 
@@ -412,9 +450,100 @@ fases.
 4. A cada 3 andares, sala de descanso: cura total, loja, troca de equipamento.
 5. Andar 10: chefe. Vencer libera o próximo ciclo com inimigos mais fortes.
 
-**Progressão:** nível 1 a 30, curva de XP `100 × nível^1,5`. Cada nível soma
-atributos pela tabela de crescimento da classe. Equipamento em 3 slots (arma,
-armadura, acessório), sem crafting no MVP.
+**Progressão: duas barras de experiência** (como base e class exp do Ragnarok
+Online):
+
+| Barra | Nível | Cada nível dá |
+| --- | --- | --- |
+| Base | 1 a 99 | Atributos (heróis: automático; recrutas: pontos para distribuir) |
+| Mastery | 0 a 75 | 1 ponto de Mastery Tree; a cada 15 níveis de Mastery, +1 ponto de bônus |
+
+- Total máximo: 75 + 5 bônus (níveis de Mastery 15, 30, 45, 60 e 75) = **80
+  pontos** de Mastery Tree.
+- No nível base 99 o personagem para de ganhar experiência de base e passa a
+  ganhar só de Mastery, até o Mastery 75.
+- Monstros e missões dão experiência de base e de Mastery.
+- Meta de balanceamento: ao chegar no nível base 99, o personagem está por volta
+  do Mastery 60–63; os últimos pontos vêm depois.
+- Equipamento em 3 slots (arma, armadura, acessório), sem crafting no MVP.
+
+### Áreas de caça
+
+Monstros e áreas são desenhados em torno de **três focos**, com troca entre eles
+(como as hunts do Tibia): onde se ganha muita experiência costuma dar prejuízo,
+e onde se ganha muito loot costuma dar pouca experiência.
+
+| Perfil | Experiência | Loot / dinheiro | Para quê |
+| --- | --- | --- | --- |
+| Foco em base | Alta (base) | Baixo; gasto com consumíveis maior que o ganho | Subir de nível |
+| Foco em Mastery | Alta (Mastery) | Baixo | Pontos de Mastery Tree |
+| Foco em loot | Baixa | Alto | Fazer dinheiro |
+| Balanceada | Média | Médio | Jogo do dia a dia |
+| Perigosa | Ruim | Ruim | Exige atenção; chance pequena de um **item raro** |
+
+- O perfil é definido no conteúdo de cada área de instância e de cada monstro.
+- **O jogo não mostra o perfil:** o jogador descobre explorando.
+- **Suprimentos são o principal freio da inflação:** o "prejuízo" das áreas de
+  experiência vem de consumíveis (poções). Runas podem vir depois, também como
+  fonte de renda entre jogadores.
+- **Itens raros por drop** (como as cartas do Ragnarok Online, que se encaixam
+  em equipamentos): opção para o futuro, se o balanceamento pedir.
+- **Munição básica infinita.** Munição especial (fogo, veneno, perfurante) é um
+  consumível **opcional**: gasto que o jogador escolhe para ganhar eficiência,
+  nunca um imposto obrigatório de uma classe só.
+
+### Experiência em party
+
+A métrica de balanceamento é **experiência por hora**, não por batalha: com a
+ATB, 3 personagens terminam uma batalha ~3× mais rápido que 1.
+
+- **Divisão igual por personagem:** a experiência da batalha é dividida entre
+  todos os personagens da party, sejam do mesmo jogador ou de jogadores
+  diferentes. Por hora, solo e party empatam; a party ganha em segurança e
+  suprimentos.
+- **Bônus por jogador distinto na party** (ex.: +20% com 2, +40% com 3),
+  calibrado com o simulador medindo experiência por hora de cada formação. Só
+  conta jogadores que **agiram** na batalha (contra contas secundárias paradas).
+- **Faixa de nível para dividir:** no estilo do Ragnarok Online clássico, os
+  níveis base do maior e do menor da party precisam estar a até 10 níveis.
+- **Penalidade por diferença de nível:** experiência (e drop) caem
+  gradualmente quando o personagem está muito acima do nível do monstro. Tabela
+  própria, calibrada no simulador. Inspirada no Renewal do Ragnarok Online, a
+  curva também **premia** caçar um pouco acima do próprio nível.
+
+### Raridade de itens
+
+| Raridade | Cor |
+| --- | --- |
+| Common | Cinza |
+| Rare | Azul |
+| Epic | Roxo |
+| Legendary | Laranja |
+| Unique | Vermelho |
+
+### Loot em party (Modo Online)
+
+- **Gerado uma vez por batalha**, nunca por jogador (um item raro não se
+  multiplica pelo tamanho da party).
+- **Direitos por jogador, não por personagem:** quem leva 2 personagens não tem 2
+  chances. Experiência é por personagem; loot, por jogador.
+- **Faixas:**
+  - **Dinheiro:** dividido igualmente entre os jogadores.
+  - **Itens abaixo da raridade de leilão:** rodízio/sorteio automático.
+  - **Itens a partir da raridade de leilão** (padrão: Rare; configurável pelo
+    líder): **leilão** estilo Blade & Soul. Cada jogador dá um lance ou passa;
+    o maior lance leva, e o valor é dividido entre os outros membros. Se todos
+    passarem, o item é sorteado entre todos.
+- O leilão roda num painel lateral com prazo (20–30 s) e **não trava o jogo**.
+- **Lance só com dinheiro Tradeable.** O leilão só redistribui dinheiro; não cria
+  nem destrói.
+- **Modos da party:** leilão (padrão), só sorteio, ou o líder distribui.
+- **Configuração:** quem cria a party define modo e raridade de leilão sem
+  votação. Quem vai entrar **vê essas configurações antes de aceitar**.
+- **Mudança depois:** o líder propõe, só **fora de batalha**; todos são avisados
+  e votam. Propor conta como voto a favor do líder; quem não responde no prazo
+  conta como **contra**. Maioria aprova; **empate rejeita** (numa party de 2, o
+  outro jogador tem, na prática, poder de veto).
 
 **Arte:** toda feita em SVG no estilo da seção 2. **Som:** música e efeitos de
 pacotes com licença livre — anotar a licença de cada um em
@@ -912,7 +1041,9 @@ entram quando o jogo sair do sandbox para o Modo História.
 
 - [ ] Penalidade por morte (XP, dinheiro, itens?) — decidir mais tarde.
 - [ ] Modo Online: o que move o jogo (missões da Guilda, exploração livre, chefes, eventos, outros) — detalhar no futuro.
-- [ ] Sistema de habilidades/magia (Materia, magias estilo FF8, ou próprio).
+- [ ] Itens raros encaixáveis em equipamento (estilo cartas do Ragnarok Online): decidir depois do balanceamento.
+- [ ] Atributos no modelo do FF7: fórmulas, curvas de crescimento por classe, pontos por nível dos recrutas — tópico próprio.
+- [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
 - [ ] Nome do jogo.
