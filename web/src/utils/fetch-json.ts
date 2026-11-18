@@ -4,23 +4,41 @@ interface JsonResponse<T> {
   body: T | null
 }
 
+/** Request options of {@link fetchJson}. */
+interface JsonRequest {
+  /** Aborts the request. */
+  signal?: AbortSignal
+  /** HTTP method; `GET` by default. */
+  method?: 'GET' | 'POST' | 'DELETE'
+  /** Sent as JSON. */
+  body?: unknown
+}
+
 /**
- * GETs `url` and parses the body as JSON, whatever the status code (some APIs
+ * Sends a request to `url` (a GET unless `method` says otherwise, with `body`
+ * as JSON) and parses the answer as JSON, whatever the status code (some APIs
  * send a useful JSON body with errors, e.g. 503 from a health check).
  * Resolves `null` when the server cannot be reached. Rethrows when `signal`
  * aborted the request, so callers can ignore aborted results.
  *
  * @example
- * const response = await fetchJson<HealthResponse>('/api/health', controller.signal)
+ * const response = await fetchJson<HealthResponse>('/api/health', { signal })
  * if (response?.body) showStatus(response.body.status)
+ * await fetchJson('/api/session', { method: 'POST', body: { username, password } })
  */
 export async function fetchJson<T>(
   url: string,
-  signal?: AbortSignal,
+  { signal, method = 'GET', body }: JsonRequest = {},
 ): Promise<JsonResponse<T> | null> {
+  const init: RequestInit = { method }
+  if (signal) init.signal = signal
+  if (body !== undefined) {
+    init.body = JSON.stringify(body)
+    init.headers = { 'content-type': 'application/json' }
+  }
   let response: Response
   try {
-    response = await fetch(url, signal ? { signal } : {})
+    response = await fetch(url, init)
   } catch (error) {
     if (signal?.aborted) throw error
     return null

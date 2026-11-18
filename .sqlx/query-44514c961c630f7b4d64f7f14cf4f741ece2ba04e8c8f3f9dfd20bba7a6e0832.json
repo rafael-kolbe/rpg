@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE accounts SET password_hash = $2, recovery_key_hash = $3 WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text",
+        "Bytea"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "44514c961c630f7b4d64f7f14cf4f741ece2ba04e8c8f3f9dfd20bba7a6e0832"
+}

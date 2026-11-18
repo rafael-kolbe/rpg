@@ -8,6 +8,11 @@ ARG SANDBOX=false
 WORKDIR /src
 COPY rust-toolchain.toml Cargo.toml Cargo.lock clippy.toml rustfmt.toml ./
 COPY crates crates
+# Queries are checked against .sqlx/ (no database at build time); the
+# migrations are embedded in the binary.
+COPY .sqlx .sqlx
+COPY migrations migrations
+ENV SQLX_OFFLINE=true
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/src/target \
     cargo build --release --locked --bin rpg-server \

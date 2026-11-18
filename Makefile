@@ -14,6 +14,12 @@ DEV_DATABASE_URL := postgres://rpg:rpg@127.0.0.1:5433/rpg
 # shell that has not loaded ~/.cargo/env.
 export PATH := $(HOME)/.cargo/bin:$(PATH)
 
+# sqlx checks queries at compile time against `.sqlx/` (committed), never a
+# live database: builds work anywhere, even before the server has applied the
+# migrations. `make sqlx-prepare` refreshes `.sqlx/` after changing a query.
+export SQLX_OFFLINE := true
+SQLX_ONLINE := SQLX_OFFLINE=false DATABASE_URL=$(DEV_DATABASE_URL)
+
 # The backup container writes ./backups as the host user (see docker-compose.yml).
 export HOST_UID := $(shell id -u)
 export HOST_GID := $(shell id -g)
@@ -21,7 +27,7 @@ export HOST_GID := $(shell id -g)
 .PHONY: help network require-env up up-d down logs ps build \
         dev-db dev-db-down dev-server dev-web \
         check check-rust check-content check-web check-protocol check-skipped-tests check-utils-docs \
-        fmt docs protocol-types sim e2e
+        check-sqlx fmt docs protocol-types sqlx-prepare sim e2e
 
 help:
 	@echo "Run (production-like, http://127.0.0.1:8083):"
@@ -43,6 +49,7 @@ help:
 	@echo "  make docs          build and open the code documentation"
 	@echo "  make e2e           build the client and run the browser tests (Playwright)"
 	@echo "  make protocol-types  regenerate TypeScript types from crates/protocol"
+	@echo "  make sqlx-prepare  refresh .sqlx/ after changing a database query"
 	@echo ""
 	@echo "Battle simulator (AI vs AI on a sandbox scenario):"
 	@echo "  make sim           one battle, full log (SEED=42 SCENARIO=sandbox/battle-basic.json)"
@@ -91,7 +98,7 @@ dev-web:
 
 # --- Quality ------------------------------------------------------------------
 
-check: check-rust check-content check-protocol check-web check-skipped-tests check-utils-docs
+check: check-rust check-sqlx check-content check-protocol check-web check-skipped-tests check-utils-docs
 	@echo ""
 	@echo "make check: all green."
 
@@ -102,6 +109,12 @@ check-rust:
 	cargo test --workspace --all-features --locked --quiet
 	cargo machete
 	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --all-features --no-deps --document-private-items --locked --quiet
+
+# Needs the development database (started here): migrations applied, every
+# query checked against it, `.sqlx/` up to date.
+check-sqlx: dev-db
+	$(SQLX_ONLINE) cargo sqlx migrate run
+	$(SQLX_ONLINE) cargo sqlx prepare --workspace --check -- --all-targets --all-features
 
 check-content:
 	cargo run --quiet --locked -p content --bin content-check
@@ -118,8 +131,9 @@ check-skipped-tests:
 check-utils-docs:
 	./scripts/check-utils-docs.sh
 
-# Browser tests: Playwright starts the server with the sandbox feature itself.
-e2e:
+# Browser tests: Playwright starts the server with the sandbox feature itself,
+# on the development database.
+e2e: dev-db
 	cd web && npm run --silent build && npx playwright test
 
 fmt:
@@ -128,6 +142,10 @@ fmt:
 
 docs:
 	cargo doc --workspace --no-deps --document-private-items --open
+
+sqlx-prepare: dev-db
+	$(SQLX_ONLINE) cargo sqlx migrate run
+	$(SQLX_ONLINE) cargo sqlx prepare --workspace -- --all-targets --all-features
 
 protocol-types:
 	cargo test --quiet -p protocol

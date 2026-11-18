@@ -24,13 +24,17 @@ const DATABASE_PING_TIMEOUT: Duration = Duration::from_secs(2);
 #[derive(Clone)]
 pub(crate) struct AppState {
     pub(crate) db: PgPool,
+    /// Failed login and recovery attempts.
+    pub(crate) attempts: std::sync::Arc<crate::accounts::Attempts>,
     #[cfg(feature = "sandbox")]
     pub(crate) sandbox: std::sync::Arc<crate::sandbox::Sandbox>,
 }
 
 /// Builds the full HTTP router.
 pub(crate) fn router(state: AppState, web_dir: &Path) -> Router {
-    let api = Router::new().route("/health", get(health));
+    let api = Router::new()
+        .route("/health", get(health))
+        .merge(crate::accounts::routes());
     #[cfg(feature = "sandbox")]
     let api = api.route("/sandbox", get(sandbox_list));
     let api = api.fallback(|| async { StatusCode::NOT_FOUND });
@@ -131,6 +135,7 @@ pub(crate) mod tests {
     fn test_state() -> AppState {
         AppState {
             db: unreachable_database(),
+            attempts: std::sync::Arc::default(),
         }
     }
 
@@ -147,6 +152,7 @@ pub(crate) mod tests {
             crate::sandbox::Sandbox::load(&root.join("content"), &root.join("sandbox")).unwrap();
         AppState {
             db: unreachable_database(),
+            attempts: std::sync::Arc::default(),
             sandbox: std::sync::Arc::new(sandbox),
         }
     }

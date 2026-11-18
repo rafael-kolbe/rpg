@@ -6,6 +6,6 @@ import { fetchJson } from '../utils/fetch-json.ts'
  * the same as having no scenarios.
  */
 export async function fetchSandboxScenarios(signal?: AbortSignal): Promise<string[]> {
-  const response = await fetchJson<SandboxList>('/api/sandbox', signal)
+  const response = await fetchJson<SandboxList>('/api/sandbox', { signal })
   return response?.status === 200 && response.body ? response.body.scenarios : []
 }

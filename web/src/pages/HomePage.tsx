@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { AccountStatus } from '../account/AccountStatus.tsx'
 import { fetchHealth } from '../api/fetch-health.ts'
 import { fetchSandboxScenarios } from '../api/fetch-sandbox.ts'
 import { LanguageSelect } from '../components/LanguageSelect.tsx'
@@ -7,7 +8,7 @@ import { useTranslation } from '../i18n/use-translation.ts'
 
 type ServerState = 'checking' | 'ok' | 'unavailable'
 
-/** `/`: server status and, on sandbox builds, the list of test scenarios. */
+/** `/`: server status, the account and, on sandbox builds, the list of test scenarios. */
 export function HomePage() {
   const { t } = useTranslation()
   const [server, setServer] = useState<ServerState>('checking')
@@ -34,6 +35,7 @@ export function HomePage() {
       <p className={`server-status server-status--${server}`}>
         {t('ui-server-status', { status: server })}
       </p>
+      <AccountStatus />
       {scenarios.length > 0 && (
         <section>
           <h2>{t('ui-sandbox-scenarios')}</h2>

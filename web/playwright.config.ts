@@ -2,8 +2,8 @@ import { defineConfig } from '@playwright/test'
 
 // End-to-end tests drive the real stack: the Rust server built with the
 // sandbox feature serves the built client (`npm run build` first; `make e2e`
-// does both). The database is not needed: battles live in memory, and the
-// server starts with an unreachable one.
+// does both). Accounts need the development database (`make dev-db`, started
+// by `make e2e`); each test signs up with its own random username.
 const PORT = 3100
 
 export default defineConfig({
@@ -19,7 +19,8 @@ export default defineConfig({
     reuseExistingServer: false,
     env: {
       PORT: String(PORT),
-      DATABASE_URL: 'postgres://rpg@127.0.0.1:1/rpg',
+      DATABASE_URL: 'postgres://rpg:rpg@127.0.0.1:5433/rpg',
+      SQLX_OFFLINE: 'true',
       WEB_DIR: 'web/dist',
       RUST_LOG: 'warn',
     },

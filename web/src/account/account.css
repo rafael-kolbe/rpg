@@ -1,0 +1,69 @@
+.account {
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.account__form {
+  display: grid;
+  gap: 12px;
+}
+
+.account__form p {
+  margin: 0;
+}
+
+.account__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.account__hint {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.account__error {
+  color: var(--color-danger);
+}
+
+.account__warning {
+  color: var(--color-warning);
+}
+
+.account__key {
+  padding: 12px;
+  border-radius: var(--radius);
+  background: rgb(0 0 0 / 35%);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  user-select: all;
+}
+
+.account__links {
+  font-size: 0.9rem;
+}
+
+.account-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* Fields stack in a form: label above a full-width input. */
+.account__form .field {
+  display: grid;
+  gap: 4px;
+}
+
+.account__form input:not([type='checkbox']) {
+  width: 100%;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+.account__form .field:has(input[type='checkbox']) {
+  display: flex;
+}

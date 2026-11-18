@@ -38,6 +38,13 @@ change.
 | Wire protocol: WebSocket messages | `crates/protocol/src/messages.rs` |
 | Wire protocol: battle state as the client sees it | `crates/protocol/src/state.rs` |
 | Wire protocol: `/api/health` | `crates/protocol/src/health.rs` |
+| Wire protocol: accounts and session (`/api/accounts`, `/api/session`) | `crates/protocol/src/account.rs` |
+| Account routes, session cookie | `crates/server/src/accounts/mod.rs` |
+| Username/password rules, password hashing, recovery keys, session tokens | `crates/server/src/accounts/credentials.rs` |
+| Account and session queries | `crates/server/src/accounts/store.rs` |
+| Failed login/recovery rate limit | `crates/server/src/accounts/rate_limit.rs` |
+| Database schema (SQLx migrations, applied at server startup) | `migrations/` |
+| Checked query metadata for offline builds (generated, committed) | `.sqlx/` |
 | Battle session per WebSocket connection (`/ws`) | `crates/server/src/ws.rs` |
 | Sandbox scenarios loaded by the server | `crates/server/src/sandbox.rs` |
 | Generated TS types of the protocol (never edit) | `web/src/protocol/generated/` |
@@ -48,6 +55,7 @@ change.
 | UI text and game text, per language | `locales/<locale>/*.ftl` |
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
+| Sign-up, login and recovery pages, recovery key notice, account status | `web/src/account/` |
 | Generic TypeScript helpers (classNames, percentOf, fetchJson…) | `web/src/utils/` |
 | Shared UI components (Window, MenuList, Gauge, Button, Select…) and menu keyboard keys (`useMenuKeys`) | `web/src/ui/` |
 | App-level components (language picker) | `web/src/components/` |
@@ -59,9 +67,6 @@ change.
 | Quality scripts used by `make check` | `scripts/`, `web/scripts/` |
 | Database backup job | `scripts/backup.sh` (run by the `backup` service) |
 
-Planned, created by the phase that needs them (see `PLAN.md` §5 and §9):
-`migrations/` (SQLx).
-
 Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
 `server` → all; `engine` never depends on I/O, network, clock or OS randomness;
 `utils` depends on nothing and anyone may use it.
@@ -70,15 +75,20 @@ Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
 
 | Command | What |
 | --- | --- |
-| `make check` | Everything that must pass before a task is done |
+| `make check` | Everything that must pass before a task is done (starts the dev database: queries are checked against it) |
 | `make fmt` | Format Rust and web code |
 | `make dev-db` / `make dev-server` / `make dev-web` | Local development with hot reload (db on 5433, server on 3000, Vite on 5173) |
 | `make up` / `make up-d` / `make down` | Production-like stack on http://127.0.0.1:8083 (needs `.env`) |
 | `make protocol-types` | Regenerate TS types after changing `crates/protocol` |
+| `make sqlx-prepare` | Refresh `.sqlx/` after adding or changing a query (needs the dev database, started for you) |
 | `make docs` | Build and open rustdoc for the whole workspace |
 | `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`) |
 | `make e2e` | Build the client and run the Playwright browser tests (starts its own sandbox server) |
 | Sandbox in the browser | `make dev-server` + `make dev-web`, open `/sandbox/battle-basic` (`?seed=42&auto=1&speed=400`) |
+
+Builds use `SQLX_OFFLINE=true` (set by the Makefile, Playwright and the
+Dockerfile): queries are checked against `.sqlx/`, never a live database. A
+new or changed migration or query needs `make sqlx-prepare`.
 
 `cargo` lives in `~/.cargo/bin`; the Makefile adds it to `PATH`. In a bare
 shell, `source ~/.cargo/env` first.
@@ -161,9 +171,6 @@ prove nothing was left behind.
 
 ## Pending wiring (do it when the trigger happens)
 
-- First `sqlx::query!` → add `cargo sqlx prepare --workspace --check` to
-  `check-rust` and commit `.sqlx/`.
-- First table → create `migrations/`, run `sqlx::migrate!` at server startup.
 - People start editing content by hand → generate JSON Schemas from the engine
   types (`schemars`) for editor autocomplete, checked for staleness like the
   protocol types.

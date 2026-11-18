@@ -7,5 +7,5 @@ import { fetchJson } from '../utils/fetch-json.ts'
  * Returns `null` when the server cannot be reached at all.
  */
 export async function fetchHealth(signal?: AbortSignal): Promise<HealthResponse | null> {
-  return (await fetchJson<HealthResponse>('/api/health', signal))?.body ?? null
+  return (await fetchJson<HealthResponse>('/api/health', { signal }))?.body ?? null
 }

@@ -120,3 +120,36 @@ ui-log-defend = { $actor } defends
 ui-log-knocked-out = { $target } is knocked out
 ui-log-failed = { $actor } fails { $action }
 ui-log-cancelled = { $actor } cancels { $action }
+
+## Account
+
+ui-account-sign-up = Create account
+ui-account-log-in = Log in
+ui-account-log-out = Log out
+ui-account-recover = Change password with the recovery key
+ui-account-forgot = Forgot your password?
+ui-account-have-account = Already have an account? Log in
+ui-account-logged-in = Logged in as { $username }
+ui-account-username = Username
+ui-account-username-rule = 8 to 20 letters and numbers, no spaces or symbols.
+ui-account-password-current = Password
+ui-account-password-new = New password
+ui-account-password-confirm = Repeat the password
+ui-account-password-rule = 8 to 64 characters.
+ui-account-recovery-key = Recovery key
+ui-account-error-mismatch = The two passwords are different.
+ui-account-error-invalid_username = The username needs 8 to 20 letters and numbers, nothing else.
+ui-account-error-invalid_password = The password needs 8 to 64 characters.
+ui-account-error-username_taken = That username is taken.
+ui-account-error-wrong_credentials = Wrong username or password.
+ui-account-error-wrong_recovery_key = Wrong username or recovery key.
+ui-account-error-too_many_attempts = Too many failed attempts. Wait 15 minutes and try again.
+ui-account-error-not_logged_in = You are not logged in.
+ui-account-error-unavailable = The server is unavailable. Try again later.
+ui-recovery-key-title = Your recovery key
+ui-recovery-key-explain = This key is the only way to change your password if you forget it. It is shown only now.
+ui-recovery-key-copy = Copy
+ui-recovery-key-copied = Copied
+ui-recovery-key-warning = Keep it somewhere safe (a password manager, a note on paper). Without it, a forgotten password means a lost account. Never share it.
+ui-recovery-key-saved = I saved my recovery key
+ui-recovery-key-continue = Continue

@@ -48,7 +48,7 @@ importa — mas sem exigir reflexo de jogo de ação.
 | | Modo História | Modo Online (multiplayer) |
 | --- | --- | --- |
 | Personagens | Heróis fixos da história | Guerreiros recrutados na Guilda de Aventureiros |
-| Party | Quase sempre 3; um NPC da história pode entrar temporariamente e levar a 4 | Máximo 3, sem exceção |
+| Party | Até 3 (a campanha começa com 1 e cresce); um NPC da história pode entrar temporariamente e levar a 4 | Máximo 3, sem exceção |
 | Classe e habilidades | Fixas por herói, árvore de habilidades fixa | Escolhidas pelo jogador no recrutamento, fixas depois disso |
 | Evolução de atributos | Automática, ritmo fixo por classe | O jogador distribui os pontos (mesma escala de poder dos heróis) |
 | Jogadores | Só single-player | Co-op |
@@ -72,7 +72,7 @@ validade: não é Tradeable e não pode ser usado no Modo História.
 | | MVP (single-player) | Depois (web, multiplayer) |
 | --- | --- | --- |
 | Batalha | ATB completo, 3 heróis contra até 4 inimigos | Cada jogador controla 1+ heróis da mesma party |
-| Conteúdo | 3 classes, ~8 inimigos, 1 chefe | Mais classes, áreas, equipamentos |
+| Conteúdo | 4 classes, ~11 inimigos, 2 chefes (ver Campanha do MVP) | Mais classes, áreas, equipamentos |
 | Progressão | XP e nível, conta e save no servidor | Guerreiros recrutados, trocas entre jogadores |
 | Mundo | Mapa-múndi com trilhas, cidades e calabouços clicáveis | Lobby e salas de party |
 
@@ -496,8 +496,8 @@ Chefes trocam de tabela por fase de HP (ex.: abaixo de 50% vira mais agressivo).
 
 ## 4. Conteúdo e progressão
 
-O MVP tem três classes com papéis claros e uma primeira região do mapa (uma
-cidade, uma zona de exploração e um calabouço com chefe). Todo o conteúdo vive em arquivos de dados (`content/`), não no
+O MVP tem quatro classes com papéis claros e três regiões do mapa (ver
+Campanha do MVP). Todo o conteúdo vive em arquivos de dados (`content/`), não no
 código da engine.
 
 ### Heróis e Guerreiros recrutados
@@ -547,10 +547,53 @@ desenho próprios.
 | Guerreiro | Tanque e dano físico | HP, Strength, Vitality | Provocar / Golpe Gêmeo / Quebra-armadura |
 | Mago | Dano mágico em área | Magic, MP | Fogo, Gelo, Raio / Fogo em área / Silêncio |
 | Clérigo | Cura e suporte | Spirit, Magic, Dexterity | Cura, Barrier / Regen, Esuna / Haste, Reviver |
+| Arqueiro | Dano físico à distância, status | Dexterity, Luck, Strength | Tiro Certeiro / Flecha Venenosa / Chuva de Flechas |
+
+O Clérigo não entra cedo na campanha: com o HP baixo do início, a cura dele
+é alta demais e o dano baixo não pesa; as poções (+100) bastam até o calabouço.
 
 **Inimigos (MVP):** ~8 tipos em 3 famílias (bestas, mortos-vivos, elementais),
 cada um com uma fraqueza elemental e uma regra de IA marcante, mais 1 chefe com 2
 fases.
+
+### Campanha do MVP
+
+Nomes provisórios (revisar depois). O herói principal só quer ser **o herói
+mais forte do mundo**; a Guilda de Aventureiros, com seus ranks, é a escada
+concreta desse sonho.
+
+**Mundo:** três regiões em linha, de sul a norte.
+
+| Região | Instâncias | Inimigos |
+| --- | --- | --- |
+| **Vilarejo de Brookhollow** (início) | Arredores: campos, fazenda, beira do rio | Lobo, Javali, Vespa Gigante (veneno) — tutorial 1v1 |
+| **Floresta de Thornwood**, densa, com a Estrada do Rei no centro | A estrada; o **acampamento goblin** fica num desvio, bloqueado até a heroína entrar na party | Goblin, Goblin Arqueiro, Goblin Xamã (fogo), Serpente Venenosa; chefe **Grukk, o Hobgoblin** |
+| **Cidade de Valcrest**, capital do reino de Aldmere | Mapa da cidade (loja, templo, Guilda, posto da guarda) e as **Catacumbas de Valcrest**, calabouço de 3 níveis (cada nível é uma instância) | Esqueleto, Carniçal, Fogo-fátuo (elemental); chefe de 2 fases no nível 3: **o Guardião dos Ossos** |
+
+**Heróis:**
+
+| Herói | Classe | Entra na party |
+| --- | --- | --- |
+| **Taren**, de Brookhollow | Guerreiro | Desde o início (sozinho até a floresta) |
+| **Lyra**, batedora da Guarda de Valcrest | Arqueiro | Encontrada perdida em Thornwood |
+| (nome a definir) | Clérigo | Libertado de uma cela no nível 2 das Catacumbas |
+
+**Roteiro:**
+
+1. Taren deixa Brookhollow rumo a Valcrest para se registrar na Guilda
+   (tutorial nos arredores, 1v1).
+2. Na Estrada do Rei, encontra Lyra: ela foi mandada investigar os goblins da
+   floresta e se perdeu. Os dois seguem juntos.
+3. Invadem o acampamento goblin e derrotam Grukk.
+4. Em Valcrest, entregam a missão ao **Sargento Bram Holt**, da guarda. Ele
+   nota que os goblins tinham armas boas demais para goblins: alguém os
+   estava armando.
+5. A pista leva às Catacumbas, embaixo da cidade, onde alguém reanima os
+   mortos e negocia com os goblins.
+6. No nível 2, a história passa obrigatoriamente pela cela do Clérigo; ele é
+   libertado e entra na party antes do nível 3.
+7. No nível 3, o Guardião dos Ossos (o capanga). Quem está por trás fica para
+   o próximo arco (a definir).
 
 ### Loop do jogo
 
@@ -759,6 +802,26 @@ protocol ──▶ engine ◀── content
 - Barras ATB interpoladas entre ticks para ficarem lisas a 60 fps.
 - A engine em WASM entra só se a previsão local se provar necessária; até lá, o
   cliente apenas anima os eventos do servidor.
+
+### Contas
+
+- **Username e senha**, ambos com **no mínimo 8 caracteres** (username até
+  20, senha até 64). Username só com letras e números (`a–z`, `A–Z`, `0–9`;
+  sem acento, espaço ou símbolo), único, sem diferenciar maiúsculas.
+- Senha guardada só como **hash Argon2id**, nunca em texto.
+- **Recovery key:** gerada no cadastro e **mostrada uma única vez**, com botão
+  de copiar e aviso para guardar em segurança. No banco fica só o hash dela.
+  **Só com ela é possível trocar a senha** (sem ela, a conta não tem
+  recuperação). Usar a key gera uma nova, mostrada do mesmo jeito.
+- Sessão por cookie `httpOnly` + `Secure` + `SameSite`, válida por 30 dias; também
+  vai autenticar o WebSocket quando o Modo História tiver sala própria (o
+  sandbox continua aberto, sem conta). Trocar a senha pela recovery key
+  derruba todas as sessões.
+- Telas: `/signup`, `/login`, `/recover`; a home mostra quem está conectado.
+- Tentativas de login limitadas por username e por IP.
+- **E-mail fica para depois** (confirmação de conta, recuperação por e-mail):
+  entra quando houver motivo e um provedor SMTP; até lá, nenhum dado pessoal é
+  guardado.
 
 ### Banco de dados
 
@@ -1137,7 +1200,7 @@ serviço gerenciado.
 | 0. Esqueleto e padrões ✅ | Git local, workspace Rust, `web/`, Dockerfile, compose (app + db), Makefile, `make check` completo, `make docs`, `CLAUDE.md`, hook, backup do banco | `/api/health` respondendo em `localhost:8083`; `make check` verde |
 | 1. Engine headless ✅ | ATB, fila, comandos, fórmulas, status (incl. Distracted), emboscadas, IA por regras, PRNG com seed, conteúdo provisório em `content/`, primeiro cenário `sandbox/battle-basic.json` | Testes de replay passando; `make sim` roda uma batalha 3×3 até o fim e dá o mesmo resultado sempre |
 | 2. Cliente + servidor ✅ | Sala de um jogador, tela de batalha, barras, menus, alvos, efeitos básicos, modos Active/Wait, i18n `en-US`/`pt-BR`, sandbox com `battle-basic` e ferramentas de debug, primeiro teste e2e | `localhost:8083/sandbox/battle-basic` jogável do início ao fim, nos dois idiomas; e2e verde |
-| 3. Conteúdo e progressão | Mapa-múndi, 1ª cidade, 1 zona de exploração, 1 calabouço com chefe, diálogos, fog of war, ~8 inimigos, XP/nível, loja, save | Região jogável do início ao chefe; save sobrevive a recarregar a página |
+| 3. Conteúdo e progressão | Contas, save, XP/nível, mapa-múndi com 3 regiões (Campanha do MVP), cidade, Catacumbas de 3 níveis com chefe, diálogos, fog of war, ~11 inimigos, loja | Região jogável do início ao chefe; save sobrevive a recarregar a página |
 | 4. Multiplayer | Guilda e Guerreiros recrutados, party, controle por jogador, validação, snapshots, reconexão | 3 navegadores em redes diferentes vencem uma batalha juntos via subdomínio; derrubar o Wi-Fi de um por 30 s e ele volta aos mesmos Guerreiros |
 | 5. Polimento | Chat e moderação, trocas, balanceamento, sons, mais conteúdo | A definir ao fim da fase 4 |
 
@@ -1177,4 +1240,6 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
 - [ ] Golpe especial próprio no lugar do Limit (que foi removido): desenhar uma mecânica nossa.
 - [ ] Nome do jogo.
-- [ ] Contas (necessárias desde o Modo História): login próprio, magic link por e-mail, login com Google/Discord?
+- [ ] Nomes da Campanha do MVP (heróis, lugares, chefes) — provisórios, revisar.
+- [ ] Nome do Clérigo das Catacumbas e o arco da história depois do Guardião dos Ossos.
+- [x] Contas: username e senha próprios, recovery key no cadastro (ver Contas, §5). E-mail e login social ficam para depois.

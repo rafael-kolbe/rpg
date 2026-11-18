@@ -9,6 +9,7 @@
 //!   `GET /api/health` with `200 OK`. The Docker healthcheck uses it because the
 //!   production image is distroless: no shell, no curl.
 
+mod accounts;
 mod config;
 mod healthcheck;
 mod http;
@@ -55,8 +56,11 @@ async fn serve(config: Config) -> anyhow::Result<()> {
         );
         std::sync::Arc::new(sandbox)
     };
+    tokio::spawn(migrate(db.clone()));
+
     let state = http::AppState {
         db,
+        attempts: std::sync::Arc::default(),
         #[cfg(feature = "sandbox")]
         sandbox,
     };
@@ -67,10 +71,30 @@ async fn serve(config: Config) -> anyhow::Result<()> {
         .with_context(|| format!("could not bind {address}"))?;
 
     tracing::info!(%address, web_dir = %config.web_dir.display(), "listening");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .context("server error")
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await
+    .context("server error")
+}
+
+/// Applies `migrations/` once the database answers, retrying while it is
+/// down: the server keeps serving meanwhile (health reports the database).
+async fn migrate(db: sqlx::PgPool) {
+    loop {
+        match sqlx::migrate!("../../migrations").run(&db).await {
+            Ok(()) => {
+                tracing::info!("database migrations applied");
+                return;
+            }
+            Err(error) => {
+                tracing::warn!(%error, "database migrations not applied; retrying in 5 s");
+                tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+            }
+        }
+    }
 }
 
 fn init_tracing(format: LogFormat) {

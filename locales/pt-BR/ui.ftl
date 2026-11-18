@@ -120,3 +120,36 @@ ui-log-defend = { $actor } defende
 ui-log-knocked-out = { $target } foi nocauteado
 ui-log-failed = { $actor } falha em { $action }
 ui-log-cancelled = { $actor } cancela { $action }
+
+## Conta
+
+ui-account-sign-up = Criar conta
+ui-account-log-in = Entrar
+ui-account-log-out = Sair
+ui-account-recover = Trocar a senha com a recovery key
+ui-account-forgot = Esqueceu a senha?
+ui-account-have-account = Já tem conta? Entrar
+ui-account-logged-in = Conectado como { $username }
+ui-account-username = Usuário
+ui-account-username-rule = 8 a 20 letras e números, sem espaços nem símbolos.
+ui-account-password-current = Senha
+ui-account-password-new = Nova senha
+ui-account-password-confirm = Repita a senha
+ui-account-password-rule = 8 a 64 caracteres.
+ui-account-recovery-key = Recovery key
+ui-account-error-mismatch = As duas senhas são diferentes.
+ui-account-error-invalid_username = O usuário precisa de 8 a 20 letras e números, nada mais.
+ui-account-error-invalid_password = A senha precisa de 8 a 64 caracteres.
+ui-account-error-username_taken = Esse usuário já existe.
+ui-account-error-wrong_credentials = Usuário ou senha incorretos.
+ui-account-error-wrong_recovery_key = Usuário ou recovery key incorretos.
+ui-account-error-too_many_attempts = Tentativas demais. Espere 15 minutos e tente de novo.
+ui-account-error-not_logged_in = Você não está conectado.
+ui-account-error-unavailable = O servidor está indisponível. Tente mais tarde.
+ui-recovery-key-title = Sua recovery key
+ui-recovery-key-explain = Essa chave é o único jeito de trocar a senha se você esquecê-la. Ela só aparece agora.
+ui-recovery-key-copy = Copiar
+ui-recovery-key-copied = Copiada
+ui-recovery-key-warning = Guarde em lugar seguro (um gerenciador de senhas, um papel). Sem ela, esquecer a senha significa perder a conta. Nunca a compartilhe.
+ui-recovery-key-saved = Guardei minha recovery key
+ui-recovery-key-continue = Continuar

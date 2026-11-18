@@ -11,14 +11,20 @@
 //!
 //! | Module | Contents |
 //! | --- | --- |
+//! | [`account`] | `/api/accounts`, `/api/session` |
 //! | [`health`] | `GET /api/health` |
 //! | [`messages`] | WebSocket messages (`/ws`) |
 //! | [`state`] | The battle as the client sees it |
 
+pub mod account;
 pub mod health;
 pub mod messages;
 pub mod state;
 
+pub use account::{
+    AccountError, AccountErrorResponse, Credentials, RecoverRequest, RecoveryKeyResponse,
+    SessionResponse,
+};
 pub use health::{HealthResponse, ServiceStatus};
 pub use messages::{ClientMessage, DebugAction, ErrorCode, RejectReason, ServerMessage, TimeMode};
 pub use state::{
