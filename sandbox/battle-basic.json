@@ -1,0 +1,132 @@
+{
+  "opening": "normal",
+  "inventory": { "potion": 5, "ether": 2, "antidote": 3, "revive-feather": 2 },
+  "party": [
+    {
+      "name": "sandbox-warrior",
+      "stats": {
+        "level": 10,
+        "maxHp": 420,
+        "maxMp": 20,
+        "attributes": { "strength": 28, "dexterity": 45, "vitality": 22, "magic": 8, "spirit": 12, "luck": 14 },
+        "equipment": { "weaponAttack": 18, "armorDefense": 10, "armorMagicDefense": 6 }
+      },
+      "attack": "attack",
+      "limit": "twin-cleave",
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              { "when": { "type": "user_hp_below", "percent": 30 }, "act": { "type": "item", "id": "potion" }, "target": { "type": "user" } },
+              { "act": { "type": "attack" }, "target": { "type": "lowest_hp_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "sandbox-mage",
+      "stats": {
+        "level": 10,
+        "maxHp": 260,
+        "maxMp": 90,
+        "attributes": { "strength": 10, "dexterity": 50, "vitality": 12, "magic": 30, "spirit": 24, "luck": 12 },
+        "equipment": { "weaponAttack": 6, "armorDefense": 6, "armorMagicDefense": 10 }
+      },
+      "attack": "attack",
+      "actions": ["fire", "ice", "thunder", "gravity-crush", "sleep"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              { "weight": 3, "act": { "type": "action", "id": "fire" }, "target": { "type": "random_opponent" } },
+              { "weight": 3, "act": { "type": "action", "id": "ice" }, "target": { "type": "random_opponent" } },
+              { "weight": 1, "act": { "type": "action", "id": "sleep" }, "target": { "type": "random_opponent" } },
+              { "weight": 1, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "sandbox-cleric",
+      "stats": {
+        "level": 10,
+        "maxHp": 300,
+        "maxMp": 80,
+        "attributes": { "strength": 14, "dexterity": 52, "vitality": 14, "magic": 24, "spirit": 28, "luck": 16 },
+        "equipment": { "weaponAttack": 8, "armorDefense": 8, "armorMagicDefense": 8 }
+      },
+      "attack": "attack",
+      "actions": ["cure", "barrier", "haste"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              { "when": { "type": "ally_knocked_out" }, "act": { "type": "item", "id": "revive-feather" }, "target": { "type": "knocked_out_ally" } },
+              { "when": { "type": "ally_hp_below", "percent": 50 }, "act": { "type": "action", "id": "cure" }, "target": { "type": "lowest_hp_ally" } },
+              { "weight": 1, "act": { "type": "action", "id": "barrier" }, "target": { "type": "random_ally" } },
+              { "weight": 3, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "enemies": [
+    {
+      "name": "monster-forest-wolf",
+      "stats": {
+        "level": 8,
+        "maxHp": 260,
+        "maxMp": 0,
+        "attributes": { "strength": 22, "dexterity": 55, "vitality": 12, "magic": 5, "spirit": 8, "luck": 10 },
+        "equipment": { "weaponAttack": 10 }
+      },
+      "attack": "bite",
+      "affinities": { "fire": "weak" },
+      "ai": { "phases": [{ "fromHpPercent": 100, "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }] }] }
+    },
+    {
+      "name": "monster-forest-wolf",
+      "stats": {
+        "level": 8,
+        "maxHp": 260,
+        "maxMp": 0,
+        "attributes": { "strength": 22, "dexterity": 55, "vitality": 12, "magic": 5, "spirit": 8, "luck": 10 },
+        "equipment": { "weaponAttack": 10 }
+      },
+      "attack": "bite",
+      "affinities": { "fire": "weak" },
+      "ai": { "phases": [{ "fromHpPercent": 100, "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }] }] }
+    },
+    {
+      "name": "monster-venom-serpent",
+      "stats": {
+        "level": 9,
+        "maxHp": 340,
+        "maxMp": 0,
+        "attributes": { "strength": 24, "dexterity": 40, "vitality": 16, "magic": 6, "spirit": 10, "luck": 12 },
+        "equipment": { "weaponAttack": 8 }
+      },
+      "attack": "bite",
+      "actions": ["poison-fang"],
+      "affinities": { "ice": "weak" },
+      "statusImmunities": ["poison"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              { "weight": 1, "act": { "type": "action", "id": "poison-fang" }, "target": { "type": "random_opponent" } },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

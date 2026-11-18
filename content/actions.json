@@ -1,0 +1,106 @@
+{
+  "attack": {
+    "category": "attack",
+    "target": "single_enemy",
+    "durationTicks": 8,
+    "effect": { "type": "physical_damage", "power": 16 }
+  },
+  "bite": {
+    "category": "attack",
+    "target": "single_enemy",
+    "durationTicks": 8,
+    "effect": { "type": "physical_damage", "power": 16 }
+  },
+  "fire": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 4,
+    "durationTicks": 12,
+    "effect": { "type": "magical_damage", "power": 8, "element": "fire" }
+  },
+  "ice": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 4,
+    "durationTicks": 12,
+    "effect": { "type": "magical_damage", "power": 8, "element": "ice" }
+  },
+  "thunder": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 4,
+    "durationTicks": 12,
+    "effect": { "type": "magical_damage", "power": 8, "element": "lightning" }
+  },
+  "gravity-crush": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 10,
+    "durationTicks": 14,
+    "effect": { "type": "percent_current_hp", "percent": 25, "element": "gravity" }
+  },
+  "sleep": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 5,
+    "durationTicks": 10,
+    "effect": { "type": "apply_status", "status": "sleep", "durationTicks": 200 }
+  },
+  "cure": {
+    "category": "magic",
+    "target": "single_ally",
+    "mpCost": 5,
+    "durationTicks": 10,
+    "effect": { "type": "heal", "power": 2 }
+  },
+  "barrier": {
+    "category": "magic",
+    "target": "single_ally",
+    "mpCost": 6,
+    "durationTicks": 10,
+    "effect": { "type": "apply_status", "status": "barrier", "durationTicks": 300 }
+  },
+  "haste": {
+    "category": "magic",
+    "target": "single_ally",
+    "mpCost": 8,
+    "durationTicks": 10,
+    "effect": { "type": "apply_status", "status": "haste", "durationTicks": 300 }
+  },
+  "poison-fang": {
+    "category": "ability",
+    "target": "single_enemy",
+    "durationTicks": 10,
+    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600 }
+  },
+  "twin-cleave": {
+    "category": "limit",
+    "target": "single_enemy",
+    "durationTicks": 20,
+    "effect": { "type": "physical_damage", "power": 48 }
+  },
+  "potion": {
+    "category": "item",
+    "target": "single_ally",
+    "durationTicks": 6,
+    "effect": { "type": "restore_hp", "amount": 100 }
+  },
+  "ether": {
+    "category": "item",
+    "target": "single_ally",
+    "durationTicks": 6,
+    "effect": { "type": "restore_mp", "amount": 100 }
+  },
+  "antidote": {
+    "category": "item",
+    "target": "single_ally",
+    "durationTicks": 6,
+    "effect": { "type": "remove_status", "statuses": ["poison"] }
+  },
+  "revive-feather": {
+    "category": "item",
+    "target": "single_ally",
+    "durationTicks": 8,
+    "effect": { "type": "revive", "hpPercent": 25 }
+  }
+}

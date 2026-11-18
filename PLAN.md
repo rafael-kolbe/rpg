@@ -1050,7 +1050,7 @@ serviço gerenciado.
 | Fase | Entrega | Critério de pronto (◆) |
 | --- | --- | --- |
 | 0. Esqueleto e padrões ✅ | Git local, workspace Rust, `web/`, Dockerfile, compose (app + db), Makefile, `make check` completo, `make docs`, `CLAUDE.md`, hook, backup do banco | `/api/health` respondendo em `localhost:8083`; `make check` verde |
-| 1. Engine headless | ATB, fila, comandos, fórmulas, status (incl. Distracted), emboscadas, IA por regras, PRNG com seed | Testes de replay passando; `cargo run -p sim -- --seed 42` roda uma batalha 3×3 até o fim e dá o mesmo resultado sempre |
+| 1. Engine headless ✅ | ATB, fila, comandos, fórmulas, status (incl. Distracted), emboscadas, IA por regras, PRNG com seed, conteúdo provisório em `content/`, primeiro cenário `sandbox/battle-basic.json` | Testes de replay passando; `make sim` roda uma batalha 3×3 até o fim e dá o mesmo resultado sempre |
 | 2. Cliente + servidor | Sala de um jogador, tela de batalha, barras, menus, alvos, efeitos básicos, modos Active/Wait, i18n `en-US`/`pt-BR`, sandbox com `battle-basic` e ferramentas de debug, primeiro teste e2e | `localhost:8083/sandbox/battle-basic` jogável do início ao fim, nos dois idiomas; e2e verde |
 | 3. Conteúdo e progressão | Mapa-múndi, 1ª cidade, 1 zona de exploração, 1 calabouço com chefe, diálogos, fog of war, ~8 inimigos, XP/nível, loja, save | Região jogável do início ao chefe; save sobrevive a recarregar a página |
 | 4. Multiplayer | Guilda e Guerreiros recrutados, party, controle por jogador, validação, snapshots, reconexão | 3 navegadores em redes diferentes vencem uma batalha juntos via subdomínio; derrubar o Wi-Fi de um por 30 s e ele volta aos mesmos Guerreiros |
@@ -1086,6 +1086,7 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Penalidade por morte (XP, dinheiro, itens?) — decidir mais tarde.
 - [ ] Modo Online: o que move o jogo (missões da Guilda, exploração livre, chefes, eventos, outros) — detalhar no futuro.
 - [ ] Itens raros encaixáveis em equipamento (estilo cartas do Ragnarok Online): decidir depois do balanceamento.
+- [ ] Acerto e esquiva: fórmula (Dexterity, precisão da arma, esquiva da armadura). A engine da fase 1 ainda não tem erro de golpe — todo ataque acerta.
 - [ ] Números de atributos (curvas por classe, pontos por nível dos recrutas, tabela de custo, limites de Sources, Poder de cada ação, teto de chance e de dano de crítico): calibrar no simulador.
 - [ ] Design visual da Mastery Tree (proposta minha, ajustada jogando).
 - [ ] Itens, habilidades e atributos que alteram as chances de emboscada (dos dois lados) — detalhar junto com itens e skills.

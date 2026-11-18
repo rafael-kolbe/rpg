@@ -1,0 +1,6 @@
+{
+  "potion": { "action": "potion" },
+  "ether": { "action": "ether" },
+  "antidote": { "action": "antidote" },
+  "revive-feather": { "action": "revive-feather" }
+}

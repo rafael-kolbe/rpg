@@ -20,8 +20,8 @@ export HOST_GID := $(shell id -g)
 
 .PHONY: help network require-env up up-d down logs ps build \
         dev-db dev-db-down dev-server dev-web \
-        check check-rust check-web check-protocol check-skipped-tests \
-        fmt docs protocol-types
+        check check-rust check-content check-web check-protocol check-skipped-tests \
+        fmt docs protocol-types sim
 
 help:
 	@echo "Run (production-like, http://127.0.0.1:8083):"
@@ -42,6 +42,10 @@ help:
 	@echo "  make fmt           format Rust and web code"
 	@echo "  make docs          build and open the code documentation"
 	@echo "  make protocol-types  regenerate TypeScript types from crates/protocol"
+	@echo ""
+	@echo "Battle simulator (AI vs AI on a sandbox scenario):"
+	@echo "  make sim           one battle, full log (SEED=42 SCENARIO=sandbox/battle-basic.json)"
+	@echo "  make sim RUNS=1000 summary over many seeds"
 
 # --- Run ----------------------------------------------------------------------
 
@@ -86,7 +90,7 @@ dev-web:
 
 # --- Quality ------------------------------------------------------------------
 
-check: check-rust check-protocol check-web check-skipped-tests
+check: check-rust check-content check-protocol check-web check-skipped-tests
 	@echo ""
 	@echo "make check: all green."
 
@@ -96,6 +100,9 @@ check-rust:
 	cargo test --workspace --locked --quiet
 	cargo machete
 	RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --document-private-items --locked --quiet
+
+check-content:
+	cargo run --quiet --locked -p content --bin content-check
 
 check-protocol:
 	./scripts/check-protocol-types.sh
@@ -115,3 +122,10 @@ docs:
 
 protocol-types:
 	cargo test --quiet -p protocol
+
+SEED     ?= 42
+RUNS     ?= 1
+SCENARIO ?= sandbox/battle-basic.json
+
+sim:
+	cargo run --quiet --release -p sim -- --scenario $(SCENARIO) --seed $(SEED) --runs $(RUNS)

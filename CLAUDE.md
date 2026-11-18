@@ -16,6 +16,23 @@ change.
 
 | Concept | Location |
 | --- | --- |
+| Battle loop: ticks, commands, action queue, end of battle | `crates/engine/src/battle.rs` |
+| Applying action effects (damage rolls, healing, statuses) | `crates/engine/src/effects.rs` |
+| Damage and healing formulas (pure math) | `crates/engine/src/damage.rs` |
+| ATB gauge speed | `crates/engine/src/atb.rs` |
+| Status kinds and timers | `crates/engine/src/status.rs` |
+| Enemy / auto-battle AI rules | `crates/engine/src/ai.rs` |
+| Attributes and derived stats | `crates/engine/src/stats.rs` |
+| Action, effect, element, item definitions | `crates/engine/src/action.rs` |
+| Battle setup and its validation | `crates/engine/src/setup.rs` |
+| Battle events | `crates/engine/src/event.rs` |
+| Deterministic RNG | `crates/engine/src/rng.rs` |
+| Engine unit-test fixtures | `crates/engine/src/test_support.rs` |
+| Loading content and scenarios | `crates/content/src/lib.rs` |
+| Content validation (`content-check`) | `crates/content/src/validation.rs` |
+| Battle simulator CLI | `crates/sim/src/main.rs` |
+| Actions and items (data) | `content/actions.json`, `content/items.json` |
+| Sandbox scenarios (data) | `sandbox/*.json` |
 | Wire protocol (client ↔ server messages) | `crates/protocol/src/lib.rs` |
 | Generated TS types of the protocol (never edit) | `web/src/protocol/generated/` |
 | Server entry point, CLI commands | `crates/server/src/main.rs` |
@@ -29,8 +46,6 @@ change.
 | Database backup job | `scripts/backup.sh` (run by the `backup` service) |
 
 Planned, created by the phase that needs them (see `PLAN.md` §5 and §9):
-`crates/engine` (pure rules), `crates/content` (+ `content-check`),
-`crates/sim` (CLI), `content/` (game data), `sandbox/` (test scenarios),
 `migrations/` (SQLx).
 
 Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
@@ -46,6 +61,7 @@ Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
 | `make up` / `make up-d` / `make down` | Production-like stack on http://127.0.0.1:8083 (needs `.env`) |
 | `make protocol-types` | Regenerate TS types after changing `crates/protocol` |
 | `make docs` | Build and open rustdoc for the whole workspace |
+| `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`) |
 
 `cargo` lives in `~/.cargo/bin`; the Makefile adds it to `PATH`. In a bare
 shell, `source ~/.cargo/env` first.
@@ -120,9 +136,20 @@ prove nothing was left behind.
 - First `sqlx::query!` → add `cargo sqlx prepare --workspace --check` to
   `check-rust` and commit `.sqlx/`.
 - First table → create `migrations/`, run `sqlx::migrate!` at server startup.
-- First content file → `crates/content` + `content-check` in `make check`.
-- First sandbox scenario → `sandbox` Cargo feature, `/sandbox/*` client routes,
-  Playwright + `make e2e`.
+- Sandbox in the browser (phase 2) → `sandbox` Cargo feature on `server`,
+  `/sandbox/*` client routes, Playwright + `make e2e`.
+- People start editing content by hand → generate JSON Schemas from the engine
+  types (`schemars`) for editor autocomplete, checked for staleness like the
+  protocol types.
+
+## Content rules
+
+- Content is data: `content/` (game) and `sandbox/` (test scenarios). The engine
+  never hard-codes an action, item or monster.
+- Every action id needs `action-<id>`, every item `item-<id>`, every combatant
+  name its message, in **every** locale (`content-check` enforces it).
+- Names are our own. Never reuse names that belong to other games (no
+  "Phoenix Down", no famous Limit names).
 
 ## Done means
 

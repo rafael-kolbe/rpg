@@ -1,0 +1,18 @@
+[package]
+name = "engine"
+version = "0.1.0"
+description = "Pure battle rules: ATB, actions, damage, statuses, enemy AI. No I/O."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { version = "1.0.229", features = ["derive"] }
+thiserror = "2.0.21"
+
+[dev-dependencies]
+serde_json = "1.0.154"
