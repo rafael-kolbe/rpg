@@ -1,38 +1,23 @@
 {
-  "bronze-sword": { "slot": "weapon", "classes": ["warrior"], "attack": 6 },
-  "iron-sword": { "slot": "weapon", "classes": ["warrior"], "attack": 14 },
-  "steel-sword": { "slot": "weapon", "classes": ["warrior"], "attack": 24, "criticalChance": 3 },
-  "short-bow": { "slot": "weapon", "classes": ["archer"], "attack": 7, "accuracy": 100 },
-  "hunting-bow": { "slot": "weapon", "classes": ["archer"], "attack": 15, "accuracy": 100 },
-  "longbow": {
-    "slot": "weapon",
-    "classes": ["archer"],
-    "attack": 25,
-    "accuracy": 100,
-    "criticalChance": 5
-  },
-  "oak-mace": { "slot": "weapon", "classes": ["cleric"], "attack": 6 },
-  "iron-mace": { "slot": "weapon", "classes": ["cleric"], "attack": 14 },
+  "bronze-sword": {"slot": "weapon", "classes": ["warrior", "guard", "soldier"], "attack": 6},
+  "iron-sword": {"slot": "weapon", "classes": ["warrior", "guard", "soldier"], "attack": 14},
+  "steel-sword": {"slot": "weapon", "classes": ["warrior", "guard", "soldier"], "attack": 24, "criticalChance": 3},
+  "short-bow": {"slot": "weapon", "classes": ["archer"], "attack": 7, "accuracy": 100},
+  "hunting-bow": {"slot": "weapon", "classes": ["archer"], "attack": 15, "accuracy": 100},
+  "longbow": {"slot": "weapon", "classes": ["archer"], "attack": 25, "accuracy": 100, "criticalChance": 5},
   "cloth-tunic": {
     "slot": "armor",
-    "classes": ["warrior", "archer", "cleric"],
+    "classes": ["warrior", "guard", "soldier", "archer"],
     "defense": 3,
     "magicDefense": 2
   },
   "leather-vest": {
     "slot": "armor",
-    "classes": ["warrior", "archer", "cleric"],
+    "classes": ["warrior", "guard", "soldier", "archer"],
     "defense": 7,
     "magicDefense": 3,
     "evasion": 2
   },
-  "chain-mail": { "slot": "armor", "classes": ["warrior"], "defense": 16, "magicDefense": 4 },
-  "scout-coat": {
-    "slot": "armor",
-    "classes": ["archer"],
-    "defense": 11,
-    "magicDefense": 8,
-    "evasion": 5
-  },
-  "acolyte-robe": { "slot": "armor", "classes": ["cleric"], "defense": 6, "magicDefense": 14 }
+  "chain-mail": {"slot": "armor", "classes": ["warrior", "guard", "soldier"], "defense": 16, "magicDefense": 4},
+  "scout-coat": {"slot": "armor", "classes": ["archer"], "defense": 11, "magicDefense": 8, "evasion": 5}
 }

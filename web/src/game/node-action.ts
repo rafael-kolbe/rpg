@@ -3,7 +3,10 @@ import type { NodeView } from '../protocol/generated/NodeView.ts'
 /** What using a node does, for its button: a Fluent id with arguments. */
 export interface NodeAction {
   message: string
+  /** Fluent ids, translated before use. */
   args: Record<string, string>
+  /** Numbers, used as they are. */
+  numbers?: Record<string, number>
   /** A fixed fight that can be ambushed. */
   ambush: boolean
 }
@@ -31,6 +34,10 @@ export function nodeAction(node: NodeView | null): NodeAction | null {
       return { message: 'ui-node-shop', args: {}, ambush: false }
     case 'temple':
       return { message: 'ui-node-temple', args: {}, ambush: false }
+    case 'inn':
+      return { message: 'ui-node-inn', args: {}, numbers: { price: kind.price }, ambush: false }
+    case 'board':
+      return { message: 'ui-node-board', args: {}, ambush: false }
     default:
       return null
   }

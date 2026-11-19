@@ -1,0 +1,18 @@
+{
+  "sewer-rats": {
+    "rank": "bronze",
+    "goal": {"type": "kill", "monsters": ["sewer-rat", "giant-rat", "mutant-rat"], "count": 20},
+    "kalds": 200,
+    "events": [{"at": 6, "dialogue": "sewer-squad"}]
+  },
+  "burrowood-goblins": {
+    "rank": "bronze",
+    "goal": {"type": "kill", "monsters": ["goblin", "goblin-archer", "goblin-shaman"], "count": 10},
+    "kalds": 150
+  },
+  "burrowood-wolves": {
+    "rank": "bronze",
+    "goal": {"type": "kill", "monsters": ["forest-wolf"], "count": 6},
+    "kalds": 120
+  }
+}

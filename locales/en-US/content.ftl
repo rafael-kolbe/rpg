@@ -62,30 +62,37 @@ item-hi-potion = Hi-Potion
 
 class-warrior = Warrior
 class-archer = Archer
-class-cleric = Cleric
-hero-taren = Taren
+class-guard = Guard
+class-soldier = Soldier
+hero-tauryen = Tauryen
 hero-lyra = Lyra
-hero-corin = Corin
+hero-merrick = Corporal Merrick
+hero-tobin = Tobin
 
 ## Monsters (campaign)
 
-monster-wild-wolf = Wild Wolf
-monster-wild-boar = Wild Boar
-monster-giant-hornet = Giant Hornet
 monster-goblin = Goblin
 monster-goblin-archer = Goblin Archer
 monster-goblin-shaman = Goblin Shaman
-monster-grukk = Grukk the Hobgoblin
+monster-bandit = Bandit
+monster-hobgoblin = Hobgoblin
+monster-sewer-rat = Sewer Rat
 monster-giant-rat = Giant Rat
-monster-crypt-bat = Crypt Bat
+monster-sewer-slime = Sewer Slime
+monster-giant-roach = Giant Roach
+monster-mutant-rat = Mutant Rat
+monster-giant-leech = Giant Leech
+monster-sewer-crawler = Sewer Crawler
+monster-injured-lich = Injured Lich
+monster-zombie = Zombie
 monster-skeleton = Skeleton
-monster-ghoul = Ghoul
-monster-crypt-spider = Crypt Spider
-monster-skeleton-archer = Skeleton Archer
-monster-will-o-wisp = Will-o'-Wisp
-monster-wraith = Wraith
-monster-skeleton-knight = Skeleton Knight
-monster-bone-warden = The Bone Warden
+
+## Monster and guest actions
+
+action-cover = Cover
+action-devour = Devour
+action-raise-dead = Raise Dead
+action-dark-bolt = Shadow Bolt
 
 ## Equipment
 
@@ -95,22 +102,18 @@ equipment-steel-sword = Steel Sword
 equipment-short-bow = Short Bow
 equipment-hunting-bow = Hunting Bow
 equipment-longbow = Longbow
-equipment-oak-mace = Oak Mace
-equipment-iron-mace = Iron Mace
 equipment-cloth-tunic = Cloth Tunic
 equipment-leather-vest = Leather Vest
 equipment-chain-mail = Chain Mail
 equipment-scout-coat = Scout's Coat
-equipment-acolyte-robe = Acolyte's Robe
 
 ## World
 
 region-brookhollow = Brookhollow
-region-thornwood = Thornwood Forest
+region-burrowood = Burrowood Forest
 region-valcrest = Valcrest
 instance-brookhollow = Brookhollow
-instance-thornwood = The King's Road, Thornwood
-instance-valcrest = City of Valcrest
-instance-catacombs-1 = Catacombs of Valcrest — Level 1
-instance-catacombs-2 = Catacombs of Valcrest — Level 2
-instance-catacombs-3 = Catacombs of Valcrest — Level 3
+instance-burrowood = Burrowood Forest
+instance-valcrest = Valcrest
+instance-valcrest-sewer-1 = Valcrest Sewer — Level 1
+instance-valcrest-sewer-2 = Valcrest Sewer — Level 2

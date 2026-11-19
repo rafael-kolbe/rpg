@@ -5,15 +5,15 @@ use std::collections::{BTreeMap, VecDeque};
 
 use serde::{Deserialize, Serialize};
 
-use crate::action::{ActionCategory, ActionDef, ItemDef, TargetRule};
+use crate::action::{ActionCategory, ActionDef, Effect, ItemDef, TargetRule};
 use crate::atb::{ATB_FULL, Speed, gain_per_tick};
 use crate::combatant::{Combatant, TurnState};
 use crate::event::{BattleEvent, CancelReason, FailReason, StatusEndReason};
 use crate::ids::{ActionId, CombatantId, ItemId, Side};
 use crate::record::RecordedCommand;
 use crate::rng::Rng;
-use crate::setup::{BattleSetup, Opening, SetupError};
-use crate::status::{ActiveStatus, StatusKind};
+use crate::setup::{BattleSetup, CombatantSetup, Opening, SetupError};
+use crate::status::{ActiveStatus, COVER_PERCENT, StatusKind};
 
 /// Who chooses the party's commands.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,6 +144,8 @@ pub struct Battle {
     pub(crate) outcome: Option<Outcome>,
     /// The player's accepted commands, for [`Battle::record`].
     pub(crate) commands: Vec<RecordedCommand>,
+    /// What [`crate::Effect::Reanimate`] can raise a fallen ally into.
+    pub(crate) forms: BTreeMap<String, CombatantSetup>,
 }
 
 impl Battle {
@@ -177,7 +179,8 @@ impl Battle {
             .chain(enemies)
             .zip(0u8..)
             .map(|((side, member), index)| {
-                let player = side == Side::Party && party_control == PartyControl::Player;
+                let player =
+                    side == Side::Party && party_control == PartyControl::Player && !member.guest;
                 Combatant::new(CombatantId(index), side, member, player)
             })
             .collect();
@@ -193,6 +196,7 @@ impl Battle {
             rng: Rng::new(seed),
             outcome: None,
             commands: Vec::new(),
+            forms: encounter.forms,
         };
         battle.open(encounter.opening);
         Ok(battle)
@@ -477,7 +481,9 @@ impl Battle {
         } else {
             actor_side.opponent()
         };
-        target.side == side && target.is_knocked_out() == def.effect.targets_knocked_out()
+        target.side == side
+            && target.is_knocked_out() == def.effect.targets_knocked_out()
+            && !(def.effect == Effect::Devour && target.id == actor)
     }
 
     /// Final targets of an action about to execute. A single target that is
@@ -500,6 +506,8 @@ impl Battle {
             TargetRule::User => eligible.into_iter().filter(|&id| id == actor).collect(),
             TargetRule::SingleEnemy | TargetRule::SingleAlly => match requested {
                 Some(id) if eligible.contains(&id) => vec![id],
+                // A creature is devoured or raised by choice, never a stand-in.
+                _ if matches!(def.effect, Effect::Devour | Effect::Reanimate { .. }) => Vec::new(),
                 _ => self.rng.pick(&eligible).into_iter().collect(),
             },
         }
@@ -665,11 +673,22 @@ impl Battle {
             Err(_) => Some(FailReason::NotEnoughMp),
             Ok(()) => None,
         };
-        let targets = if failure.is_none() {
+        let mut targets = if failure.is_none() {
             self.resolve_targets(actor, &def, target)
         } else {
             Vec::new()
         };
+        if def.target == TargetRule::SingleEnemy
+            && let [protected] = targets[..]
+            && let Some(protector) = self.protector_of(protected)
+            && self.rng.chance_percent(COVER_PERCENT)
+        {
+            targets = vec![protector];
+            events.push(BattleEvent::Covered {
+                protector,
+                protected,
+            });
+        }
         let failure = failure.or_else(|| targets.is_empty().then_some(FailReason::NoValidTarget));
 
         let combatant = self.combatant_mut(actor);
@@ -752,13 +771,38 @@ impl Battle {
         self.cancel_queued(id, CancelReason::ActorKnockedOut, events);
     }
 
-    fn side_defeated(&self) -> bool {
-        [Side::Party, Side::Enemies].into_iter().any(|side| {
-            self.combatants
-                .iter()
-                .filter(|c| c.side == side)
+    /// A standing ally of `protected` whose Cover can take a hit for it.
+    fn protector_of(&self, protected: CombatantId) -> Option<CombatantId> {
+        let side = self.combatant(protected)?.side;
+        self.combatants
+            .iter()
+            .find(|c| {
+                c.side == side
+                    && c.id != protected
+                    && !c.is_knocked_out()
+                    && c.has_status(StatusKind::Cover)
+                    && !c.has_status(StatusKind::Sleep)
+            })
+            .map(|c| c.id)
+    }
+
+    /// Whether a side can no longer fight: everyone is down, or, for a side
+    /// with leaders, every leader is.
+    fn side_out(&self, side: Side) -> bool {
+        let members = || self.combatants.iter().filter(move |c| c.side == side);
+        if members().any(|c| c.leader) {
+            members()
+                .filter(|c| c.leader)
                 .all(Combatant::is_knocked_out)
-        })
+        } else {
+            members().all(Combatant::is_knocked_out)
+        }
+    }
+
+    fn side_defeated(&self) -> bool {
+        [Side::Party, Side::Enemies]
+            .into_iter()
+            .any(|side| self.side_out(side))
     }
 
     /// Ends the battle if a side is out. Party defeat wins a tie.
@@ -766,19 +810,25 @@ impl Battle {
         if self.outcome.is_some() {
             return true;
         }
-        let side_out = |side: Side| {
-            self.combatants
-                .iter()
-                .filter(|c| c.side == side)
-                .all(Combatant::is_knocked_out)
-        };
-        let outcome = if side_out(Side::Party) {
+        let outcome = if self.side_out(Side::Party) {
             Outcome::Defeat
-        } else if side_out(Side::Enemies) {
+        } else if self.side_out(Side::Enemies) {
             Outcome::Victory
         } else {
             return false;
         };
+        // The servants of a fallen leader fall with it.
+        let standing: Vec<CombatantId> = self
+            .combatants
+            .iter()
+            .filter(|c| c.side == Side::Enemies && !c.is_knocked_out())
+            .map(|c| c.id)
+            .collect();
+        if outcome == Outcome::Victory {
+            for id in standing {
+                self.knock_out(id, events);
+            }
+        }
         self.outcome = Some(outcome);
         events.push(BattleEvent::BattleEnded { outcome });
         true
@@ -792,7 +842,7 @@ impl Battle {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::action::Effect;
+    use crate::ai::{AiAct, AiPhase, AiProfile, AiRule, Condition, TargetPick};
     use crate::status::StatusTimer;
     use crate::test_support::{catalog_setup, fighter, run_until, until_turn};
 
@@ -1203,5 +1253,164 @@ mod tests {
         let mut ignored = Vec::new();
         battle.knock_out(CombatantId(1), &mut ignored);
         assert!(battle.is_eligible(HERO, &feather, CombatantId(1)));
+    }
+
+    /// A combatant that follows one rule (and attacks otherwise).
+    fn with_rule(name: &str, when: Condition, id: &str, target: TargetPick) -> CombatantSetup {
+        let mut setup = fighter(name);
+        setup.actions.push(ActionId::new(id));
+        setup.ai = Some(AiProfile {
+            phases: vec![AiPhase {
+                from_hp_percent: 100,
+                rules: vec![
+                    AiRule {
+                        when,
+                        weight: 1,
+                        act: AiAct::Action {
+                            id: ActionId::new(id),
+                        },
+                        target,
+                    },
+                    AiRule {
+                        when: Condition::Always,
+                        weight: 1,
+                        act: AiAct::Attack,
+                        target: TargetPick::RandomOpponent,
+                    },
+                ],
+            }],
+        });
+        setup
+    }
+
+    #[test]
+    fn a_guest_acts_on_its_own_while_the_player_commands_the_rest() {
+        let mut guest = fighter("guard");
+        guest.guest = true;
+        let setup = catalog_setup(vec![fighter("hero"), guest], vec![fighter("wolf")]);
+        let mut battle = Battle::new(setup, 3, PartyControl::Player).unwrap();
+        let guard = CombatantId(1);
+
+        assert!(!battle.combatant(guard).unwrap().player_controlled);
+        run_until(
+            &mut battle,
+            |e| matches!(e, BattleEvent::ActionStarted { actor, .. } if *actor == guard),
+        );
+        assert!(battle.awaiting_command().all(|id| id != guard));
+    }
+
+    #[test]
+    fn cover_takes_most_single_target_hits_meant_for_an_ally() {
+        let knight = with_rule(
+            "knight",
+            Condition::UserLacksStatus {
+                status: StatusKind::Cover,
+            },
+            "cover",
+            TargetPick::User,
+        );
+        let mut party = fighter("hero");
+        party.stats.max_hp = 9999;
+        let mut knight = knight;
+        knight.stats.max_hp = 9999;
+        knight.guest = true;
+        let setup = catalog_setup(vec![party, knight], vec![fighter("wolf")]);
+        let mut battle = Battle::new(setup, 5, PartyControl::Player).unwrap();
+        let knight = CombatantId(1);
+
+        let mut hero_hit = 0;
+        let mut covered = 0;
+        for _ in 0..20_000 {
+            for event in battle.step() {
+                match event {
+                    BattleEvent::Covered {
+                        protector,
+                        protected,
+                    } => {
+                        assert_eq!((protector, protected), (knight, HERO));
+                        covered += 1;
+                    }
+                    BattleEvent::Damaged { target, .. } if target == HERO => hero_hit += 1,
+                    _ => {}
+                }
+            }
+        }
+
+        assert!(covered > 0, "Cover never took a hit");
+        assert!(
+            covered > hero_hit,
+            "covered {covered}, hero still hit {hero_hit}"
+        );
+    }
+
+    #[test]
+    fn a_fallen_leader_takes_its_servants_with_it() {
+        let mut boss = fighter("lich");
+        boss.leader = true;
+        let setup = catalog_setup(vec![fighter("hero")], vec![boss, fighter("zombie")]);
+        let mut battle = Battle::new(setup, 1, PartyControl::Player).unwrap();
+        let mut events = Vec::new();
+
+        battle.knock_out(CombatantId(1), &mut events);
+        events.extend(battle.step());
+
+        assert_eq!(battle.outcome(), Some(Outcome::Victory));
+        assert!(events.contains(&BattleEvent::KnockedOut {
+            combatant: CombatantId(2)
+        }));
+    }
+
+    #[test]
+    fn devour_feeds_on_the_named_ally_and_never_on_another() {
+        let mut lich = with_rule(
+            "lich",
+            Condition::UserHpBelow { percent: 50 },
+            "devour",
+            TargetPick::AllyNamed {
+                name: "zombie".to_owned(),
+            },
+        );
+        lich.hp = Some(100);
+        let setup = catalog_setup(
+            vec![fighter("hero")],
+            vec![lich, fighter("skeleton"), fighter("zombie")],
+        );
+        let mut battle = Battle::new(setup, 2, PartyControl::Player).unwrap();
+        let (lich, skeleton, zombie) = (CombatantId(1), CombatantId(2), CombatantId(3));
+
+        let events = run_until(
+            &mut battle,
+            |e| matches!(e, BattleEvent::ActionStarted { actor, .. } if *actor == lich),
+        );
+
+        assert!(events.contains(&BattleEvent::KnockedOut { combatant: zombie }));
+        assert_eq!(battle.combatant(lich).unwrap().hp(), 300);
+        assert!(!battle.combatant(skeleton).unwrap().is_knocked_out());
+    }
+
+    #[test]
+    fn reanimate_raises_a_fallen_ally_as_another_creature() {
+        let lich = with_rule(
+            "lich",
+            Condition::AllyKnockedOut,
+            "raise",
+            TargetPick::KnockedOutAllyNamed {
+                name: "zombie".to_owned(),
+            },
+        );
+        let setup = catalog_setup(vec![fighter("hero")], vec![lich, fighter("zombie")]);
+        let mut battle = Battle::new(setup, 2, PartyControl::Player).unwrap();
+        let zombie = CombatantId(2);
+        let mut ignored = Vec::new();
+        battle.knock_out(zombie, &mut ignored);
+
+        run_until(
+            &mut battle,
+            |e| matches!(e, BattleEvent::Revived { target, .. } if *target == zombie),
+        );
+
+        let raised = battle.combatant(zombie).unwrap();
+        assert_eq!(raised.name(), "skeleton");
+        assert_eq!(raised.hp(), 300);
     }
 }

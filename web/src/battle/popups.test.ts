@@ -25,4 +25,12 @@ describe('effectsOf', () => {
     expect(effectsOf(1, hit('fire'), catalog).popups[0]?.element).toBe('fire')
     expect(effectsOf(1, hit('attack'), catalog).popups[0]?.element).toBeUndefined()
   })
+
+  test('Cover shows over the combatant that took the hit', () => {
+    const covered: BattleEvent[] = [{ type: 'covered', protector: 2, protected: 1 }]
+
+    expect(effectsOf(1, covered, catalog).popups).toEqual([
+      { key: '1-0', target: 2, kind: 'cover' },
+    ])
+  })
 })

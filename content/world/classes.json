@@ -21,28 +21,28 @@
       "luck": 10
     },
     "attack": "attack",
-    "learns": [{ "level": 3, "action": "twin-cleave" }, { "level": 8, "action": "whirlwind" }],
+    "learns": [{"level": 3, "action": "twin-cleave"}, {"level": 8, "action": "whirlwind"}],
     "ai": {
       "phases": [
         {
           "fromHpPercent": 100,
           "rules": [
             {
-              "when": { "type": "user_hp_below", "percent": 30 },
-              "act": { "type": "item", "id": "potion" },
-              "target": { "type": "user" }
+              "when": {"type": "user_hp_below", "percent": 30},
+              "act": {"type": "item", "id": "potion"},
+              "target": {"type": "user"}
             },
             {
               "weight": 2,
-              "act": { "type": "action", "id": "whirlwind" },
-              "target": { "type": "random_opponent" }
+              "act": {"type": "action", "id": "whirlwind"},
+              "target": {"type": "random_opponent"}
             },
             {
               "weight": 2,
-              "act": { "type": "action", "id": "twin-cleave" },
-              "target": { "type": "lowest_hp_opponent" }
+              "act": {"type": "action", "id": "twin-cleave"},
+              "target": {"type": "lowest_hp_opponent"}
             },
-            { "weight": 4, "act": { "type": "attack" }, "target": { "type": "lowest_hp_opponent" } }
+            {"weight": 4, "act": {"type": "attack"}, "target": {"type": "lowest_hp_opponent"}}
           ]
         }
       ]
@@ -71,9 +71,9 @@
     },
     "attack": "arrow-shot",
     "learns": [
-      { "level": 1, "action": "aimed-shot" },
-      { "level": 4, "action": "poison-arrow" },
-      { "level": 8, "action": "arrow-rain" }
+      {"level": 1, "action": "aimed-shot"},
+      {"level": 4, "action": "poison-arrow"},
+      {"level": 8, "action": "arrow-rain"}
     ],
     "ai": {
       "phases": [
@@ -81,103 +81,103 @@
           "fromHpPercent": 100,
           "rules": [
             {
-              "when": { "type": "ally_knocked_out" },
-              "act": { "type": "item", "id": "revive-feather" },
-              "target": { "type": "knocked_out_ally" }
+              "when": {"type": "ally_knocked_out"},
+              "act": {"type": "item", "id": "revive-feather"},
+              "target": {"type": "knocked_out_ally"}
             },
             {
-              "when": { "type": "ally_hp_below", "percent": 35 },
-              "act": { "type": "item", "id": "potion" },
-              "target": { "type": "lowest_hp_ally" }
+              "when": {"type": "ally_hp_below", "percent": 35},
+              "act": {"type": "item", "id": "potion"},
+              "target": {"type": "lowest_hp_ally"}
             },
             {
               "weight": 2,
-              "act": { "type": "action", "id": "arrow-rain" },
-              "target": { "type": "random_opponent" }
+              "act": {"type": "action", "id": "arrow-rain"},
+              "target": {"type": "random_opponent"}
             },
             {
               "weight": 1,
-              "act": { "type": "action", "id": "poison-arrow" },
-              "target": { "type": "random_opponent" }
+              "act": {"type": "action", "id": "poison-arrow"},
+              "target": {"type": "random_opponent"}
             },
             {
               "weight": 2,
-              "act": { "type": "action", "id": "aimed-shot" },
-              "target": { "type": "lowest_hp_opponent" }
+              "act": {"type": "action", "id": "aimed-shot"},
+              "target": {"type": "lowest_hp_opponent"}
             },
-            { "weight": 4, "act": { "type": "attack" }, "target": { "type": "lowest_hp_opponent" } }
+            {"weight": 4, "act": {"type": "attack"}, "target": {"type": "lowest_hp_opponent"}}
           ]
         }
       ]
     }
   },
-  "cleric": {
+  "guard": {
     "base": {
-      "maxHp": 75,
-      "maxMp": 20,
-      "strength": 8,
-      "dexterity": 20,
-      "vitality": 9,
-      "magic": 14,
-      "spirit": 16,
-      "luck": 12
+      "maxHp": 110,
+      "maxMp": 10,
+      "strength": 13,
+      "dexterity": 18,
+      "vitality": 14,
+      "magic": 4,
+      "spirit": 8,
+      "luck": 8
     },
     "growth": {
-      "maxHp": 130,
-      "maxMp": 40,
-      "strength": 12,
-      "dexterity": 16,
-      "vitality": 13,
-      "magic": 22,
-      "spirit": 24,
-      "luck": 12
+      "maxHp": 200,
+      "maxMp": 10,
+      "strength": 20,
+      "dexterity": 12,
+      "vitality": 22,
+      "magic": 4,
+      "spirit": 8,
+      "luck": 8
     },
     "attack": "attack",
-    "learns": [
-      { "level": 1, "action": "cure" },
-      { "level": 3, "action": "purify" },
-      { "level": 5, "action": "barrier" },
-      { "level": 7, "action": "regen" },
-      { "level": 9, "action": "haste" },
-      { "level": 10, "action": "raise" }
-    ],
+    "learns": [{"level": 1, "action": "cover"}],
     "ai": {
       "phases": [
         {
           "fromHpPercent": 100,
           "rules": [
             {
-              "when": { "type": "ally_knocked_out" },
-              "act": { "type": "action", "id": "raise" },
-              "target": { "type": "knocked_out_ally" }
+              "when": {"type": "user_lacks_status", "status": "cover"},
+              "act": {"type": "action", "id": "cover"},
+              "target": {"type": "user"}
             },
-            {
-              "when": { "type": "ally_knocked_out" },
-              "act": { "type": "item", "id": "revive-feather" },
-              "target": { "type": "knocked_out_ally" }
-            },
-            {
-              "when": { "type": "ally_hp_below", "percent": 55 },
-              "act": { "type": "action", "id": "cure" },
-              "target": { "type": "lowest_hp_ally" }
-            },
-            {
-              "weight": 1,
-              "act": { "type": "action", "id": "haste" },
-              "target": { "type": "random_ally" }
-            },
-            {
-              "weight": 1,
-              "act": { "type": "action", "id": "barrier" },
-              "target": { "type": "random_ally" }
-            },
-            {
-              "weight": 1,
-              "act": { "type": "action", "id": "regen" },
-              "target": { "type": "random_ally" }
-            },
-            { "weight": 3, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            {"weight": 1, "act": {"type": "attack"}, "target": {"type": "lowest_hp_opponent"}}
           ]
+        }
+      ]
+    }
+  },
+  "soldier": {
+    "base": {
+      "maxHp": 100,
+      "maxMp": 6,
+      "strength": 14,
+      "dexterity": 20,
+      "vitality": 12,
+      "magic": 4,
+      "spirit": 6,
+      "luck": 8
+    },
+    "growth": {
+      "maxHp": 170,
+      "maxMp": 8,
+      "strength": 20,
+      "dexterity": 14,
+      "vitality": 16,
+      "magic": 4,
+      "spirit": 8,
+      "luck": 8
+    },
+    "attack": "attack",
+    "learns": [],
+    "ai": {
+      "phases": [
+        {
+          "fromHpPercent": 100,
+          "rules": [{"weight": 1, "act": {"type": "attack"}, "target": {"type": "lowest_hp_opponent"}}]
         }
       ]
     }

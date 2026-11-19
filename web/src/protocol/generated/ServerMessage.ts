@@ -36,7 +36,7 @@ events: Array<BattleEvent>,
  */
 state: BattleState, } | { "type": "game_update", 
 /**
- * The view.
+ * The view (boxed: by far the largest message).
  */
 view: GameView, } | { "type": "game_rejected", 
 /**

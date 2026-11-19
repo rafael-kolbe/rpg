@@ -3,209 +3,230 @@
     "category": "attack",
     "target": "single_enemy",
     "durationTicks": 8,
-    "effect": { "type": "physical_damage", "power": 16 }
+    "effect": {"type": "physical_damage", "power": 16}
   },
   "bite": {
     "category": "attack",
     "target": "single_enemy",
     "durationTicks": 8,
-    "effect": { "type": "physical_damage", "power": 16 }
+    "effect": {"type": "physical_damage", "power": 16}
   },
   "fire": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 4,
     "durationTicks": 12,
-    "effect": { "type": "magical_damage", "power": 8, "element": "fire" }
+    "effect": {"type": "magical_damage", "power": 8, "element": "fire"}
   },
   "ice": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 4,
     "durationTicks": 12,
-    "effect": { "type": "magical_damage", "power": 8, "element": "ice" }
+    "effect": {"type": "magical_damage", "power": 8, "element": "ice"}
   },
   "thunder": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 4,
     "durationTicks": 12,
-    "effect": { "type": "magical_damage", "power": 8, "element": "lightning" }
+    "effect": {"type": "magical_damage", "power": 8, "element": "lightning"}
   },
   "gravity-crush": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 10,
     "durationTicks": 14,
-    "effect": { "type": "percent_current_hp", "percent": 25, "element": "gravity" }
+    "effect": {"type": "percent_current_hp", "percent": 25, "element": "gravity"}
   },
   "sleep": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 5,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "sleep", "durationTicks": 200, "accuracy": 70 }
+    "effect": {"type": "apply_status", "status": "sleep", "durationTicks": 200, "accuracy": 70}
   },
   "cure": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 5,
     "durationTicks": 10,
-    "effect": { "type": "heal", "power": 2 }
+    "effect": {"type": "heal", "power": 2}
   },
   "barrier": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 6,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "barrier", "durationTicks": 300 }
+    "effect": {"type": "apply_status", "status": "barrier", "durationTicks": 300}
   },
   "haste": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 8,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "haste", "durationTicks": 300 }
+    "effect": {"type": "apply_status", "status": "haste", "durationTicks": 300}
   },
   "poison-fang": {
     "category": "technic",
     "target": "single_enemy",
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 80 }
+    "effect": {"type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 80}
   },
   "twin-cleave": {
     "category": "technic",
     "target": "single_enemy",
     "mpCost": 6,
     "durationTicks": 20,
-    "effect": { "type": "physical_damage", "power": 48 }
+    "effect": {"type": "physical_damage", "power": 48}
   },
   "potion": {
     "category": "item",
     "target": "single_ally",
     "durationTicks": 6,
-    "effect": { "type": "restore_hp", "amount": 100 }
+    "effect": {"type": "restore_hp", "amount": 100}
   },
   "ether": {
     "category": "item",
     "target": "single_ally",
     "durationTicks": 6,
-    "effect": { "type": "restore_mp", "amount": 100 }
+    "effect": {"type": "restore_mp", "amount": 100}
   },
   "antidote": {
     "category": "item",
     "target": "single_ally",
     "durationTicks": 6,
-    "effect": { "type": "remove_status", "statuses": ["poison"] }
+    "effect": {"type": "remove_status", "statuses": ["poison"]}
   },
   "revive-feather": {
     "category": "item",
     "target": "single_ally",
     "durationTicks": 8,
-    "effect": { "type": "revive", "hpPercent": 25 }
+    "effect": {"type": "revive", "hpPercent": 25}
   },
   "claw": {
     "category": "attack",
     "target": "single_enemy",
     "durationTicks": 8,
-    "effect": { "type": "physical_damage", "power": 16 }
+    "effect": {"type": "physical_damage", "power": 16}
   },
   "arrow-shot": {
     "category": "attack",
     "target": "single_enemy",
     "durationTicks": 8,
-    "effect": { "type": "physical_damage", "power": 16 }
+    "effect": {"type": "physical_damage", "power": 16}
   },
   "venom-sting": {
     "category": "technic",
     "target": "single_enemy",
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 75 }
+    "effect": {"type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 75}
   },
   "crushing-blow": {
     "category": "technic",
     "target": "single_enemy",
     "durationTicks": 18,
-    "effect": { "type": "physical_damage", "power": 26 }
+    "effect": {"type": "physical_damage", "power": 26}
   },
   "war-cry": {
     "category": "technic",
     "target": "user",
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "haste", "durationTicks": 300 }
+    "effect": {"type": "apply_status", "status": "haste", "durationTicks": 300}
   },
   "web": {
     "category": "technic",
     "target": "single_enemy",
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "slow", "durationTicks": 300, "accuracy": 70 }
+    "effect": {"type": "apply_status", "status": "slow", "durationTicks": 300, "accuracy": 70}
   },
   "hush": {
     "category": "magic",
     "target": "single_enemy",
     "mpCost": 6,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "silence", "durationTicks": 300, "accuracy": 70 }
+    "effect": {"type": "apply_status", "status": "silence", "durationTicks": 300, "accuracy": 70}
   },
   "bone-storm": {
     "category": "technic",
     "target": "all_enemies",
     "durationTicks": 20,
-    "effect": { "type": "physical_damage", "power": 18 }
+    "effect": {"type": "physical_damage", "power": 18}
   },
   "whirlwind": {
     "category": "technic",
     "target": "all_enemies",
     "mpCost": 10,
     "durationTicks": 18,
-    "effect": { "type": "physical_damage", "power": 12 }
+    "effect": {"type": "physical_damage", "power": 12}
   },
   "aimed-shot": {
     "category": "technic",
     "target": "single_enemy",
     "mpCost": 3,
     "durationTicks": 12,
-    "effect": { "type": "physical_damage", "power": 26 }
+    "effect": {"type": "physical_damage", "power": 26}
   },
   "poison-arrow": {
     "category": "technic",
     "target": "single_enemy",
     "mpCost": 4,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 85 }
+    "effect": {"type": "apply_status", "status": "poison", "durationTicks": 600, "accuracy": 85}
   },
   "arrow-rain": {
     "category": "technic",
     "target": "all_enemies",
     "mpCost": 10,
     "durationTicks": 18,
-    "effect": { "type": "physical_damage", "power": 12 }
+    "effect": {"type": "physical_damage", "power": 12}
   },
   "regen": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 8,
     "durationTicks": 10,
-    "effect": { "type": "apply_status", "status": "regen", "durationTicks": 450 }
+    "effect": {"type": "apply_status", "status": "regen", "durationTicks": 450}
   },
   "purify": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 5,
     "durationTicks": 10,
-    "effect": { "type": "remove_status", "statuses": ["poison", "silence", "slow", "sleep"] }
+    "effect": {"type": "remove_status", "statuses": ["poison", "silence", "slow", "sleep"]}
   },
   "raise": {
     "category": "magic",
     "target": "single_ally",
     "mpCost": 16,
     "durationTicks": 14,
-    "effect": { "type": "revive", "hpPercent": 30 }
+    "effect": {"type": "revive", "hpPercent": 30}
   },
   "hi-potion": {
     "category": "item",
     "target": "single_ally",
     "durationTicks": 6,
-    "effect": { "type": "restore_hp", "amount": 300 }
+    "effect": {"type": "restore_hp", "amount": 300}
+  },
+  "cover": {
+    "category": "technic",
+    "target": "user",
+    "durationTicks": 10,
+    "effect": {"type": "apply_status", "status": "cover", "durationTicks": 600}
+  },
+  "devour": {"category": "magic", "target": "single_ally", "durationTicks": 16, "effect": {"type": "devour"}},
+  "raise-dead": {
+    "category": "magic",
+    "target": "single_ally",
+    "mpCost": 20,
+    "durationTicks": 18,
+    "effect": {"type": "reanimate", "into": "skeleton"}
+  },
+  "dark-bolt": {
+    "category": "magic",
+    "target": "single_enemy",
+    "mpCost": 12,
+    "durationTicks": 14,
+    "effect": {"type": "magical_damage", "power": 4, "element": "gravity"}
   }
 }

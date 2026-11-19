@@ -39,13 +39,13 @@ O presente do jogo é **965** (20 anos depois do ataque de Volcanika).
 
 | Ano | Acontecimento | Quando o jogador descobre |
 | --- | --- | --- |
-| 915 | Nasce **Brenna**, mãe de Taren. | *(em aberto)* |
-| 938 | Nasce **Taren**, em Brookhollow. | — |
+| 915 | Nasce **Brenna**, mãe de Tauryen. | *(em aberto)* |
+| 938 | Nasce **Tauryen**, em Brookhollow. | — |
 | 939 | Nasce **Lyra**, em Valcrest. | *(em aberto)* |
-| 941 | Nasce **Tessa**, irmã de Taren. | *(em aberto)* |
-| 945 | **Ataque de Volcanika.** A dragoa lendária atravessa o reino e destrói várias cidades. **Valcrest** é a que mais sofre. Em Brookhollow o fogo de mana queima os campos por duas semanas e a vila perde quase toda a colheita. **Doran, pai de Taren, morre** tentando apagar o fogo do trigal. **Corwin, pai de Jory, também morre**, de um jeito diferente. Brookhollow tinha cerca de **300** habitantes. | *(em aberto)* |
+| 941 | Nasce **Tessa**, irmã de Tauryen. | *(em aberto)* |
+| 945 | **Ataque de Volcanika.** A dragoa lendária atravessa o reino e destrói várias cidades. **Valcrest** é a que mais sofre. Em Brookhollow o fogo de mana queima os campos por duas semanas e a vila perde quase toda a colheita. **Doran, pai de Tauryen, morre** tentando apagar o fogo do trigal. **Corwin, pai de Jory, também morre**, de um jeito diferente. Brookhollow tinha cerca de **300** habitantes. | *(em aberto)* |
 | 945 | **Os pais de Lyra morrem** no ataque de Volcanika. O Major Harlow passa a cuidar dela. | *(em aberto)* |
-| 945 | A **Ordem do Lírio Rubro**, o grupo de elite mais forte do reino, chega tarde demais para impedir a destruição; persegue Volcanika e luta com ela **em outro lugar**, longe de Valcrest. Derrota a dragoa (versão oficial), mas seus membros saem **gravemente feridos**. Corre o boato de que ela fugiu e vive em outro continente. Ao saber da vitória, Taren decide se tornar o mais forte e começa a treinar. | O motivo de Taren: **mais para frente no primeiro arco**. |
+| 945 | A **Ordem do Lírio Rubro**, o grupo de elite mais forte do reino, chega tarde demais para impedir a destruição; persegue Volcanika e luta com ela **em outro lugar**, longe de Valcrest. Derrota a dragoa (versão oficial), mas seus membros saem **gravemente feridos**. Corre o boato de que ela fugiu e vive em outro continente. Ao saber da vitória, Tauryen decide se tornar o mais forte e começa a treinar. | O motivo de Tauryen: **mais para frente no primeiro arco**. |
 | 945 | **Duas semanas depois do ataque**, quando o fogo de mana enfim se apaga, o **reino vizinho de Draskar**, hostil e intocado pela dragoa, aproveita: declara guerra e invade **Valcrest** pelos muros que Volcanika derrubou. Começa o **cerco de Valcrest**. O **Major Edmund Harlow**, de passagem pelo castelo a serviço do reino, assume a defesa e impede a queda da cidade. Halvaren manda reforços para Valcrest e outros pontos da fronteira. Surge o boato de que Draskar invocou a dragoa; nunca foi comprovado. | *(em aberto)* |
 | 945–948 | **O resto da família de Lyra, incluindo o irmão mais velho, morre** na guerra com Draskar. | *(em aberto)* |
 | 945–946 | A Ordem passa **1 ano** se recuperando. Sem ela, Halvaren perde cidades para Draskar e **quase perde a capital**. | *(em aberto)* |
@@ -56,23 +56,29 @@ O presente do jogo é **965** (20 anos depois do ataque de Volcanika).
 | 956 | **Lorde Cassian Velmont** visita Brookhollow procurando talentos para magia e leva Tessa, prometendo riqueza à vila se ela se destacar. Desde então, nenhuma notícia dela. | *(em aberto)* |
 | até 962 | Lyra tenta se alistar no exército e é recusada por muito tempo: mulheres são raras no exército, e ela foge do estereótipo militar. Treina sozinha. | *(em aberto)* |
 | 962 | Lyra desmascara um **infiltrado de Draskar** que, disfarçado em Valcrest, tentava jogar o povo contra o exército de Halvaren; o homem é preso. Por isso o exército a aceita, aos 23 anos. Desde então, ela só fica estacionada na cidade. | *(em aberto)* |
-| 965 | **Início do jogo.** Taren sai de casa para se tornar o aventureiro mais forte. Deixa a mãe aos cuidados de **Jory**, amigo de infância. Brookhollow tem cerca de **100** habitantes. |
-| 965 | Com a guarda ocupada com outros assuntos, um terceiro-sargento do exército dá a Lyra a missão de **reconhecimento** do acampamento goblin em Burrowood ("se você se acha tão capaz assim…"). Ela vai **sozinha** e é emboscada por goblins. Taren, a caminho de Valcrest pela estrada, ouve a luta e a salva. Juntos, cumprem o reconhecimento e destroem um acampamento goblin. | — |
+| 965 | **Início do jogo.** Tauryen sai de casa para se tornar o aventureiro mais forte. Deixa a mãe aos cuidados de **Jory**, amigo de infância. Brookhollow tem cerca de **100** habitantes. |
+| 965 | Com a guarda ocupada com outros assuntos, um terceiro-sargento do exército dá a Lyra a missão de **reconhecimento** do acampamento goblin em Burrowood ("se você se acha tão capaz assim…"). Ela vai **sozinha** e é emboscada por goblins. Tauryen, a caminho de Valcrest pela estrada, ouve a luta e a salva. Juntos, cumprem o reconhecimento e destroem um acampamento goblin. | — |
 
 ## Capítulo 1 — enredo
 
 O que acontece no jogo, em ordem. Cada cena entra aqui quando o autor a conta.
 
-1. **Partida (Brookhollow, 965).** Taren sai de casa rumo a Valcrest.
-   *(em aberto: a cena)*
-2. **Burrowood.** Na estrada, Taren ouve uma luta e salva Lyra, emboscada por
-   goblins durante o reconhecimento do acampamento. Juntos, cumprem o
-   reconhecimento e destroem um acampamento goblin.
-3. **O relatório (Valcrest).** Os dois voltam juntos para a cidade; Taren a
+1. **Partida (Brookhollow, 965).** Tauryen (nível 1) sai de casa rumo a
+   Valcrest. A mãe, Vó Hilda e Jory vêm se despedir e desejar sucesso no sonho
+   dele. Cena curta; **sem tutorial**.
+2. **Burrowood.** A primeira batalha acontece no caminho pela floresta (se
+   houver encontro) ou ao achar Lyra. Na estrada, Tauryen ouve uma luta e salva
+   Lyra, emboscada por goblins durante o reconhecimento do acampamento; ela
+   entra na party no **nível 3**. Juntos, cumprem o reconhecimento e destroem
+   um acampamento goblin, cujo chefe é um **Hobgoblin** (nível 10, com 2
+   goblins). Goblins de Burrowood: 3 tipos, níveis 2–5.
+3. **O relatório (Valcrest).** Os dois voltam juntos para a cidade; Tauryen a
    acompanha até o terceiro-sargento que deu a missão. Lyra reporta o que
-   aconteceu, apresenta Taren e leva uma bronca, com razão, por ter ido
-   sozinha. Os dois se despedem.
-4. **A Guilda (Valcrest).** Taren vai se inscrever, no salão da Guilda. A
+   aconteceu, apresenta Tauryen e leva uma bronca, com razão, por ter ido
+   sozinha. Os dois se despedem e **Lyra sai da party**. Daqui em diante o
+   jogador é livre (pode voltar à floresta para caçar, por exemplo); a história
+   só segue quando ele entra na Guilda.
+4. **A Guilda (Valcrest).** Tauryen vai se inscrever, no salão da Guilda. A
    secretária, Delia, não dá muita atenção a ele no começo. Quando pergunta o
    objetivo dele, o salão inteiro ouve (antes disso, entre as explicações,
    ela diz que cada um só aceita missões **do próprio rank ou abaixo**: a
@@ -80,17 +86,17 @@ O que acontece no jogo, em ordem. Cada cena entra aqui quando o autor a conta.
    mundo!"*. Todos riem, menos ela: o tom e o olhar dele mostram que não é
    vaidade. Ela não pergunta mais nada; explica como a Guilda funciona, passa o
    termo de responsabilidade para ele assinar e decide acompanhar os próximos
-   passos desse novo aventureiro. Taren recebe a **insígnia de Bronze**.
-5. **Os feridos.** Depois das gargalhadas, ninguém quer formar equipe com Taren.
+   passos desse novo aventureiro. Tauryen recebe a **insígnia de Bronze**.
+5. **Os feridos.** Depois das gargalhadas, ninguém quer formar equipe com Tauryen.
    Antes que ele vá ao quadro de missões, uma equipe de 3 aventureiros de rank
    **Ouro** invade a Guilda: dois feridos carregam o terceiro, inconsciente, no
    meio deles. "Ajudem!" Os risos viram tensão. Delia chama os curandeiros e vai
    até eles; outro grupo de aventureiros, conhecidos dos três, pergunta o que
    poderia tê-los deixado assim numa cidade remota como Valcrest. Um dos feridos
    conta:
-   - Faziam uma patrulha no **esgoto da cidade**, área de rank Bronze, aonde
-     jovens aventureiros e curiosos vão treinar ou cumprir missões para
-     diminuir a infestação, e às vezes precisam de ajuda.
+   - Faziam uma ronda no **esgoto da cidade** (nível 1 de rank Bronze, nível
+     2 de Prata iniciante), aonde jovens aventureiros e curiosos vão treinar ou
+     cumprir missões para diminuir a infestação, e às vezes precisam de ajuda.
    - Foram emboscados por um grupo de **Carniçais** (rank Ouro), que devoravam
      aventureiros novatos mortos no chão. Ninguém sabe de onde vieram; nem
      deveriam existir ali.
@@ -102,71 +108,143 @@ O que acontece no jogo, em ordem. Cada cena entra aqui quando o autor a conta.
      Guilda uns 10 minutos depois.
    - A equipe ferida são as **Lâminas Douradas**; quem pergunta são os
      **Martelos de Ferro** (ver [Gente de Valcrest](#gente-de-valcrest)).
-6. **"Eu vou."** Taren diz abertamente que vai ao esgoto. Ninguém o leva a
+6. **"Eu vou."** Tauryen diz abertamente que vai ao esgoto. Ninguém o leva a
    sério: é o novato que acabou de fazer o salão rir. Sem o jogador ver, ele
    pega do quadro uma missão de rank Bronze, caçar os ratos do esgoto, e sai
    pela porta. Só Delia percebe;
    escolhendo acreditar nele, chama alguns membros de sua confiança que estavam
-   no andar de cima. *(A cena volta para Taren sem mostrar quem são.)*
+   no andar de cima. *(A cena volta para Tauryen sem mostrar quem são.)*
 7. **O esgoto, nível 1.** Corte direto do node da Guilda para o node do nível
    1 do esgoto. No canto da tela aparece uma missão: **"Mate 20 ratos"**.
-   Parece tutorial; é a folha que Taren pegou do quadro. Taren entende que, se esses monstros subirem, a cidade
+   Parece tutorial; é a folha que Tauryen pegou do quadro. Tauryen entende que, se esses monstros subirem, a cidade
    corre grande risco. Se o relato das Lâminas estiver certo, os Carniçais
    morreram e o Lich está enfraquecido; talvez ele tenha até uma chance. Procura
    pistas do Lich enfrentando os monstros do nível 1. Durante essa parte da
    história, o jogador **não pode sair do esgoto**.
-8. **O cabo.** Ao matar o **10º rato**, Taren reencontra Lyra, com outro soldado e um cabo, mandados ao
+8. **O cabo.** Ao matar o **6º rato**, Tauryen reencontra Lyra, com outro soldado e um cabo, mandados ao
    esgoto pelo exército depois dos boatos sobre a Guilda.
-   - O cabo manda Taren sair: o exército assume dali. Taren se recusa; pode
+   - O cabo manda Tauryen sair: o exército assume dali. Tauryen se recusa; pode
      ajudar.
-   - O cabo: ele é só um civil e, se não obedecer, será preso. Taren mostra a
+   - O cabo: ele é só um civil e, se não obedecer, será preso. Tauryen mostra a
      insígnia de Bronze: não é civil, é da Guilda, e membros da Guilda podem
      aceitar missões em nome dela.
    - O cabo: só missões do próprio rank ou abaixo, e caçar um Lich é rank
-     Platina. Taren: ele não falou em caçar Lich, mas os ratos do esgoto, e
-     mostra o papel da missão. O cabo fica atordoado. Taren diz isso
+     Platina. Tauryen: ele não falou em caçar Lich, mas os ratos do esgoto, e
+     mostra o papel da missão. O cabo fica atordoado. Tauryen diz isso
      **literalmente**, sem malícia: é a missão que o rank dele permite, e ele de
      fato caça os ratos no caminho. O atordoamento vem de a resposta estar
      certa, não de um truque.
    - **Surpresa para o jogador:** só aqui ele entende que a missão "Mate 20
-     ratos" era a folha que Taren pegou do quadro, e por quê: a regra que Delia
+     ratos" era a folha que Tauryen pegou do quadro, e por quê: a regra que Delia
      explicou na cena 4.
-   - Prestes a prendê-lo mesmo assim, ouve Taren dizer que não pode deixar as
+   - Prestes a prendê-lo mesmo assim, ouve Tauryen dizer que não pode deixar as
      pessoas da cidade em perigo e que vai fazer o melhor para achar pistas de
-     onde foi **o Lich ferido**. "O Lich está ferido?!" Taren confirma o relato
+     onde foi **o Lich ferido**. "O Lich está ferido?!" Tauryen confirma o relato
      das Lâminas.
-   - Lyra aproveita a brecha: conhece Taren da missão no acampamento goblin e
+   - Lyra aproveita a brecha: conhece Tauryen da missão no acampamento goblin e
      confia que ele sabe se cuidar.
-   - O cabo avalia e aceita Taren na equipe de reconhecimento.
-   - **Party:** Taren, Lyra, o soldado (nível 10, **convidado**) e o cabo (nível
+   - O cabo avalia e aceita Tauryen na equipe de reconhecimento.
+   - **Party:** Tauryen, Lyra, o soldado (nível 10, **convidado**) e o cabo (nível
      20, **convidado**). Primeira party de 4.
 9. **O quadro (Guilda).** Corte para a Guilda: Delia olha o quadro de missões,
    percebe que a missão dos ratos sumiu e sorri.
-   *(continua)*
+10. **A trilha do Lich.** Os quatro investigam o esgoto a fundo; pistas em
+    certos nodes levam à entrada do **nível 2** (o último). O cabo avisa: dali
+    em diante fica mais difícil, todos atentos. Monstros do nível 1: níveis
+    6–9; do nível 2: níveis 14–18, incluindo **ratos mutantes**, que também
+    contam para a missão de Tauryen.
+11. **A câmara.** A trilha termina no que parece um beco sem saída, mas a parede
+    está destruída e revela uma passagem para uma **câmara maior, separada do
+    esgoto**: um salão imenso. A parede quebrada separa o esgoto do salão; do
+    lado oposto fica uma grande **porta dupla**; à esquerda de quem entra pela
+    parede, de frente para a porta, um **corredor** some no escuro. Enquanto a party vai inspecionar a
+    porta, o Lich ferido sai do corredor e ataca.
+12. **Chefe: Lich Ferido** (en: *Injured Lich*). Ver
+    [Mecânicas](#mecânicas-que-a-história-pede) para a luta. A batalha acaba
+    quando o Lich cai; o Esqueleto cai junto, sem o controlador.
+13. **O golpe final.** Numa cena, o Lich se levanta mais uma vez e tenta um
+    golpe especial de surpresa contra Tauryen; a equipe que Delia chamou (três
+    aventureiros de rank Diamante, ver [Gente de Valcrest](#gente-de-valcrest))
+    aparece, impede o golpe e derrota o Lich de vez, salvando Tauryen. Os dois grupos conversam sobre o que
+    aconteceu. Roderic aponta a imprudência de Tauryen, e Isolde confirma em seguida: perseguir um Lich
+    no nível dele, mesmo com gente em perigo, só o tornaria mais um alvo e
+    dificultaria a missão de todos. Tauryen **promete nunca mais fazer isso** e
+    se esforçar para ficar mais forte, para um dia poder ajudar de verdade
+    quando algo assim voltar a acontecer.
+14. **O exército assume.** O exército chega pela parede quebrada, com Garrick,
+    o terceiro-sargento que Lyra conhece. Depois de um resumo, todos são
+    convidados a sair e deixar o local com o exército. A party sai do esgoto e
+    volta à cidade; ali a **party se desfaz** (mecânica, como sair da party
+    depois de uma caçada num MMO): Tauryen volta a ficar sozinho na party, mas
+    todos continuam amigos e podem formar equipe de novo no futuro. O esgoto
+    fica **fechado por um tempo**; a missão dos ratos continua aberta até
+    Tauryen poder voltar.
+    *(continua)*
 
 ### Mistérios em andamento
 
 | Mistério | O que se sabe | Verdade |
 | --- | --- | --- |
-| **Os aliados de Delia** | Membros da Guilda de confiança dela, que estavam no andar de cima; ela os chama quando Taren vai ao esgoto. | *(em aberto: quem são)* |
-| **Mortos-vivos no esgoto de Valcrest** | Carniçais (Ouro) e um Lich (Platina) surgiram num esgoto de rank Bronze, onde não deveriam existir. O Lich provavelmente conjurou os Carniçais. | *(em aberto)* |
+| **Os aliados de Delia** | Uma equipe de rank Diamante, velhos amigos dela, que estavam no andar de cima; ela os chama quando Tauryen vai ao esgoto, e eles salvam Tauryen do último golpe do Lich. | *(em aberto: a história deles; serão mais importantes no futuro)* |
+| **Mortos-vivos no esgoto de Valcrest** | Carniçais (Ouro) e um Lich (Platina) surgiram num esgoto de ranks Bronze e Prata iniciante, onde não deveriam existir. O Lich provavelmente conjurou os Carniçais. O Lich foi derrotado pela equipe de Delia. | O Lich veio das Catacumbas e conjurou os Carniçais no esgoto; foi solto de propósito (ver a câmara abaixo). |
+| **A câmara sob o esgoto** | Um salão imenso, separado do esgoto, atrás de uma parede destruída; uma grande porta dupla do lado oposto à parede; um corredor à esquerda de quem entra, de onde veio o Lich. No mapa, a porta e o corredor aparecem como **"???"** e estão fechados. O exército assumiu o local. | A porta dupla é a entrada das **Catacumbas**, que ficam **sob o castelo** de Valcrest; o **corredor leva ao castelo**. **Alguém do castelo, com acesso às Catacumbas, soltou o Lich de propósito:** abriu a porta dupla e quebrou a parede para o esgoto. O Lich saiu, viu a passagem e foi para o esgoto (o resto é a história do Capítulo 1). A mesma pessoa voltou, trancou de novo a porta das Catacumbas e saiu pelo corredor, trancando também a passagem para o castelo. Ferido, o Lich tentou voltar às Catacumbas e achou a porta fechada; foi pelo corredor e achou a passagem do castelo trancada; voltou ao salão no momento em que a party chegou pela parede, e atacou. *(em aberto: quem é essa pessoa; por que soltou o Lich; o que há nas Catacumbas; quando o jogador descobre)* |
 
 ### Mecânicas que a história pede
 
-Regras de jogo que nascem da história; entram no `PLAN.md` quando forem
-implementadas.
+Regras de jogo que nascem da história. **Implementadas** (as regras valem no
+`PLAN.md`, Campanha: capítulo 1), exceto as marcadas como ideia.
 
+- **Curva de níveis íngreme:** Tauryen chega a Valcrest entre os níveis 5 e 8
+  e sai do esgoto entre os níveis **12 e 14**. Daí em diante subir fica
+  bem mais difícil, porque ainda há muita história e mundo pela frente.
+- **Derrota:**
+  - **Modo História (só nele):** tela de **Game Over** e volta ao último auto
+    save.
+  - **Multiplayer (só nele):** ressurreição no último templo onde salvou.
+    *(penalidade a decidir)*
+- **Auto save** (só no modo História): ao mudar de instância, em momentos
+  específicos da história e **antes de toda batalha de chefe**.
+- **Moeda:** número na HUD, não item no inventário (na história, são moedas).
+  **Uma só para o mundo todo**, usada em todos os reinos: o **Kald** (plural
+  **Kalds**; en: *Kald*, *Kalds*), forjado pelo reino anão de **Kaldrum**.
 - **Party de 4** (a primeira é no esgoto de Valcrest).
+- **Missões na tela:** no topo, a **missão de campanha** com o próximo passo
+  da história (ex.: "Inscreva-se na Guilda de Aventureiros"); abaixo, as
+  missões opcionais que o jogador pegou (ex.: os ratos).
 - **Missão no canto da tela:** objetivo e contador (ex.: "Mate 20 ratos"). Uma
   missão pode surgir por história, sem o jogador escolher, e o contador pode
-  disparar um evento no meio do caminho (ex.: o 10º rato).
+  disparar um evento no meio do caminho (ex.: o 6º rato).
+- **Instâncias subterrâneas** (os níveis do esgoto, as Catacumbas) não
+  aparecem no mapa-múndi.
+- **Party desfeita:** ao fim de um trecho, a party volta a ter só o Tauryen, como
+  sair da party num MMO; os membros continuam amigos e podem voltar depois.
 - **Área trancada pela história:** durante um trecho, o jogador não pode sair
   de uma área (ex.: o esgoto de Valcrest).
 - **Inimigos por encontro:** de 1 a 3, sorteado; quando a party passa de 3
   membros, o limite acompanha (party de 4: de 1 a 4).
 - **Convidados** (*guest*): membros temporários da party que agem sozinhos; o
   jogador só escolhe as ações dos membros fixos.
-- *(ideia, a decidir)* **Fugir:** o Taren não tem como vencer Carniçais ou um
+- **Cover** (técnica): por 60 s, 70% de chance de receber no lugar de um
+  aliado o ataque dirigido a ele. Quem tem Cover a usa de novo sempre que o
+  efeito acaba. Usada pelo cabo Merrick (convidado) e pelo Esqueleto do Lich
+  Ferido (protegendo o Lich).
+- **Itens só em aliados:** não se usam poções nos inimigos, e magia de cura não
+  causa dano em mortos-vivos.
+- **Chefe com HP inicial abaixo do máximo e atributos reduzidos** (o Lich
+  Ferido).
+- **Vitória pelo chefe:** a batalha pode acabar quando um inimigo específico
+  cai, levando junto quem ele controla.
+- **Chefe: Lich Ferido**, nível 56, atributos **reduzidos em 80%**, começa com
+  **1600/8000 HP** e não tem cura. Vem com um **Zumbi** (nível 22, atributos e
+  HP normais), invocado por ele: ferido, o Lich não consegue invocar nada mais
+  forte (fica subentendido para o jogador). O Zumbi **não** está entre os
+  monstros do esgoto: só aparece nessa luta.
+  - **Fase 2:** abaixo de **400 HP**, o Lich sacrifica o Zumbi e absorve todo o
+    HP que restava a ele.
+  - No turno seguinte, ressuscita o Zumbi como **Esqueleto** (nível 22,
+    atributos e habilidades diferentes, com Cover protegendo o Lich). Se o
+    Zumbi já tiver morrido antes dos 400 HP, o Lich vai direto à ressurreição.
+- *(ideia, a decidir)* **Fugir:** o Tauryen não tem como vencer Carniçais ou um
   Lich nos níveis 5–8.
 
 ## Mundo
@@ -202,8 +280,9 @@ implementadas.
   *Orichalcum*) e **Draconita** (en: *Dracite*), o mineral mais forte desta
   história.
 - **Ranks também para monstros e lugares:** cada monstro e cada área têm um
-  rank, na mesma escala dos aventureiros (ex.: o esgoto de Valcrest é área de
-  Bronze; Carniçal é monstro de Ouro; Lich, de Platina). Em níveis:
+  rank, na mesma escala dos aventureiros (ex.: o nível 1 do esgoto de Valcrest
+  é área de Bronze e o nível 2, de Prata iniciante; Carniçal é monstro de Ouro;
+  Lich, de Platina). Em níveis:
 
   | Rank | Níveis |
   | --- | --- |
@@ -227,10 +306,21 @@ implementadas.
   direito do rei está no mesmo nível, mas serve ao exército e por isso não tem
   rank da Guilda.
 
-  Taren chega a Valcrest entre os níveis 5 e 8: um Carniçal ou um Lich pode
+  Tauryen chega a Valcrest entre os níveis 5 e 8: um Carniçal ou um Lich pode
   matá-lo com um golpe.
 - **Curandeiros:** a Guilda tem curandeiros que atendem os aventureiros.
 - **Maior exemplo:** a Ordem do Lírio Rubro.
+
+### Kaldrum
+
+- **O que é:** o reino dos **anões**. Ainda existe, nas montanhas, no
+  **centro do mapa-múndi**, e faz fronteira com praticamente todos os outros
+  reinos.
+- **Capital:** no centro das montanhas, junto a um **vulcão ativo**.
+- **Moeda:** forjava as moedas de todo o mundo; por isso a moeda se chama
+  **Kald**.
+- **Em aberto:** se ainda forja as moedas; se faz fronteira com Halvaren; o
+  resto da ficha.
 
 ### Volcanika
 
@@ -254,14 +344,14 @@ implementadas.
 - **População:** cerca de 100 pessoas, entre idosos, adultos e crianças: um
   terço do que era em 945. Muitos morreram no ataque; outros partiram em busca
   de uma vida melhor quando a pobreza apertou.
-- **Gente:** muito simples. Todos conhecem Taren desde criança e gostam muito
+- **Gente:** muito simples. Todos conhecem Tauryen desde criança e gostam muito
   dele. A vizinha da família, **Vó Hilda**, sempre divide um pouco da horta com
   eles. *(em aberto: costumes, jeito de falar, como tratam forasteiros)*
 - **Poder:** **Bertram**, avô de Jory, lidera a vila. Jory será o dono do
   vilarejo quando o avô morrer. Acima deles, a Coroa e seus impostos.
 - **Fé e lendas:** *(em aberto)*
 - **História:** em 945 perdeu quase toda a colheita; o fogo de mana queimou os
-  campos por duas semanas; Doran, pai de Taren, morreu nele. Vinte anos depois
+  campos por duas semanas; Doran, pai de Tauryen, morreu nele. Vinte anos depois
   os campos estão replantados; não há mais marca do fogo na terra.
 - **Fauna e perigos:** o maior perigo são os **goblins** da floresta ao norte,
   que sempre existiram ali (ver [Burrowood](#burrowood)).
@@ -270,7 +360,7 @@ implementadas.
   levados por nobres.
 - **Lugares marcantes:**
   - **Praça do poço:** o centro da vila, onde todos se encontram.
-  - **Casa da família de Taren:** pequena, de pedra e madeira, na beira dos
+  - **Casa da família de Tauryen:** pequena, de pedra e madeira, na beira dos
     trigais.
   - **Casa da Vó Hilda:** vizinha, com a horta que ela divide.
   - **Casa de Bertram:** a maior da vila, onde se resolvem as questões de todos.
@@ -278,14 +368,14 @@ implementadas.
     Valcrest, e onde o cobrador de impostos faz as contas.
   - **Moinho à beira do rio:** mói o trigo da vila.
   - **Trigais:** os campos onde o fogo de 945 queimou, replantados.
-  - **Velho carvalho:** na beira dos trigais, onde Taren treina todos os dias
+  - **Velho carvalho:** na beira dos trigais, onde Tauryen treina todos os dias
     desde criança.
   - **Cemitério da colina:** os túmulos de Doran, de Corwin e de quem morreu
     em 945.
   - **Foz do rio:** onde o rio encontra o mar, ao sul.
   - **Estrada norte:** sai da vila rumo à floresta e a Valcrest.
-- **Ganchos:** a irmã desaparecida de Taren; o nobre que leva talentos; a
-  promessa de Taren de voltar e acabar com a pobreza.
+- **Ganchos:** a irmã desaparecida de Tauryen; o nobre que leva talentos; a
+  promessa de Tauryen de voltar e acabar com a pobreza.
 
 ### Burrowood
 
@@ -301,6 +391,17 @@ implementadas.
   - A **estrada** é um pouco mais segura que o resto da floresta.
 - **Poder:** a **guarda de Valcrest** controla o número de goblins; o exército
   ajuda quando é preciso.
+- **Em aberto:** todo o resto da ficha.
+
+### Catacumbas de Valcrest
+
+- **O que é:** catacumbas **sob o castelo** de Valcrest. A entrada é a porta
+  dupla do salão escondido atrás do esgoto. No mesmo salão, um corredor leva
+  ao castelo.
+- **Perigo:** área de nível Platina a Diamante. O Lich Ferido veio daqui.
+- **No jogo:** zona fechada durante a história; no mapa, a porta e o corredor
+  aparecem como **"???"**. A instância ainda não será montada: a história não
+  chega aqui por um bom tempo.
 - **Em aberto:** todo o resto da ficha.
 
 ### Valcrest
@@ -328,10 +429,19 @@ implementadas.
   da vida difícil; saqueadores que às vezes fogem para se esconder em Burrowood.
 - **Tensões atuais:** a "paz" frágil com Draskar; finanças ruins; o boato de que
   Draskar invocou a dragoa.
+- **Lugares:** Guilda, Arsenal (armas e armaduras), Boticário (poções e
+  itens), **Loja de Magias**, **Loja de Técnicas**, Mercado (vender espólios), Pousada (descanso
+  pago), Templo, Taverna, posto do exército, entrada do esgoto, castelo
+  (fechado). Mais lugares podem entrar depois.
+- **Loja de Magias:** vende magias, que só podem ser compradas depois de
+  desbloqueadas na **mastery tree**, e no futuro as **runas**. *(a mastery tree
+  e as runas ainda serão desenhadas)*
+- **Loja de Técnicas:** vende técnicas (*technics*), que também só podem ser
+  compradas depois de desbloqueadas na **mastery tree**.
 - **Serviços:** tem tudo de que um aventureiro iniciante precisa. A **Guilda de
   Aventureiros** tem um prédio na cidade; a sede fica na capital de Halvaren.
-- **Esgoto:** tem mais de um nível. Área de rank Bronze, com uma infestação que a Guilda ajuda a
-  conter; jovens aventureiros e curiosos vão lá treinar e cumprir missões.
+- **Esgoto:** duas instâncias separadas, uma por nível: o 1 é área de rank Bronze, o 2 de Prata
+  iniciante. Tem uma infestação que a Guilda ajuda a conter; jovens aventureiros e curiosos vão lá treinar e cumprir missões.
   Fica a uns 10 minutos da Guilda.
 - **Militares:** uma unidade do exército de Halvaren fica estacionada na
   cidade, além da guarda, e ajuda a guarda quando é preciso. Mulheres são
@@ -353,10 +463,24 @@ Aventureiros que se acham mais do que são.
 | **Martelos de Ferro** (equipe) | *(em aberto)* | Conhecidos das Lâminas; rivais de bar que fingem não se preocupar. |
 | Hogg, dos Martelos | *(em aberto)* | Grandalhão; o que pergunta o que poderia ter feito aquilo "numa cidade remota como esta". |
 
+#### A equipe de Delia (rank Diamante)
+
+Velhos amigos de Delia: dois homens e uma mulher, todos de rank Diamante.
+Responsáveis, do estilo virtuoso que um herói passa aos outros. Serão mais
+importantes no futuro; por ora, só o encontro no esgoto (cena 13).
+
+| Quem | Canon | Em aberto |
+| --- | --- | --- |
+| **Roderic** | Membro da equipe. Dá a bronca em Tauryen no esgoto. | Ficha; papel na equipe. |
+| **Calen** | Membro da equipe. | Ficha; papel na equipe. |
+| **Isolde** | Membro da equipe. Confirma a bronca de Roderic logo em seguida. | Ficha; papel na equipe. |
+
+*(em aberto: nome da equipe)*
+
 #### Merrick, cabo
 
 - **Papel:** secundário; lidera a equipe de reconhecimento do exército no
-  esgoto. Convidado na party (nível 20).
+  esgoto. Convidado na party (nível 20). Usa **Cover** (ver Mecânicas).
 - **Personalidade:** apegado às regras e às ordens; teimoso, mas justo: muda de
   ideia diante de um fato novo (o Lich ferido) e de quem confia (Lyra).
 - **Em aberto:** voz; o resto da ficha.
@@ -377,7 +501,7 @@ Aventureiros que se acham mais do que são.
   acha tão capaz assim…"), sem esperar que ela fosse sozinha. Arrependeu-se
   logo, mas por dentro ficou muito impressionado. Dá a bronca quando ela volta;
   depois de um tempo, a relação dos dois volta ao normal.
-- **Voz:** *(em aberto)*
+- **Voz:** rascunho em [Vozes em rascunho](#vozes-em-rascunho-a-aprovar).
 - **Em aberto:** nascimento; o resto da ficha.
 
 #### Delia, secretária da Guilda
@@ -390,9 +514,9 @@ Aventureiros que se acham mais do que são.
   cidade do reino. Acredita, pelos boatos da época, que a dragoa sobreviveu, e
   quis virar aventureira para caçá-la. Não tinha talento para a carreira, mas
   preferiu ajudar como podia: trabalha para a Guilda, guiando aventureiros.
-- **Com Taren:** foi a primeira a perceber, pelo tom e pelo olhar dele, que o
+- **Com Tauryen:** foi a primeira a perceber, pelo tom e pelo olhar dele, que o
   sonho não era vaidade. Não sabe o motivo e não perguntou.
-- **Voz:** *(em aberto)*
+- **Voz:** rascunho em [Vozes em rascunho](#vozes-em-rascunho-a-aprovar).
 - **Revelação:** o jogador só descobre o passado dela **mais para frente**.
   *(em aberto: quando exatamente)*
 - **Em aberto:** nascimento; a cidade onde perdeu a família; quando entrou para
@@ -405,7 +529,7 @@ Aventureiros que se acham mais do que são.
 
 ## Personagens
 
-### Taren (protagonista, Guerreiro)
+### Tauryen (protagonista, Guerreiro)
 
 - **Papel:** protagonista; o Guerreiro da party, na linha de frente.
 - **Aparência:** *(em aberto)*
@@ -446,7 +570,7 @@ Aventureiros que se acham mais do que são.
   E eu quero chegar antes."*
 - **Relações:** a mãe, Brenna; a irmã desaparecida, Tessa; Jory, amigo de
   infância que protege a família.
-  **Ordem do Lírio Rubro:** a prova de que ser o mais forte salva vidas. Taren
+  **Ordem do Lírio Rubro:** a prova de que ser o mais forte salva vidas. Tauryen
   quer ser **maior que a Ordem**: mesmo tendo "derrotado" a dragoa, ela não
   chegou a tempo de impedir a destruição do reino. É o **único** ponto que ele
   tem contra eles; de resto, os admira. *(em aberto: quando o jogador percebe
@@ -458,12 +582,16 @@ Aventureiros que se acham mais do que são.
   animais.
 - **Revelação:** o porquê do sonho só aparece **mais para frente no primeiro
   arco**. Até lá, nenhuma fala dele ou dos outros entrega isso.
+- **Promessa (canon, esgoto de Valcrest):** nunca mais perseguir um inimigo
+  muito acima do nível dele, como fez com o Lich; vai ficar mais forte para
+  poder ajudar de verdade. Como ele não mente, **a promessa vale**: nenhuma
+  cena futura pode mostrá-lo quebrando-a sem um motivo forte e assumido.
 - **Arco:** *(em aberto)*
 - **Segredos:** *(em aberto)*
 
 ### Lyra
 
-- **Papel:** a primeira companheira de Taren; a **Arqueira** da party.
+- **Papel:** a primeira companheira de Tauryen; a **Arqueira** da party.
 - **Aparência:** *(em aberto)*
 - **Nasceu:** 939, em Valcrest.
 - **Personalidade:**
@@ -491,7 +619,7 @@ Aventureiros que se acham mais do que são.
 - **Relações:** **Harlow**, que cuidou dela depois de 945, até ir embora; é o
   modelo dela. Harlow **nunca a incentivou** a entrar para o exército: a
   vontade nasceu da admiração por ele. O **terceiro-sargento** que lhe deu a missão dos goblins.
-  **Taren**, que a salva em Burrowood e a trata de igual para igual desde o
+  **Tauryen**, que a salva em Burrowood e a trata de igual para igual desde o
   primeiro minuto.
 - **Passado:** sobrevivente do ataque de 945. Os pais morreram no ataque de
   Volcanika; o resto da família e o irmão mais velho, na guerra com Draskar.
@@ -503,24 +631,24 @@ Aventureiros que se acham mais do que são.
   perdoar conforme a história avança.
 - **Segredos:** *(em aberto)*
 
-### Família de Taren
+### Família de Tauryen
 
 Os nomes podem nunca aparecer no jogo; ficam aqui para registro.
 
 | Quem | Canon | Em aberto |
 | --- | --- | --- |
 | **Doran** (pai) | Fazendeiro. Morreu em 945 tentando apagar o fogo de Volcanika no trigal; não tinha como saber que fogo de mana não se apaga. | Nascimento. |
-| **Brenna** (mãe) | Nasceu em 915. Criou os dois filhos sozinha. Cuida da casa enquanto Taren viaja. | Ficha. |
+| **Brenna** (mãe) | Nasceu em 915. Criou os dois filhos sozinha. Cuida da casa enquanto Tauryen viaja. | Ficha. |
 | **Tessa** (irmã) | Nasceu em 941. Muito talento para magia. Em 956 saiu com Lorde Cassian Velmont, que prometeu riqueza à vila se ela se destacasse; não queria deixar a família, mas confiou na promessa. Nunca mais se ouviu falar dela. | Onde está; o que aconteceu. |
-| **Jory** (amigo de infância) | Neto de Bertram, o líder da vila, e futuro dono do vilarejo. Perdeu o pai, Corwin, no ataque de 945, como Taren. Taren confia muito nele. Prometeu proteger a família de Taren enquanto ele viaja. | Nascimento; ficha. |
+| **Jory** (amigo de infância) | Neto de Bertram, o líder da vila, e futuro dono do vilarejo. Perdeu o pai, Corwin, no ataque de 945, como Tauryen. Tauryen confia muito nele. Prometeu proteger a família de Tauryen enquanto ele viaja. | Nascimento; ficha. |
 
 ### Gente de Brookhollow
 
 | Quem | Canon | Em aberto |
 | --- | --- | --- |
 | **Bertram** | Avô de Jory; lidera a vila. | Nascimento; ficha. |
-| **Corwin** | Pai de Jory. Morreu no ataque de 945, de um jeito diferente do pai de Taren. | Como morreu; nascimento. |
-| **Vó Hilda** | Vizinha da família de Taren; sempre divide um pouco da horta com eles. | Ficha. |
+| **Corwin** | Pai de Jory. Morreu no ataque de 945, de um jeito diferente do pai de Tauryen. | Como morreu; nascimento. |
+| **Vó Hilda** | Vizinha da família de Tauryen; sempre divide um pouco da horta com eles. | Ficha. |
 
 ### Outros
 
@@ -579,28 +707,64 @@ Propostas, **não canon**. Marque o que gostar, mude ou descarte.
 
 ## Nomes
 
-**Canon:** Taren, Lyra, Brookhollow, Valcrest, Burrowood, Volcanika, Ordem do Lírio Rubro; ranks da Guilda: Bronze, Prata, Ouro, Platina, Diamante, Oricalco, Draconita.
+**Canon:** Tauryen, Lyra, Halvaren, Kaldrum, Kald (moeda), Brookhollow, Valcrest, Burrowood, Volcanika, Ordem do Lírio Rubro; ranks da Guilda: Bronze, Prata, Ouro, Platina, Diamante, Oricalco, Draconita.
 
-**Propostos (provisórios, a aprovar):** Halvaren (o reino); Doran (pai),
+**Propostos (provisórios, a aprovar):** Doran (pai),
 Brenna (mãe), Tessa (irmã), Jory (amigo de infância); Lorde Cassian Velmont (o nobre recrutador);
 Bertram (avô de Jory, líder da vila), Corwin (pai de Jory), Vó Hilda (vizinha);
 Draskar (o reino hostil); Edmund Harlow (o militar que defendeu Valcrest),
 Osric Penhallow (governador de Valcrest); Garrick (o terceiro-sargento), Delia
 (secretária da Guilda); Merrick (o cabo), Tobin (o soldado); figurantes:
-Brann, Sylas, Fennick (Lâminas Douradas), Hogg (Martelos de Ferro).
+Brann, Sylas, Fennick (Lâminas Douradas), Hogg (Martelos de Ferro); Roderic, Calen,
+Isolde (equipe de Delia).
 
-## O piloto (descartado)
+## No jogo hoje
 
-O jogo ainda roda a história do piloto, que **não é canon** e será substituída
-conforme a história verdadeira for escrita. Ela é útil só como inventário do
-que trocar:
+O jogo roda o **capítulo 1 até o fim do esgoto** (cenas 1 a 14): falas em
+`locales/*/story.ftl`, conteúdo em `content/world/`. O piloto foi removido.
 
-- **Contradiz o canon:** Valcrest como capital; Taren sem família e sem
-  passado; a abertura com a Anciã Maren; falas de Taren que soam exibidas.
-- **Personagens do piloto, fora do canon até serem recontados:** Corin,
-  Anciã Maren, Fazendeiro Carvel, Sargento Bram Holt, atendente da Guilda,
-  Grukk, Guardião dos Ossos, Coroa de Espinhos.
-- **Lugares do piloto:** Floresta de Thornwood e as Catacumbas sob Valcrest;
-  os nodes de Brookhollow e Valcrest também foram inventados para o piloto.
-- **Mecânica que fica:** mapas, batalhas, party, lojas e saves não dependem da
-  história; só o conteúdo (`content/world/`, `story.ftl`) muda.
+**Criado por mim para o jogo funcionar, a aprovar** (pode trocar ou cortar):
+
+- **Lugares:**
+  - **Nascente** em Burrowood: a party descansa de graça. Sem ela, quem chegava
+    ao chefe ferido não tinha como se curar entre Brookhollow e Valcrest.
+  - **Salas de Manutenção**, uma em cada nível do esgoto: descanso seguro
+    durante o trecho em que a história tranca a saída.
+  - **Toca Escondida** em Burrowood: um baú com poções.
+  - Em Brookhollow, os nodes da ficha. Em Valcrest, os lugares aprovados; a
+    **Taverna** e o **Castelo** aparecem fechados por enquanto.
+- **Monstros** (com motivo para estar ali):
+  - **Burrowood:** Goblin, Goblin Arqueiro, Goblin Xamã, Lobo da Floresta,
+    Saqueador; o chefe do acampamento é um **Hobgoblin**.
+  - **Esgoto, nível 1:** Rato de Esgoto, Rato Gigante, Gosma de Esgoto,
+    Barata Gigante.
+  - **Esgoto, nível 2:** Rato Mutante, Sanguessuga Gigante, Rastejador do
+    Esgoto.
+  - **Chefe:** o **Lich Ferido**, com o **Zumbi** (invocado) e o **Esqueleto**
+    (o Zumbi reerguido, com Cover).
+- **Missões no quadro:** "Mate 10 goblins em Burrowood" e "Mate 6 lobos em
+  Burrowood", além dos 20 ratos.
+- **Falas de quem não tinha voz** (seguindo as fichas): mãe, Vó Hilda e Jory
+  na despedida; Garrick, Delia, Hogg, Brann, Sylas, Merrick, Tobin, Roderic e
+  Isolde. Vozes registradas abaixo, como rascunho.
+
+### Vozes em rascunho (a aprovar)
+
+| Quem | Voz |
+| --- | --- |
+| **Brenna** (mãe) | Cuidadosa e prática; esconde a preocupação conferindo a bagagem. Pede pouco: "Volte inteiro." |
+| **Vó Hilda** | Avó da vizinhança: dá comida e chama Tauryen de "menino" aos 27 anos. |
+| **Jory** | Amigo de infância, à vontade e leal; brinca com o sonho de Tauryen, mas o leva a sério. |
+| **Garrick** | Seco e disciplinado; a bronca é firme e justa, e o elogio vem curto ("O relatório está bem feito."). |
+| **Delia** | Animada e descontraída no balcão; quando algo a toca, fica quieta. |
+| **Hogg** | Fanfarrão de salão; zomba alto. |
+| **Brann** | Conta vantagem até ferido. |
+| **Sylas** | Narra exagerando o próprio papel ("Eu segurei a maioria sozinho"). |
+| **Cabo Merrick** | Ordens curtas, apegado às regras; muda de ideia diante de um fato. |
+| **Tobin** | Soldado obediente: "Sim, senhor!" |
+| **Roderic** | Firme sem humilhar; fala de responsabilidade, não de força. |
+| **Isolde** | Confirma com calma, pelo lado de quem é protegido. |
+
+**O piloto, para referência:** o protagonista se chamava **Taren**; Corin,
+Anciã Maren, Fazendeiro Carvel, Bram Holt, Grukk, o Guardião dos Ossos e a
+Coroa de Espinhos ficam fora do canon até serem recontados.

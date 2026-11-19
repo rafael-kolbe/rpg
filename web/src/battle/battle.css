@@ -257,7 +257,8 @@
 
 .popup--miss,
 .popup--resist,
-.popup--immune {
+.popup--immune,
+.popup--cover {
   color: #d9dce6;
   font-size: 1.05rem;
 }

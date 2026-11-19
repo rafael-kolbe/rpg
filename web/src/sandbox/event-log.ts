@@ -41,6 +41,8 @@ export function describeEvent(
       return t('ui-log-regen', { target: name(event.target), amount: event.amount })
     case 'missed':
       return t('ui-log-miss', { target: name(event.target) })
+    case 'covered':
+      return t('ui-log-cover', { protector: name(event.protector), target: name(event.protected) })
     case 'status_applied':
       return t('ui-log-status-gain', {
         target: name(event.target),

@@ -55,6 +55,8 @@
 //!     }),
 //!     hp: None,
 //!     mp: None,
+//!     guest: false,
+//!     leader: false,
 //! };
 //!
 //! let setup = BattleSetup {
@@ -63,6 +65,7 @@
 //!         inventory: BTreeMap::new(),
 //!         party: vec![fighter("hero")],
 //!         enemies: vec![fighter("wolf")],
+//!         forms: BTreeMap::new(),
 //!     },
 //!     actions: BTreeMap::from([(
 //!         attack,

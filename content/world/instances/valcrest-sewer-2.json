@@ -1,0 +1,82 @@
+{
+  "region": "valcrest",
+  "terrain": "crypt",
+  "nodes": {
+    "stairs-up": {
+      "x": 500,
+      "y": 950,
+      "label": "label-stairs-up",
+      "kind": {"type": "exit", "to": {"instance": "valcrest-sewer-1", "node": "stairs-down"}}
+    },
+    "deep-1": {"x": 280, "y": 770, "kind": {"type": "path"}},
+    "deep-2": {"x": 720, "y": 720, "kind": {"type": "path"}},
+    "deep-3": {"x": 500, "y": 560, "kind": {"type": "path"}},
+    "maintenance": {"x": 820, "y": 900, "label": "label-maintenance-room", "kind": {"type": "temple"}},
+    "dead-end": {"x": 500, "y": 400, "label": "label-broken-wall", "kind": {"type": "path"}},
+    "hall": {
+      "x": 500,
+      "y": 230,
+      "label": "label-hall",
+      "kind": {"type": "path"},
+      "event": {"dialogue": "lich-appears", "when": {"forbids": ["lich-fought"]}}
+    },
+    "door": {"x": 500, "y": 70, "label": "label-unknown", "kind": {"type": "sealed"}},
+    "corridor": {"x": 250, "y": 230, "label": "label-unknown", "kind": {"type": "sealed"}}
+  },
+  "trails": [
+    {
+      "a": "stairs-up",
+      "b": "deep-1",
+      "chance": 40,
+      "monsters": [
+        {"monster": "mutant-rat", "weight": 3},
+        {"monster": "giant-leech", "weight": 2},
+        {"monster": "sewer-crawler", "weight": 1}
+      ]
+    },
+    {
+      "a": "stairs-up",
+      "b": "deep-2",
+      "chance": 40,
+      "monsters": [
+        {"monster": "mutant-rat", "weight": 3},
+        {"monster": "giant-leech", "weight": 2},
+        {"monster": "sewer-crawler", "weight": 1}
+      ]
+    },
+    {
+      "a": "deep-1",
+      "b": "deep-3",
+      "chance": 40,
+      "monsters": [
+        {"monster": "mutant-rat", "weight": 3},
+        {"monster": "giant-leech", "weight": 2},
+        {"monster": "sewer-crawler", "weight": 1}
+      ]
+    },
+    {
+      "a": "deep-2",
+      "b": "deep-3",
+      "chance": 40,
+      "monsters": [
+        {"monster": "mutant-rat", "weight": 3},
+        {"monster": "giant-leech", "weight": 2},
+        {"monster": "sewer-crawler", "weight": 1}
+      ]
+    },
+    {
+      "a": "deep-3",
+      "b": "dead-end",
+      "chance": 40,
+      "monsters": [
+        {"monster": "mutant-rat", "weight": 3},
+        {"monster": "giant-leech", "weight": 2},
+        {"monster": "sewer-crawler", "weight": 1}
+      ]
+    },
+    {"a": "dead-end", "b": "hall"},
+    {"a": "stairs-up", "b": "maintenance"},
+    {"a": "hall", "b": "door"},
+    {"a": "hall", "b": "corridor"}
+  ]
+}

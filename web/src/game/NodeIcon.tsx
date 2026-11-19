@@ -79,5 +79,28 @@ export function NodeIcon({ node }: Props) {
           <path d="M0 -11 V11 M-7 -4 H7" />
         </g>
       )
+    case 'inn':
+      return (
+        <g className="node-icon node-icon--inn">
+          <circle r="18" />
+          <path d="M-10 8 V-6 M-10 2 H10 V8 M-6 -2 a3 3 0 1 1 0.1 0 M-2 -2 H8 V2" />
+        </g>
+      )
+    case 'board':
+      return (
+        <g className="node-icon node-icon--board">
+          <circle r="18" />
+          <rect x="-9" y="-10" width="18" height="20" rx="1" />
+          <path d="M-5 -4 H5 M-5 1 H5 M-5 6 H2" />
+        </g>
+      )
+    case 'sealed':
+      return (
+        <g className="node-icon node-icon--sealed">
+          <circle r="18" />
+          <rect x="-7" y="-2" width="14" height="11" rx="2" />
+          <path d="M-4 -2 V-6 a4 4 0 0 1 8 0 V-2" />
+        </g>
+      )
   }
 }

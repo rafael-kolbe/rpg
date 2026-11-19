@@ -1,6 +1,6 @@
 # 0008 — The campaign runs on the server from data; saves are JSON documents
 
-- **Status:** accepted
+- **Status:** accepted; defeat, party size and encounters amended by [0010](0010-game-over-auto-saves-and-missions.md)
 - **Date:** 2026-11-18
 
 ## Context

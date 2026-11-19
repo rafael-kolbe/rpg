@@ -11,7 +11,7 @@ import { goodName } from './goods.ts'
 
 interface Props {
   goods: ShopEntry[]
-  crowns: number
+  kalds: number
   onBuy: (good: ShopGood) => void
   onSell: (good: ShopGood) => void
   onLeave: () => void
@@ -20,7 +20,7 @@ interface Props {
 type Mode = 'buy' | 'sell'
 
 /** A shop: buy or sell one at a time; ←/→ switch, Esc leaves. */
-export function ShopWindow({ goods, crowns, onBuy, onSell, onLeave }: Props) {
+export function ShopWindow({ goods, kalds, onBuy, onSell, onLeave }: Props) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<Mode>('buy')
   useMenuKeys((key) => {
@@ -35,7 +35,7 @@ export function ShopWindow({ goods, crowns, onBuy, onSell, onLeave }: Props) {
     <Window className="game-window shop" testId="shop">
       <div className="game-window__head">
         <h2>{t('ui-shop-title')}</h2>
-        <span className="crowns">{t('ui-crowns', { amount: crowns })}</span>
+        <span className="kalds">{t('ui-kalds', { amount: kalds })}</span>
       </div>
       <div className="shop__modes">
         <Button onClick={() => setMode('buy')} pressed={mode === 'buy'} testId="shop-buy">
@@ -56,7 +56,7 @@ export function ShopWindow({ goods, crowns, onBuy, onSell, onLeave }: Props) {
             key: `${entry.good.type}-${entry.good.id}`,
             label: t(goodName(entry.good)),
             detail: t('ui-shop-line', { price: price(entry), owned: entry.owned }),
-            disabled: mode === 'buy' && entry.price > crowns,
+            disabled: mode === 'buy' && entry.price > kalds,
             onSelect: () => (mode === 'buy' ? onBuy(entry.good) : onSell(entry.good)),
           }))}
         />

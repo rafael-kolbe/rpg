@@ -15,6 +15,8 @@ describe('nodeAction', () => {
     expect(nodeAction(node({ type: 'battle', boss: false, done: false }))?.ambush).toBe(true)
     expect(nodeAction(node({ type: 'battle', boss: true, done: false }))?.ambush).toBe(false)
     expect(nodeAction(node({ type: 'exit', to: 'cave' }))?.args).toEqual({ place: 'instance-cave' })
+    expect(nodeAction(node({ type: 'inn', price: 30 }))?.numbers).toEqual({ price: 30 })
+    expect(nodeAction(node({ type: 'sealed' }))).toBeNull()
   })
 
   test('glimpsed nodes and no node offer nothing', () => {

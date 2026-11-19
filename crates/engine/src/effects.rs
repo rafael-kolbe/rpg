@@ -130,6 +130,22 @@ impl Battle {
                     }
                 }
             }
+            Effect::Devour => {
+                let hp = self.combatants[usize::from(target.0)].hp;
+                self.knock_out(target, events);
+                self.restore_hp(actor, u64::from(hp), events);
+            }
+            Effect::Reanimate { into } => {
+                // Checked against the forms when the battle was set up.
+                let Some(form) = self.forms.get(into).cloned() else {
+                    return;
+                };
+                let side = self.combatants[usize::from(target.0)].side;
+                let raised = crate::combatant::Combatant::new(target, side, form, false);
+                let hp = raised.hp;
+                self.combatants[usize::from(target.0)] = raised;
+                events.push(BattleEvent::Revived { target, hp });
+            }
         }
     }
 

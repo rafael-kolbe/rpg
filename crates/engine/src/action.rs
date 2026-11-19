@@ -142,6 +142,15 @@ pub enum Effect {
         /// Statuses removed, when present.
         statuses: Vec<StatusKind>,
     },
+    /// Consumes another ally: it is knocked out and the user recovers the HP
+    /// it had (a Lich feeding on its summon).
+    Devour,
+    /// Raises a knocked-out ally as another creature, at full HP: the
+    /// encounter's form `into` takes its place.
+    Reanimate {
+        /// Key of the form in [`crate::Encounter::forms`].
+        into: String,
+    },
 }
 
 fn full_accuracy() -> u8 {
@@ -152,7 +161,7 @@ impl Effect {
     /// Whether this effect is aimed at knocked-out combatants.
     #[must_use]
     pub fn targets_knocked_out(&self) -> bool {
-        matches!(self, Self::Revive { .. })
+        matches!(self, Self::Revive { .. } | Self::Reanimate { .. })
     }
 
     /// The element of a damaging effect, if any.
@@ -167,7 +176,9 @@ impl Effect {
             | Self::RestoreMp { .. }
             | Self::Revive { .. }
             | Self::ApplyStatus { .. }
-            | Self::RemoveStatus { .. } => None,
+            | Self::RemoveStatus { .. }
+            | Self::Devour
+            | Self::Reanimate { .. } => None,
         }
     }
 }

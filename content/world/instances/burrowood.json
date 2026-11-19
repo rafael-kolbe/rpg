@@ -1,0 +1,147 @@
+{
+  "region": "burrowood",
+  "terrain": "forest",
+  "nodes": {
+    "south-edge": {
+      "x": 500,
+      "y": 940,
+      "label": "label-to-brookhollow",
+      "kind": {"type": "exit", "to": {"instance": "brookhollow", "node": "north-road"}}
+    },
+    "road-1": {"x": 500, "y": 800, "kind": {"type": "path"}},
+    "hollow": {
+      "x": 250,
+      "y": 760,
+      "label": "label-hollow",
+      "kind": {"type": "chest", "flag": "hollow-chest", "items": {"potion": 2}, "kalds": 40}
+    },
+    "road-2": {"x": 520, "y": 650, "kind": {"type": "path"}},
+    "spring": {"x": 770, "y": 620, "label": "label-spring", "kind": {"type": "temple"}},
+    "clearing": {
+      "x": 520,
+      "y": 520,
+      "label": "label-clearing",
+      "kind": {"type": "path"},
+      "event": {"dialogue": "meet-lyra", "when": {"forbids": ["lyra-met"]}}
+    },
+    "fork": {"x": 520, "y": 390, "kind": {"type": "path"}},
+    "camp-path": {"x": 290, "y": 350, "kind": {"type": "path"}, "when": {"requires": ["lyra-met"]}},
+    "camp": {
+      "x": 170,
+      "y": 210,
+      "label": "label-goblin-camp",
+      "kind": {
+        "type": "battle",
+        "monsters": ["goblin", "hobgoblin", "goblin"],
+        "flag": "camp-destroyed",
+        "boss": true,
+        "onWin": [{"type": "scene", "dialogue": "camp-after"}]
+      },
+      "when": {"requires": ["lyra-met"]}
+    },
+    "road-north": {"x": 570, "y": 220, "kind": {"type": "path"}},
+    "north-edge": {
+      "x": 570,
+      "y": 70,
+      "label": "label-to-valcrest",
+      "kind": {"type": "exit", "to": {"instance": "valcrest", "node": "south-gate"}}
+    }
+  },
+  "trails": [
+    {
+      "a": "south-edge",
+      "b": "road-1",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ]
+    },
+    {
+      "a": "road-1",
+      "b": "hollow",
+      "chance": 35,
+      "monsters": [
+        {"monster": "goblin", "weight": 2},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2},
+        {"monster": "bandit", "weight": 1}
+      ]
+    },
+    {
+      "a": "road-1",
+      "b": "road-2",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ]
+    },
+    {
+      "a": "road-2",
+      "b": "clearing",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ]
+    },
+    {"a": "road-2", "b": "spring"},
+    {
+      "a": "clearing",
+      "b": "fork",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ]
+    },
+    {
+      "a": "fork",
+      "b": "camp-path",
+      "chance": 40,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "goblin-shaman", "weight": 1}
+      ],
+      "when": {"requires": ["lyra-met"]}
+    },
+    {
+      "a": "camp-path",
+      "b": "camp",
+      "chance": 40,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "goblin-shaman", "weight": 1}
+      ],
+      "when": {"requires": ["lyra-met"]}
+    },
+    {
+      "a": "fork",
+      "b": "road-north",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ],
+      "when": {"requires": ["camp-destroyed"]}
+    },
+    {
+      "a": "road-north",
+      "b": "north-edge",
+      "chance": 20,
+      "monsters": [
+        {"monster": "goblin", "weight": 3},
+        {"monster": "goblin-archer", "weight": 2},
+        {"monster": "forest-wolf", "weight": 2}
+      ]
+    }
+  ]
+}

@@ -85,8 +85,9 @@ async fn game_summary(
     let account = crate::accounts::account_of(&state, &jar)
         .await
         .ok_or(StatusCode::UNAUTHORIZED)?;
-    let progress = crate::saves::progress(&state.db, account).await;
-    let campaign = crate::saves::save(&state.db, account, world::GameMode::Campaign).await;
+    let progress = crate::saves::progress(&state.db, account, &state.world).await;
+    let campaign =
+        crate::saves::save(&state.db, account, world::GameMode::Campaign, &state.world).await;
     match (progress, campaign) {
         (Ok(progress), Ok(campaign)) => Ok(Json(protocol::GameSummary {
             campaign_started: campaign.is_some(),

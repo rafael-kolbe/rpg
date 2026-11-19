@@ -34,6 +34,12 @@ const GLYPHS: Record<StatusKind, ReactNode> = {
       />
     </>
   ),
+  cover: (
+    <>
+      <path d="M14 5.5l4.5 1.5v3.5c0 2.8-1.8 4.5-4.5 5.3-2.7-.8-4.5-2.5-4.5-5.3V7z" />
+      <path className="status-icon__line" d="M6 9v4.5c0 2.2 1.4 3.6 3.5 4.3" />
+    </>
+  ),
   distracted: (
     <path
       className="status-icon__line"

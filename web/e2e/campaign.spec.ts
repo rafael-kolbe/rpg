@@ -20,7 +20,7 @@ test('a new player starts the Campaign, walks and talks, and the game is saved',
   await expect(modes.getByRole('button', { name: /Multiplayer/ })).toBeDisabled()
   await modes.getByRole('button', { name: /Campaign/ }).click()
 
-  // The opening scene, line by line.
+  // The farewell at home, line by line.
   const dialogue = page.getByTestId('dialogue')
   await expect(dialogue).toContainText('Brookhollow')
   while (await dialogue.isVisible()) {
@@ -31,18 +31,19 @@ test('a new player starts the Campaign, walks and talks, and the game is saved',
       .poll(async () => ((await dialogue.isVisible()) ? await dialogue.textContent() : null))
       .not.toBe(line)
   }
+  await expect(page.getByTestId('objective')).toContainText('north road')
 
-  // The elder is south of the square: walk there and talk.
-  await page.keyboard.press('ArrowDown')
-  await expect(page.getByTestId('interact')).toContainText('Elder Maren')
+  // Jory waits at the well square, east of home: walk there and talk.
+  await page.keyboard.press('ArrowRight')
+  await expect(page.getByTestId('interact')).toContainText('Jory')
   await page.getByTestId('interact').click()
-  await expect(dialogue).toContainText('Carvel')
+  await expect(dialogue).toContainText('north road')
 
-  // Saved on the server: a reload continues at the elder, scene over.
+  // Saved on the server: a reload continues at the square, scene over.
   await page.reload()
   await expect(modes.getByRole('button', { name: /Continue/ })).toBeVisible()
   await modes.getByRole('button', { name: /Campaign/ }).click()
-  await expect(page.getByTestId('interact')).toContainText('Elder Maren')
+  await expect(page.getByTestId('interact')).toContainText('Jory')
 })
 
 test('opening the game in a second tab closes the first one', async ({ page, context }) => {

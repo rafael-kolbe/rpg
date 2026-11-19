@@ -324,7 +324,9 @@ impl Connection {
         let view = game.view();
         self.session = None;
         self.unsaved = true;
-        Some(ServerMessage::GameUpdate { view })
+        Some(ServerMessage::GameUpdate {
+            view: Box::new(view),
+        })
     }
 
     /// Drops the game (unsaved) when a newer tab of the account opened it.
@@ -373,8 +375,8 @@ impl Connection {
             ticket: state.open_games.claim(account),
         });
         let loaded = async {
-            let progress = saves::progress(&state.db, account).await?;
-            let save = saves::save(&state.db, account, mode).await?;
+            let progress = saves::progress(&state.db, account, &state.world).await?;
+            let save = saves::save(&state.db, account, mode, &state.world).await?;
             Ok::<_, sqlx::Error>((progress, save))
         };
         let (progress, save) = match loaded.await {
@@ -399,7 +401,9 @@ impl Connection {
         if let Some(order) = owed {
             replies.push(self.start_game_battle(order));
         }
-        replies.push(ServerMessage::GameUpdate { view });
+        replies.push(ServerMessage::GameUpdate {
+            view: Box::new(view),
+        });
         // A record that reached the battle's last blow.
         replies.extend(self.settle());
         replies
@@ -418,7 +422,9 @@ impl Connection {
                 if let Some(order) = order {
                     replies.push(self.start_game_battle(order));
                 }
-                replies.push(ServerMessage::GameUpdate { view });
+                replies.push(ServerMessage::GameUpdate {
+                    view: Box::new(view),
+                });
                 replies
             }
         }
@@ -900,11 +906,16 @@ mod tests {
         assert!(sent < usize::try_from(BURST_MESSAGES * 2).unwrap());
     }
 
-    /// A connection playing a new Campaign of `account`, without the database.
+    /// A connection playing a new Campaign of `account`, without the
+    /// database, standing on the Burrowood road (where monsters roam).
     fn playing(state: &AppState, account: AccountId) -> Connection {
         let mut connection = Connection::new(Some(account));
-        let save = Save::new(&state.world, 1);
-        let progress = world::Progress::default();
+        let mut save = Save::new(&state.world, 1);
+        save.position = world::Position {
+            instance: world::InstanceId::new("burrowood"),
+            node: world::NodeId::new("road-1"),
+        };
+        let progress = world::Progress::new(&state.world);
         connection.game = Some(Game::new(
             Arc::clone(&state.world),
             GameMode::Campaign,
@@ -957,7 +968,7 @@ mod tests {
                 break;
             }
             // Back and forth until an encounter.
-            for node in ["fields", "square"] {
+            for node in ["road-2", "road-1"] {
                 replies = connection
                     .handle(
                         &state,

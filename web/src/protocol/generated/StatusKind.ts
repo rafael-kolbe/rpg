@@ -3,4 +3,4 @@
 /**
  * A status condition.
  */
-export type StatusKind = "poison" | "regen" | "sleep" | "silence" | "haste" | "slow" | "barrier" | "magic_barrier" | "distracted";
+export type StatusKind = "poison" | "regen" | "sleep" | "silence" | "haste" | "slow" | "barrier" | "magic_barrier" | "distracted" | "cover";

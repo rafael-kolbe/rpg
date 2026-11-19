@@ -6,14 +6,14 @@ import { Button } from '../ui/Button.tsx'
 import { useMenuKeys } from '../ui/use-menu-keys.ts'
 import { Window } from '../ui/Window.tsx'
 
-type Notice = Extract<SceneView, { type: 'victory' | 'defeat' | 'rested' | 'found' }>
+type Notice = Extract<SceneView, { type: 'victory' | 'defeat' | 'rested' | 'found' | 'game_over' }>
 
 interface Props {
   scene: Notice
   onContinue: () => void
 }
 
-/** Rewards, defeat, a rest or a chest's loot; confirm closes it. */
+/** Rewards, a defeat, a Game Over, a rest or a chest's loot; confirm closes it. */
 export function SceneNotice({ scene, onContinue }: Props) {
   const { t } = useTranslation()
   useMenuKeys((key) => {
@@ -30,7 +30,7 @@ export function SceneNotice({ scene, onContinue }: Props) {
       title = t('ui-victory-title')
       lines = [
         t('ui-victory-xp', { xp: rewards.xp }),
-        t('ui-victory-crowns', { amount: rewards.crowns }),
+        t('ui-victory-kalds', { amount: rewards.kalds }),
         ...Object.entries(rewards.items).map(([item, count]) =>
           t('ui-found-item', { name: t(`item-${item}`), count: count ?? 0 }),
         ),
@@ -38,9 +38,14 @@ export function SceneNotice({ scene, onContinue }: Props) {
           t('ui-level-up', { name: t(`hero-${up.hero}`), level: up.level }),
           ...up.learned.map((action) => t('ui-learned', { action: t(`action-${action}`) })),
         ]),
+        ...rewards.questsDone.map((quest) => t('ui-quest-done', { name: t(`quest-${quest}`) })),
       ]
       break
     }
+    case 'game_over':
+      title = t('ui-game-over-title')
+      lines = [t('ui-game-over-text')]
+      break
     case 'defeat':
       title = t('ui-defeat-title')
       lines = [t('ui-defeat-text')]
@@ -57,7 +62,7 @@ export function SceneNotice({ scene, onContinue }: Props) {
           t('ui-found-item', { name: t(`item-${item}`), count: count ?? 0 }),
         ),
         ...loot.equipment.map((piece) => t(`equipment-${piece}`)),
-        ...(loot.crowns > 0 ? [t('ui-crowns', { amount: loot.crowns })] : []),
+        ...(loot.kalds > 0 ? [t('ui-kalds', { amount: loot.kalds })] : []),
       ]
       break
     }

@@ -1,79 +1,213 @@
 {
-  "intro": {
-    "lines": [null, "hero-taren", "npc-elder", "hero-taren"],
+  "farewell": {
+    "lines": [
+      null,
+      "npc-brenna",
+      "hero-tauryen",
+      "npc-hilda",
+      "hero-tauryen",
+      "npc-jory",
+      "hero-tauryen",
+      "npc-jory",
+      "hero-tauryen",
+      "npc-brenna",
+      null
+    ],
     "effects": [
-      { "type": "set_flag", "flag": "intro-done" },
-      { "type": "give", "item": "potion", "count": 3 }
+      {"type": "set_flag", "flag": "farewell-done"},
+      {"type": "give", "item": "potion", "count": 2},
+      {"type": "objective", "message": "objective-road-north"},
+      {"type": "autosave"}
     ]
   },
-  "elder-farm": { "lines": ["npc-elder", "npc-elder"] },
-  "elder-later": { "lines": ["npc-elder"] },
-  "farm-thanks": {
-    "lines": ["npc-farmer", "hero-taren", "npc-farmer"],
-    "effects": [
-      { "type": "set_flag", "flag": "farm-thanked" },
-      { "type": "give_equipment", "id": "leather-vest" }
-    ]
-  },
+  "brenna-later": {"lines": ["npc-brenna"]},
+  "hilda-later": {"lines": ["npc-hilda"]},
+  "jory-later": {"lines": ["npc-jory"]},
   "meet-lyra": {
-    "lines": [null, "hero-lyra", "hero-taren", "hero-lyra", "hero-taren", "hero-lyra", null],
+    "lines": [null, "hero-lyra", "hero-tauryen", "hero-lyra"],
     "effects": [
-      { "type": "join", "hero": "lyra" },
-      { "type": "set_flag", "flag": "lyra-joined" },
-      { "type": "battle", "monsters": ["goblin", "goblin"] }
+      {"type": "join", "hero": "lyra", "level": 3},
+      {"type": "set_flag", "flag": "lyra-met"},
+      {
+        "type": "battle",
+        "monsters": ["goblin", "goblin-archer", "goblin"],
+        "onWin": [{"type": "scene", "dialogue": "lyra-recon"}]
+      }
     ]
   },
-  "lyra-insists": {
-    "lines": ["hero-lyra", "hero-taren"],
-    "effects": [{ "type": "set_flag", "flag": "lyra-insisted" }]
+  "lyra-recon": {
+    "lines": [
+      "hero-lyra",
+      "hero-tauryen",
+      "hero-lyra",
+      "hero-tauryen",
+      "hero-lyra",
+      "hero-lyra",
+      "hero-tauryen",
+      "hero-lyra"
+    ],
+    "effects": [{"type": "objective", "message": "objective-goblin-camp"}, {"type": "autosave"}]
   },
-  "after-grukk": {
-    "lines": [null, "hero-lyra", "hero-taren", "hero-lyra"],
+  "camp-after": {
+    "lines": [null, "hero-lyra", "hero-tauryen", "hero-lyra"],
+    "effects": [{"type": "objective", "message": "objective-valcrest"}, {"type": "autosave"}]
+  },
+  "the-report": {
+    "lines": [
+      null,
+      "npc-garrick",
+      "hero-lyra",
+      "npc-garrick",
+      "hero-lyra",
+      "npc-garrick",
+      "hero-lyra",
+      "npc-garrick",
+      "hero-lyra",
+      "npc-garrick",
+      "npc-garrick",
+      "hero-tauryen",
+      "hero-lyra",
+      null
+    ],
     "effects": [
-      { "type": "set_flag", "flag": "grukk-aftermath" },
-      { "type": "crowns", "amount": 200 }
+      {"type": "leave", "hero": "lyra"},
+      {"type": "set_flag", "flag": "report-done"},
+      {"type": "objective", "message": "objective-guild"},
+      {"type": "autosave"}
     ]
   },
-  "arrive-valcrest": {
-    "lines": [null, "hero-taren", "hero-lyra"],
-    "effects": [{ "type": "set_flag", "flag": "valcrest-arrived" }]
-  },
+  "garrick-later": {"lines": ["npc-garrick"]},
   "guild-register": {
-    "lines": ["npc-clerk", "hero-taren", "npc-clerk"],
+    "lines": [
+      null,
+      "npc-delia",
+      "npc-delia",
+      "hero-tauryen",
+      "npc-delia",
+      "npc-delia",
+      null,
+      "npc-delia",
+      "hero-tauryen",
+      null,
+      "npc-hogg",
+      null,
+      "npc-delia"
+    ],
     "effects": [
-      { "type": "set_flag", "flag": "guild-registered" },
-      { "type": "give", "item": "potion", "count": 2 }
+      {"type": "set_rank", "rank": "bronze"},
+      {"type": "set_flag", "flag": "registered"},
+      {"type": "objective", "message": null},
+      {"type": "scene", "dialogue": "wounded"}
     ]
   },
-  "guild-later": { "lines": ["npc-clerk"] },
-  "holt-report": {
-    "lines": ["npc-holt", "hero-lyra", "npc-holt", "npc-holt", "hero-taren", "npc-holt"],
+  "wounded": {
+    "lines": [
+      null,
+      "npc-brann",
+      null,
+      "npc-delia",
+      "npc-hogg",
+      "npc-sylas",
+      "npc-sylas",
+      "npc-hogg",
+      "npc-sylas",
+      "npc-delia",
+      "npc-brann",
+      "hero-tauryen",
+      "npc-hogg",
+      null,
+      null
+    ],
     "effects": [
-      { "type": "set_flag", "flag": "mission-reported" },
-      { "type": "crowns", "amount": 500 },
-      { "type": "give", "item": "hi-potion", "count": 2 }
+      {"type": "start_quest", "quest": "sewer-rats"},
+      {"type": "set_flag", "flag": "sewer-hunt"},
+      {"type": "objective", "message": "objective-lich-clues"},
+      {"type": "travel", "to": {"instance": "valcrest-sewer-1", "node": "landing"}},
+      {"type": "autosave"}
     ]
   },
-  "holt-catacombs": { "lines": ["npc-holt"] },
-  "enter-catacombs": {
-    "lines": [null, "hero-lyra", "hero-taren"],
-    "effects": [{ "type": "set_flag", "flag": "catacombs-entered" }]
-  },
-  "free-corin": {
-    "lines": [null, "hero-corin", "hero-taren", "hero-corin", "hero-lyra", "hero-corin", null],
+  "sewer-squad": {
+    "lines": [
+      null,
+      "hero-merrick",
+      "hero-lyra",
+      "hero-tauryen",
+      "hero-merrick",
+      "hero-tauryen",
+      null,
+      "hero-merrick",
+      "hero-tauryen",
+      null,
+      "hero-merrick",
+      "hero-tauryen",
+      "hero-merrick",
+      "hero-tauryen",
+      "hero-lyra",
+      "hero-merrick",
+      "hero-tobin"
+    ],
     "effects": [
-      { "type": "join", "hero": "corin" },
-      { "type": "set_flag", "flag": "corin-joined" },
-      { "type": "heal" }
+      {"type": "join", "hero": "lyra"},
+      {"type": "join", "hero": "merrick", "level": 20, "guest": true},
+      {"type": "join", "hero": "tobin", "level": 10, "guest": true},
+      {"type": "set_flag", "flag": "squad-formed"},
+      {"type": "objective", "message": "objective-lich-trail"},
+      {"type": "scene", "dialogue": "delia-board"},
+      {"type": "autosave"}
     ]
   },
-  "after-warden": {
-    "lines": [null, "hero-corin", "hero-lyra", "hero-taren"],
-    "effects": [{ "type": "set_flag", "flag": "warden-aftermath" }]
+  "delia-board": {"lines": [null, null, "npc-delia", null]},
+  "clue-slime": {
+    "lines": [null, "hero-merrick", "hero-lyra"],
+    "effects": [{"type": "set_flag", "flag": "clue-1"}]
   },
-  "holt-ending": {
-    "lines": ["npc-holt", "hero-lyra", "npc-holt", "hero-taren", null],
-    "effects": [{ "type": "set_flag", "flag": "arc-complete" }, { "type": "crowns", "amount": 1000 }]
+  "clue-grate": {
+    "lines": [null, "hero-tauryen", "hero-merrick"],
+    "effects": [{"type": "set_flag", "flag": "clue-2"}]
   },
-  "holt-after": { "lines": ["npc-holt"] }
+  "lich-appears": {
+    "lines": [null, "hero-lyra", "hero-merrick", null, "hero-merrick", "hero-tauryen"],
+    "effects": [
+      {"type": "set_flag", "flag": "lich-fought"},
+      {
+        "type": "battle",
+        "monsters": ["injured-lich", "zombie"],
+        "boss": true,
+        "onWin": [{"type": "scene", "dialogue": "lich-final"}]
+      }
+    ]
+  },
+  "lich-final": {
+    "lines": [
+      null,
+      null,
+      "npc-roderic",
+      "hero-merrick",
+      "npc-isolde",
+      "npc-roderic",
+      "npc-roderic",
+      "npc-isolde",
+      "hero-tauryen",
+      "hero-tauryen",
+      "npc-roderic",
+      null,
+      "npc-garrick",
+      "hero-merrick",
+      "npc-garrick",
+      null,
+      "hero-lyra",
+      "hero-tauryen",
+      null
+    ],
+    "effects": [
+      {"type": "leave", "hero": "merrick"},
+      {"type": "leave", "hero": "tobin"},
+      {"type": "leave", "hero": "lyra"},
+      {"type": "set_flag", "flag": "sewer-closed"},
+      {"type": "objective", "message": "objective-continued"},
+      {"type": "travel", "to": {"instance": "valcrest", "node": "plaza"}},
+      {"type": "autosave"}
+    ]
+  },
+  "delia-later": {"lines": ["npc-delia"]}
 }

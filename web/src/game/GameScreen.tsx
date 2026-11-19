@@ -20,6 +20,8 @@ import { PartyWindow } from './PartyWindow.tsx'
 import { SceneNotice } from './SceneNotice.tsx'
 import { ShopWindow } from './ShopWindow.tsx'
 import { WorldMapWindow } from './WorldMapWindow.tsx'
+import { BoardWindow } from './BoardWindow.tsx'
+import { QuestTracker } from './QuestTracker.tsx'
 import './game.css'
 
 const TIME_MODES: readonly TimeMode[] = ['active', 'wait', 'turn']
@@ -119,8 +121,13 @@ export function GameScreen({ mode }: Props) {
         <h1 className="game__place" data-testid="place">
           {t(`instance-${game.instance.id}`)}
         </h1>
-        <span className="crowns" data-testid="crowns">
-          {t('ui-crowns', { amount: game.crowns })}
+        {game.rank !== null && (
+          <span className="rank-badge" data-testid="rank">
+            {t(`ui-rank-${game.rank}`)}
+          </span>
+        )}
+        <span className="kalds" data-testid="kalds">
+          {t('ui-kalds', { amount: game.kalds })}
         </span>
         <Button onClick={() => setPanel('party')} testId="open-party">
           {t('ui-party-title')}
@@ -155,6 +162,7 @@ export function GameScreen({ mode }: Props) {
         />
       ) : (
         <div className="game__stage">
+          <QuestTracker objective={game.objective} quests={game.quests} />
           <InstanceMap
             instance={game.instance}
             position={game.position}
@@ -176,14 +184,22 @@ export function GameScreen({ mode }: Props) {
           {scene?.type === 'shop' && (
             <ShopWindow
               goods={scene.goods}
-              crowns={game.crowns}
+              kalds={game.kalds}
               onBuy={(good) => act({ type: 'buy', good, count: 1 })}
               onSell={(good) => act({ type: 'sell', good, count: 1 })}
               onLeave={() => act({ type: 'next' })}
             />
           )}
+          {scene?.type === 'board' && (
+            <BoardWindow
+              entries={scene.entries}
+              onAccept={(quest) => act({ type: 'accept_quest', quest })}
+              onClose={() => act({ type: 'next' })}
+            />
+          )}
           {(scene?.type === 'victory' ||
             scene?.type === 'defeat' ||
+            scene?.type === 'game_over' ||
             scene?.type === 'rested' ||
             scene?.type === 'found') && (
             <SceneNotice scene={scene} onContinue={() => act({ type: 'next' })} />
@@ -193,7 +209,7 @@ export function GameScreen({ mode }: Props) {
               party={game.party}
               bag={game.bag}
               inventory={game.inventory}
-              crowns={game.crowns}
+              kalds={game.kalds}
               onEquip={(hero, slot, id) => act({ type: 'equip', hero, slot, id })}
               onUse={(item, hero) => act({ type: 'use_item', item, hero })}
               onClose={() => setPanel('none')}

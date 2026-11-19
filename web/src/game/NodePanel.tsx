@@ -13,12 +13,14 @@ interface Props {
 export function NodePanel({ node, onInteract }: Props) {
   const { t } = useTranslation()
   const action = nodeAction(node)
-  const args = Object.fromEntries(
-    Object.entries(action?.args ?? {}).map(([name, id]) => [name, t(id)]),
-  )
+  const args = {
+    ...Object.fromEntries(Object.entries(action?.args ?? {}).map(([name, id]) => [name, t(id)])),
+    ...action?.numbers,
+  }
   return (
     <Window className="node-panel" testId="node-panel">
       <p className="node-panel__hint">{t('ui-map-keys')}</p>
+      {node?.kind?.type === 'sealed' && <p className="node-panel__sealed">{t('ui-node-sealed')}</p>}
       {action !== null && (
         <div className="node-panel__actions">
           <Button onClick={() => onInteract(false)} testId="interact">

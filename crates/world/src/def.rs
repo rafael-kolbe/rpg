@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::ids::{
     ClassId, DialogueId, EquipmentId, Flag, HeroId, InstanceId, MonsterId, NodeId, Position,
-    RegionId, ShopId,
+    QuestId, RegionId, ShopId,
 };
 
 /// Everything in `content/world/`.
@@ -38,18 +38,101 @@ pub struct WorldDef {
     pub shops: BTreeMap<ShopId, ShopDef>,
     /// Weapons and armor.
     pub equipment: BTreeMap<EquipmentId, EquipmentDef>,
+    /// Missions (`content/world/quests.json`).
+    pub quests: BTreeMap<QuestId, QuestDef>,
+}
+
+/// A Guild rank: of an adventurer, a mission, a monster or an area
+/// (`STORY.md`, Guilda de Aventureiros).
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Rank {
+    /// Levels 1–15.
+    Bronze,
+    /// Levels 16–30.
+    Silver,
+    /// Levels 31–45.
+    Gold,
+    /// Levels 46–60.
+    Platinum,
+    /// Levels 61–80.
+    Diamond,
+    /// Levels 81–99.
+    Orichalcum,
+    /// Level 100 and above: whoever has slain a legendary monster.
+    Dracite,
+}
+
+/// A mission (name: `quest-<id>`, e.g. "Kill 20 rats").
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct QuestDef {
+    /// Lowest Guild rank allowed to take it from a board.
+    pub rank: Rank,
+    /// What completes it.
+    pub goal: QuestGoal,
+    /// Money paid when it is completed.
+    #[serde(default)]
+    pub kalds: u32,
+    /// Scenes on the way, played once the progress reaches `at`.
+    #[serde(default)]
+    pub events: Vec<QuestEvent>,
+}
+
+/// What completes a mission.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(
+    tag = "type",
+    rename_all = "snake_case",
+    rename_all_fields = "camelCase",
+    deny_unknown_fields
+)]
+pub enum QuestGoal {
+    /// Defeat `count` monsters of these kinds.
+    Kill {
+        /// The kinds that count.
+        monsters: Vec<MonsterId>,
+        /// How many.
+        count: u16,
+    },
+}
+
+impl QuestGoal {
+    /// Progress needed to complete it.
+    #[must_use]
+    pub fn count(&self) -> u16 {
+        match self {
+            Self::Kill { count, .. } => *count,
+        }
+    }
+}
+
+/// A scene a mission plays on the way.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct QuestEvent {
+    /// Progress that triggers it.
+    pub at: u16,
+    /// The scene.
+    pub dialogue: DialogueId,
 }
 
 /// A new game (`content/world/start.json`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct StartDef {
+    /// Content version. Raised when a change leaves old saves pointing at
+    /// places or story that no longer exist: saves of another version start
+    /// over.
+    #[serde(default)]
+    pub epoch: u32,
     /// Where the player appears; also the first return point after a defeat.
     pub position: Position,
     /// The heroes in the party, in order.
     pub party: Vec<HeroId>,
     /// Starting money.
-    pub crowns: u32,
+    pub kalds: u32,
     /// Starting items.
     #[serde(default)]
     pub inventory: BTreeMap<ItemId, u16>,
@@ -179,7 +262,7 @@ pub enum NodeKind {
         equipment: Vec<EquipmentId>,
         /// Money inside.
         #[serde(default)]
-        crowns: u32,
+        kalds: u32,
     },
     /// Someone to talk to; the first talk whose condition holds plays.
     Npc {
@@ -195,6 +278,19 @@ pub enum NodeKind {
     },
     /// Heals the party for free and becomes the return point after a defeat.
     Temple,
+    /// Heals the party for a price.
+    Inn {
+        /// Kalds per night.
+        price: u32,
+    },
+    /// Missions to take, those the player's rank allows.
+    Board {
+        /// The missions posted.
+        quests: Vec<QuestId>,
+    },
+    /// A place that does not open yet (a locked door, a shop for later);
+    /// its label says what it is (or "???").
+    Sealed,
 }
 
 /// One possible talk of an NPC.
@@ -219,22 +315,23 @@ pub struct TrailDef {
     /// Chance of a battle when walking it, in percent.
     #[serde(default)]
     pub chance: u8,
-    /// Monster groups met on it, by weight.
+    /// Monsters met on it: each of the 1–3 enemies (up to the party's size
+    /// when it is larger) is drawn from here by weight.
     #[serde(default)]
-    pub encounters: Vec<EncounterGroup>,
+    pub monsters: Vec<Weighted>,
     /// When it is open.
     #[serde(default)]
     pub when: Condition,
 }
 
-/// Monsters met together on a trail.
+/// A monster a trail can throw at the party, and how often.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct EncounterGroup {
-    /// Relative chance among the trail's groups.
+pub struct Weighted {
+    /// The monster.
+    pub monster: MonsterId,
+    /// Relative chance among the trail's monsters.
     pub weight: u16,
-    /// The enemies, in order.
-    pub monsters: Vec<MonsterId>,
 }
 
 /// Something the story does: after a dialogue, a choice or a won fight.
@@ -251,10 +348,39 @@ pub enum StoryEffect {
         /// The flag.
         flag: Flag,
     },
-    /// A hero joins the party (at the party's average level, at least 1).
+    /// A hero joins the party. One who left before comes back as they were;
+    /// otherwise at `level`, or at the party's average level.
     Join {
         /// The hero.
         hero: HeroId,
+        /// Level of a hero who never joined before.
+        #[serde(default)]
+        level: Option<u8>,
+        /// A guest: fights on its own; the player does not command it.
+        #[serde(default)]
+        guest: bool,
+    },
+    /// A hero leaves the party, keeping their level and gear for a return.
+    Leave {
+        /// The hero.
+        hero: HeroId,
+    },
+    /// Shows the campaign's next step at the top of the screen (a Fluent
+    /// message id), or hides it.
+    Objective {
+        /// The message; `None` clears it.
+        #[serde(default)]
+        message: Option<String>,
+    },
+    /// Sets the player's Guild rank.
+    SetRank {
+        /// The new rank.
+        rank: Rank,
+    },
+    /// Gives the player a mission, without the board.
+    StartQuest {
+        /// The mission.
+        quest: QuestId,
     },
     /// Items into the bag.
     Give {
@@ -269,7 +395,7 @@ pub enum StoryEffect {
         id: EquipmentId,
     },
     /// Money.
-    Crowns {
+    Kalds {
         /// How much.
         amount: u32,
     },
@@ -279,9 +405,25 @@ pub enum StoryEffect {
     Battle {
         /// The enemies, in order.
         monsters: Vec<MonsterId>,
+        /// A boss: the Campaign saves right before it starts.
+        #[serde(default)]
+        boss: bool,
         /// Effects of winning.
         #[serde(default)]
         on_win: Vec<StoryEffect>,
+    },
+    /// The Campaign saves here: a defeat comes back to this moment.
+    Autosave,
+    /// Moves the party to another place without walking (a cut to the next
+    /// scene of the story).
+    Travel {
+        /// Where.
+        to: Position,
+    },
+    /// Plays a scene once the screen is free (after a battle's rewards).
+    Scene {
+        /// The scene.
+        dialogue: DialogueId,
     },
 }
 
@@ -358,7 +500,7 @@ pub struct MonsterDef {
     /// Experience for each standing hero.
     pub xp: u32,
     /// Money it drops.
-    pub crowns: u32,
+    pub kalds: u32,
     /// Items it may drop.
     #[serde(default)]
     pub drops: Vec<Drop>,
@@ -417,7 +559,7 @@ pub struct ShopDef {
 pub struct Priced<T> {
     /// What.
     pub id: T,
-    /// Price in crowns.
+    /// Price in kalds.
     pub price: u32,
 }
 

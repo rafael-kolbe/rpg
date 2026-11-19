@@ -6,6 +6,9 @@ use serde::{Deserialize, Serialize};
 pub(crate) const PULSE_INTERVAL_TICKS: u16 = 30;
 /// Share of max HP lost to Poison, or restored by Regen, per pulse.
 pub(crate) const PULSE_PERCENT: u16 = 5;
+/// Chance that Cover takes a single-target attack meant for an ally, in
+/// percent.
+pub(crate) const COVER_PERCENT: u8 = 70;
 
 /// A status condition.
 #[cfg_attr(feature = "ts", derive(ts_rs::TS))]
@@ -31,6 +34,9 @@ pub enum StatusKind {
     /// Turned away: the next hit taken deals 150%. Ends on that hit or when
     /// the combatant's own ATB gauge fills.
     Distracted,
+    /// Guards the allies: a single-target attack on one of them has a 70%
+    /// chance to hit this combatant instead.
+    Cover,
 }
 
 impl StatusKind {
@@ -39,7 +45,7 @@ impl StatusKind {
     pub fn is_harmful(self) -> bool {
         match self {
             Self::Poison | Self::Sleep | Self::Silence | Self::Slow | Self::Distracted => true,
-            Self::Regen | Self::Haste | Self::Barrier | Self::MagicBarrier => false,
+            Self::Regen | Self::Haste | Self::Barrier | Self::MagicBarrier | Self::Cover => false,
         }
     }
 

@@ -3,4 +3,4 @@
 /**
  * Why a command was refused; nothing changed.
  */
-export type GameError = "busy" | "no_such_node" | "no_trail" | "trail_closed" | "barrier" | "nothing_here" | "no_such_choice" | "not_for_sale" | "not_enough_crowns" | "not_owned" | "cannot_equip" | "not_usable_here" | "no_such_hero" | "bag_full";
+export type GameError = "busy" | "no_such_node" | "no_trail" | "trail_closed" | "barrier" | "nothing_here" | "no_such_choice" | "not_for_sale" | "not_enough_kalds" | "not_owned" | "cannot_equip" | "not_usable_here" | "no_such_hero" | "bag_full" | "not_on_board" | "rank_too_low" | "quest_taken" | "sealed";

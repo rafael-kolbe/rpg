@@ -5,6 +5,8 @@ import type { HeroView } from "./HeroView";
 import type { InstanceView } from "./InstanceView";
 import type { ItemId } from "./ItemId";
 import type { NodeId } from "./NodeId";
+import type { QuestView } from "./QuestView";
+import type { Rank } from "./Rank";
 import type { RegionView } from "./RegionView";
 import type { SceneView } from "./SceneView";
 
@@ -39,7 +41,7 @@ party: Array<HeroView>,
 /**
  * Money.
  */
-crowns: number, 
+kalds: number, 
 /**
  * Items.
  */
@@ -47,4 +49,16 @@ inventory: { [key in ItemId]: number },
 /**
  * Weapons and armor not worn.
  */
-bag: Array<BagEntry>, };
+bag: Array<BagEntry>, 
+/**
+ * Guild rank, once registered.
+ */
+rank: Rank | null, 
+/**
+ * The campaign's next step (a Fluent message id).
+ */
+objective: string | null, 
+/**
+ * Missions under way.
+ */
+quests: Array<QuestView>, };

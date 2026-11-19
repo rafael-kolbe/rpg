@@ -99,8 +99,8 @@ pub enum ServerMessage {
     },
     /// The game as the player sees it, after every change.
     GameUpdate {
-        /// The view.
-        view: GameView,
+        /// The view (boxed: by far the largest message).
+        view: Box<GameView>,
     },
     /// A game command was refused; nothing changed.
     GameRejected {

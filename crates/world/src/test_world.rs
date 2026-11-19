@@ -17,13 +17,13 @@ use engine::{
 
 use crate::World;
 use crate::def::{
-    ChoiceDef, ClassDef, Condition, DialogueDef, EncounterGroup, EquipmentDef, EventDef, HeroDef,
-    InstanceDef, Learn, MonsterDef, NodeDef, NodeKind, Priced, RegionDef, ShopDef, Slot, StartDef,
-    StatLine, StoryEffect, TalkDef, Terrain, TrailDef, WorldDef,
+    ChoiceDef, ClassDef, Condition, DialogueDef, EquipmentDef, EventDef, HeroDef, InstanceDef,
+    Learn, MonsterDef, NodeDef, NodeKind, Priced, QuestDef, QuestEvent, QuestGoal, Rank, RegionDef,
+    ShopDef, Slot, StartDef, StatLine, StoryEffect, TalkDef, Terrain, TrailDef, Weighted, WorldDef,
 };
 use crate::ids::{
     ClassId, DialogueId, EquipmentId, Flag, HeroId, InstanceId, MonsterId, NodeId, Position,
-    RegionId, ShopId,
+    QuestId, RegionId, ShopId,
 };
 
 pub(crate) fn position(instance: &str, node: &str) -> Position {
@@ -63,9 +63,9 @@ fn trail(a: &str, b: &str, chance: u8) -> TrailDef {
         a: NodeId::new(a),
         b: NodeId::new(b),
         chance,
-        encounters: vec![EncounterGroup {
+        monsters: vec![Weighted {
+            monster: MonsterId::new("slime"),
             weight: 1,
-            monsters: vec![MonsterId::new("slime")],
         }],
         when: Condition::default(),
     }
@@ -155,9 +155,11 @@ fn slime() -> MonsterDef {
             ai: Some(ai()),
             hp: None,
             mp: None,
+            guest: false,
+            leader: false,
         },
         xp: 25,
-        crowns: 7,
+        kalds: 7,
         drops: vec![crate::def::Drop {
             item: potion.clone(),
             percent: 100,
@@ -173,7 +175,7 @@ fn field() -> InstanceDef {
             flag: flag("chest-opened"),
             items: BTreeMap::from([(potion.clone(), 2)]),
             equipment: vec![EquipmentId::new("sword")],
-            crowns: 50,
+            kalds: 50,
         },
     );
     chest_node.event = Some(EventDef {
@@ -202,6 +204,8 @@ fn field() -> InstanceDef {
                         boss: false,
                         on_win: vec![StoryEffect::Join {
                             hero: HeroId::new("bea"),
+                            level: None,
+                            guest: false,
                         }],
                     },
                 ),
@@ -231,6 +235,15 @@ fn field() -> InstanceDef {
             ),
             (NodeId::new("secret"), node(900, NodeKind::Path)),
             (
+                NodeId::new("board"),
+                node(
+                    850,
+                    NodeKind::Board {
+                        quests: vec![QuestId::new("slimes"), QuestId::new("dragon")],
+                    },
+                ),
+            ),
+            (
                 NodeId::new("stairs"),
                 node(
                     950,
@@ -248,6 +261,7 @@ fn field() -> InstanceDef {
             trail("road", "shop", 0),
             secret_trail,
             trail("road", "stairs", 0),
+            trail("road", "board", 0),
         ],
     }
 }
@@ -287,19 +301,51 @@ fn dialogues() -> BTreeMap<DialogueId, DialogueDef> {
                 lines: vec![Some("npc-elder".to_owned()), None],
                 choices: vec![
                     ChoiceDef {
-                        effects: vec![StoryEffect::Crowns { amount: 5 }],
+                        effects: vec![StoryEffect::Kalds { amount: 5 }],
                     },
                     ChoiceDef {
                         effects: vec![StoryEffect::Battle {
                             monsters: vec![MonsterId::new("slime")],
+                            boss: false,
                             on_win: vec![StoryEffect::Battle {
                                 monsters: vec![MonsterId::new("slime"), MonsterId::new("slime")],
+                                boss: true,
                                 on_win: Vec::new(),
                             }],
                         }],
                     },
                 ],
                 effects: Vec::new(),
+            },
+        ),
+    ])
+}
+
+fn quests() -> BTreeMap<QuestId, QuestDef> {
+    let kill = |count| QuestGoal::Kill {
+        monsters: vec![MonsterId::new("slime")],
+        count,
+    };
+    BTreeMap::from([
+        (
+            QuestId::new("slimes"),
+            QuestDef {
+                rank: Rank::Bronze,
+                goal: kill(4),
+                kalds: 20,
+                events: vec![QuestEvent {
+                    at: 2,
+                    dialogue: DialogueId::new("found-chest"),
+                }],
+            },
+        ),
+        (
+            QuestId::new("dragon"),
+            QuestDef {
+                rank: Rank::Dracite,
+                goal: kill(1),
+                kalds: 0,
+                events: Vec::new(),
             },
         ),
     ])
@@ -316,9 +362,10 @@ pub(crate) fn world() -> Arc<World> {
     let (actions, class, slime, field, cave) = (actions(), class(), slime(), field(), cave());
     let map = WorldDef {
         start: StartDef {
+            epoch: 0,
             position: position("field", "home"),
             party: vec![HeroId::new("ann")],
-            crowns: 100,
+            kalds: 100,
             inventory: BTreeMap::from([(potion.clone(), 1)]),
         },
         regions: BTreeMap::from([(
@@ -379,6 +426,7 @@ pub(crate) fn world() -> Arc<World> {
                 evasion: 0,
             },
         )]),
+        quests: quests(),
     };
     Arc::new(World {
         map,

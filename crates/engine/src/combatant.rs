@@ -38,6 +38,8 @@ pub struct Combatant {
     pub(crate) status_immunities: Vec<StatusKind>,
     pub(crate) ai: Option<AiProfile>,
     pub(crate) player_controlled: bool,
+    /// Its fall ends the battle for its side ([`CombatantSetup::leader`]).
+    pub(crate) leader: bool,
 
     pub(crate) hp: u16,
     pub(crate) mp: u16,
@@ -69,6 +71,7 @@ impl Combatant {
             affinities: setup.affinities,
             status_immunities: setup.status_immunities,
             ai: setup.ai,
+            leader: setup.leader,
             player_controlled,
             atb: 0,
             state: TurnState::Charging,

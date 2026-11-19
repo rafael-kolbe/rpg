@@ -88,6 +88,11 @@ pub enum Condition {
         /// The status.
         status: StatusKind,
     },
+    /// The combatant itself does not have the status (renewing Cover).
+    UserLacksStatus {
+        /// The status.
+        status: StatusKind,
+    },
 }
 
 /// What an AI rule does.
@@ -109,7 +114,7 @@ pub enum AiAct {
 }
 
 /// Who an AI rule aims at.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(
     tag = "type",
     rename_all = "snake_case",
@@ -135,6 +140,17 @@ pub enum TargetPick {
     LowestHpAlly,
     /// A knocked-out ally (for revival).
     KnockedOutAlly,
+    /// A standing ally (never the user) with this display name: a Lich
+    /// devouring its Zombie, never its other servants.
+    AllyNamed {
+        /// Fluent message id of the name (e.g. `monster-zombie`).
+        name: String,
+    },
+    /// A knocked-out ally with this display name.
+    KnockedOutAllyNamed {
+        /// Fluent message id of the name.
+        name: String,
+    },
 }
 
 /// What an engine-controlled combatant will do when its gauge fills.
@@ -280,15 +296,15 @@ impl Battle {
             if self.check_usable(actor, &def).is_err() {
                 continue;
             }
-            let candidates = self.candidates(actor, rule.target, &def);
+            let candidates = self.candidates(actor, &rule.target, &def);
             if def.target.needs_target() && candidates.is_empty() {
                 continue;
             }
 
             if rule.when == Condition::Always {
-                always.push((rule.weight, kind, rule.target, def));
+                always.push((rule.weight, kind, rule.target.clone(), def));
             } else {
-                let target = self.pick(actor, rule.target, &def);
+                let target = self.pick(actor, &rule.target, &def);
                 return (kind, target);
             }
         }
@@ -298,7 +314,7 @@ impl Battle {
             let mut roll = self.rng.below(total);
             for (weight, kind, pick, def) in always {
                 if roll < u64::from(weight) {
-                    let target = self.pick(actor, pick, &def);
+                    let target = self.pick(actor, &pick, &def);
                     return (kind, target);
                 }
                 roll -= u64::from(weight);
@@ -307,7 +323,7 @@ impl Battle {
 
         let attack = self.combatants[usize::from(actor.0)].attack.clone();
         let def = self.actions[&attack].clone();
-        let target = self.pick(actor, TargetPick::RandomOpponent, &def);
+        let target = self.pick(actor, &TargetPick::RandomOpponent, &def);
         (CommandKind::Attack, target)
     }
 
@@ -327,6 +343,7 @@ impl Battle {
                 .any(|c| c.hp_percent() < u16::from(percent)),
             Condition::AllyKnockedOut => allies().any(Combatant::is_knocked_out),
             Condition::OpponentHasStatus { status } => opponents().any(|c| c.has_status(status)),
+            Condition::UserLacksStatus { status } => !me.has_status(status),
         }
     }
 
@@ -334,7 +351,7 @@ impl Battle {
     fn candidates(
         &self,
         actor: CombatantId,
-        pick: TargetPick,
+        pick: &TargetPick,
         def: &ActionDef,
     ) -> Vec<CombatantId> {
         let mut eligible: Vec<&Combatant> = self
@@ -344,7 +361,10 @@ impl Battle {
             .collect();
         match pick {
             TargetPick::User => eligible.retain(|c| c.id == actor),
-            TargetPick::OpponentWithStatus { status } => eligible.retain(|c| c.has_status(status)),
+            TargetPick::OpponentWithStatus { status } => eligible.retain(|c| c.has_status(*status)),
+            TargetPick::AllyNamed { name } | TargetPick::KnockedOutAllyNamed { name } => {
+                eligible.retain(|c| c.id != actor && &c.name == name);
+            }
             TargetPick::LowestHpOpponent | TargetPick::LowestHpAlly => {
                 eligible.sort_by_key(|c| (c.hp_percent(), c.id));
             }
@@ -356,7 +376,7 @@ impl Battle {
     fn pick(
         &mut self,
         actor: CombatantId,
-        pick: TargetPick,
+        pick: &TargetPick,
         def: &ActionDef,
     ) -> Option<CombatantId> {
         if !def.target.needs_target() {

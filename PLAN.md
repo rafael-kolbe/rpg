@@ -72,7 +72,7 @@ validade: não é Tradeable e não pode ser usado no Modo História.
 | | MVP (single-player) | Depois (web, multiplayer) |
 | --- | --- | --- |
 | Batalha | ATB completo, 3 heróis contra até 4 inimigos | Cada jogador controla 1+ heróis da mesma party |
-| Conteúdo | 4 classes, ~11 inimigos, 2 chefes (ver Campanha do MVP) | Mais classes, áreas, equipamentos |
+| Conteúdo | 4 classes, ~11 inimigos, 2 chefes (ver Campanha: capítulo 1) | Mais classes, áreas, equipamentos |
 | Progressão | XP e nível, conta e save no servidor | Guerreiros recrutados, trocas entre jogadores |
 | Mundo | Mapa-múndi com trilhas, cidades e calabouços clicáveis | Lobby e salas de party |
 
@@ -497,7 +497,7 @@ Chefes trocam de tabela por fase de HP (ex.: abaixo de 50% vira mais agressivo).
 ## 4. Conteúdo e progressão
 
 O MVP tem quatro classes com papéis claros e três regiões do mapa (ver
-Campanha do MVP). Todo o conteúdo vive em arquivos de dados (`content/`), não no
+Campanha: capítulo 1). Todo o conteúdo vive em arquivos de dados (`content/`), não no
 código da engine.
 
 ### Heróis e Guerreiros recrutados
@@ -556,115 +556,104 @@ O Clérigo não entra cedo na campanha: com o HP baixo do início, a cura dele
 cada um com uma fraqueza elemental e uma regra de IA marcante, mais 1 chefe com 2
 fases.
 
-### Campanha do MVP
+### Campanha: capítulo 1
 
-> **História do piloto, descartada.** A história abaixo serviu para testar o
-> jogo e **não é canon**. A história verdadeira, a linha do tempo e as fichas
-> de personagens e regiões estão em `STORY.md`. Esta seção continua valendo
-> para a **estrutura** (regiões em linha, instâncias, nodes, chefes, party de
-> até 3) até a nova história substituí-la.
-
-Nomes provisórios (revisar depois). O herói principal só quer ser **o herói
-mais forte do mundo**; a Guilda de Aventureiros, com seus ranks, é a escada
-concreta desse sonho.
+A história, a linha do tempo, as fichas e o enredo cena a cena estão em
+`STORY.md`; aqui fica só a **estrutura** e as **regras de jogo**.
 
 **Mundo:** três regiões em linha, de sul a norte.
 
 | Região | Instâncias | Inimigos |
 | --- | --- | --- |
-| **Vilarejo de Brookhollow** (início) | Arredores: campos, fazenda, beira do rio | Lobo, Javali, Vespa Gigante (veneno) — tutorial 1v1 |
-| **Floresta de Thornwood**, densa, com a Estrada do Rei no centro | A estrada; o **acampamento goblin** fica num desvio, bloqueado até a heroína entrar na party | Goblin, Goblin Arqueiro, Goblin Xamã (fogo), Serpente Venenosa; chefe **Grukk, o Hobgoblin** |
-| **Cidade de Valcrest**, capital do reino de Aldmere | Mapa da cidade (loja, templo, Guilda, posto da guarda) e as **Catacumbas de Valcrest**, calabouço de 3 níveis (cada nível é uma instância) | Um elenco próprio por nível (abaixo); chefe de 2 fases no nível 3: **o Guardião dos Ossos** |
+| **Brookhollow** (início) | O vilarejo: casa de Tauryen, praça, trigais, moinho, cemitério da colina | Nenhum: a primeira luta é na floresta |
+| **Floresta de Burrowood** | A estrada (mais segura), a toca escondida, a nascente e o **acampamento goblin** (abre quando Lyra entra) | Goblin, Goblin Arqueiro, Goblin Xamã (níveis 2–5), Lobo da Floresta, Saqueador; chefe **Hobgoblin** (nível 10, com 2 goblins) |
+| **Valcrest** (cidade de fronteira) | A cidade (Guilda, quadro de missões, Arsenal, Boticário, Mercado, Pousada, Templo; lojas de Magias e Técnicas, Taverna e Castelo fechados por ora) e o **Esgoto de Valcrest**, 2 instâncias subterrâneas | Nível 1 (Bronze, 6–9): ratos, gosma, barata; nível 2 (Prata iniciante, 14–18): rato mutante, sanguessuga, rastejador; chefe **Lich Ferido** (nível 56, atributos −80%, 1600/8000 HP), com um Zumbi |
 
-**Catacumbas, inimigos por nível** (cada nível apresenta ameaças novas):
+As **Catacumbas** (sob o castelo; Platina a Diamante) aparecem só como "???"
+no salão do esgoto; a instância vem depois.
 
-| Nível | Inimigos | O que ensina |
+**Heróis e convidados:**
+
+| Quem | Classe | Na party |
 | --- | --- | --- |
-| 1 | Rato Gigante, Morcego da Cripta (rápido, esquivo), Esqueleto (fraco a fogo) | Grupos maiores, prioridade de alvo |
-| 2 | Carniçal (veneno), Aranha da Cripta (Lentidão), Esqueleto Arqueiro | Status: Antídoto e Haste valem ouro |
-| 3 | Fogo-fátuo (magia de fogo, fraco a gelo), Espectro (Silêncio, resiste a físico), Cavaleiro Esqueleto (tanque) | Misturar físico e magia |
+| **Tauryen** | Guerreiro | Desde o início, nível 1 |
+| **Lyra** | Arqueira | De Burrowood (entra no nível 3) até o relatório em Valcrest; volta no esgoto |
+| **Cabo Merrick** | Guarda (Cover) | Convidado no esgoto, nível 20 |
+| **Tobin** | Soldado | Convidado no esgoto, nível 10 |
 
-**Heróis:**
-
-| Herói | Classe | Entra na party |
-| --- | --- | --- |
-| **Taren**, de Brookhollow | Guerreiro | Desde o início (sozinho até a floresta) |
-| **Lyra**, batedora da Guarda de Valcrest | Arqueiro | Encontrada perdida em Thornwood |
-| **Corin**, acólito do Templo de Valcrest (nome provisório) | Clérigo | Libertado de uma cela no nível 2 das Catacumbas |
-
-**Roteiro:**
-
-1. Taren deixa Brookhollow rumo a Valcrest para se registrar na Guilda
-   (tutorial nos arredores, 1v1).
-2. Na Estrada do Rei, encontra Lyra: ela foi mandada investigar os goblins da
-   floresta e se perdeu. Os dois seguem juntos.
-3. Invadem o acampamento goblin e derrotam Grukk.
-4. Em Valcrest, entregam a missão ao **Sargento Bram Holt**, da guarda. Ele
-   nota que os goblins tinham armas boas demais para goblins: alguém os
-   estava armando.
-5. A pista leva às Catacumbas, embaixo da cidade, onde alguém reanima os
-   mortos e negocia com os goblins.
-6. No nível 2, a história passa obrigatoriamente pela cela do Clérigo; ele é
-   libertado e entra na party antes do nível 3.
-7. No nível 3, o Guardião dos Ossos (o capanga). Quem está por trás fica para
-   o próximo arco (a definir).
-
-**Regras do arco (implementação)** — valores iniciais, calibrados jogando e no
+**Regras do capítulo (implementação)** — valores iniciais, calibrados no
 simulador:
 
 - **Mundo em dados:** `content/world/` descreve regiões, instâncias, nodes,
-  trilhas, encontros, heróis, monstros, diálogos e lojas; nada de história no
-  código. A cidade e cada nível das Catacumbas são instâncias como as outras
-  (a cidade, sem encontros).
-- **Nodes:** caminho, saída (leva a um node de outra instância), batalha fixa
-  (uma vez), chefe, baú (uma vez), NPC (diálogo), loja, templo. Um node pode
-  disparar um evento ao chegar (diálogo da história). Trilhas e nodes podem
-  exigir ou proibir **flags** da história (ex.: o desvio do acampamento só
-  abre com Lyra na party).
-- **Encontros ao andar:** cada trilha tem chance de 0–100% e uma tabela de
-  grupos de monstros com peso; 5% dos encontros são emboscada inimiga. Em
-  batalhas fixas o jogador pode escolher **Emboscada** (efeito em 20%).
-- **Diálogos:** falas com o nome e o avatar de quem fala, escolhas opcionais
-  e efeitos no fim (flag, herói entra na party, itens, dinheiro, batalha).
-- **Experiência:** só heróis em pé ao fim da batalha ganham; os nocauteados
-  voltam com 1 HP. XP para o próximo nível = `20 × nível²`. Atributos, HP e
-  MP crescem num ritmo fixo por classe; técnicas e magias chegam por nível
-  (tabela da classe). HP e MP **continuam entre batalhas**.
-- **Dinheiro:** **Coroas**. Monstros dão coroas, XP e às vezes itens.
-- **Equipamento:** arma e armadura por herói, compradas na loja e trocadas no
-  menu da party (acessório fica para depois).
-- **Templo:** cura a party de graça e vira o ponto de retorno. **Derrota:**
-  volta ao último Templo com a party curada, sem perder nada (a penalidade
-  continua em aberto).
+  trilhas, monstros, heróis, diálogos, lojas e missões; nada de história no
+  código.
+- **Nodes:** caminho, saída, batalha fixa (uma vez), chefe, baú (uma vez), NPC,
+  loja, templo, **pousada** (cura pagando), **quadro de missões** e **lugar
+  fechado** (uma porta trancada, uma loja que ainda não abre; o nome pode ser
+  "???"). Um node pode disparar uma cena ao chegar. Trilhas e nodes podem
+  exigir ou proibir **flags** da história.
+- **Encontros ao andar:** cada trilha tem chance de 0–100% e uma lista de
+  monstros com peso. Cada encontro tem **de 1 a 3 inimigos**, sorteados; com
+  uma party maior que 3, o limite acompanha (party de 4: de 1 a 4). 5% dos
+  encontros são emboscada inimiga; em batalhas fixas o jogador pode tentar
+  **Emboscada** (efeito em 20%).
+- **Party:** até **4** heróis. A história pode pôr e tirar heróis; quem sai
+  guarda nível e equipamento para quando voltar. **Convidados** agem pela
+  própria IA (o jogador só comanda os fixos) e não ganham experiência.
+- **Diálogos e efeitos da história:** flag, herói entra ou sai, itens,
+  dinheiro, cura, rank da Guilda, missão, objetivo de campanha na tela,
+  viagem (corte para outro lugar), cena na fila (toca depois de uma batalha),
+  auto save e batalha (de chefe ou não).
+- **Missões:** "mate N monstros destes tipos". O quadro da Guilda só oferece
+  missões do **rank do jogador ou abaixo**; a história também pode dar uma
+  missão. O contador pode disparar uma cena no meio do caminho; ao completar,
+  paga em Kalds. Na tela: o **objetivo de campanha** no topo e as missões
+  abaixo, com o progresso.
+- **Ranks da Guilda:** Bronze (níveis 1–15), Prata (16–30), Ouro (31–45),
+  Platina (46–60), Diamante (61–80), Oricalco (81–99), Draconita (100+). Valem
+  para aventureiros, missões, monstros e áreas. Humanos vão até o nível 99;
+  criaturas, até o 130.
+- **Experiência:** só heróis em pé (e não convidados) ganham; os nocauteados
+  voltam com 1 HP. XP para o próximo nível = **`12 × nível³`** (íngreme: o
+  começo é rápido, o resto pede os lugares difíceis do mundo). HP e MP
+  **continuam entre batalhas**.
+- **Moeda:** **Kald** (plural Kalds), a mesma em todos os reinos; número na
+  HUD.
+- **Equipamento:** arma e armadura por herói (acessório fica para depois).
+- **Derrota:**
+  - **Campaign:** tela de **Game Over** e volta ao último **auto save** (o
+    que veio depois se perde; a sorte dos encontros segue, sem repetir a
+    mesma emboscada).
+  - **Multiplayer:** a party ressuscita no último Templo onde salvou
+    (penalidade a decidir).
+- **Auto save (só Campaign):** ao mudar de instância, em momentos da história
+  (efeito da cena), ao descansar (templo, pousada, nascente, salas de
+  manutenção) e **antes de todo chefe**: antes de um chefe num node, o
+  jogador volta ao mapa livre para se preparar; antes de uma emboscada ao
+  chegar num lugar, volta ao node anterior.
 - **Save:** cada passo no mapa, fim de batalha, compra e diálogo concluído
-  grava no servidor. **Progresso compartilhado da conta:** flags da história e
-  nodes explorados (só a Campaign libera; o Multiplayer vê o que não foi
-  liberado como barreira intransponível). **Save por modo:** posição, party,
-  inventário, coroas e Templo.
-- **Batalha interrompida:** a batalha também fica no save, com o registro do
-  que aconteceu (cada comando aceito e o tick em que veio, e até que tick o
-  tempo correu). Se a página fechar ou a conexão cair, ao voltar a batalha
-  **continua exatamente de onde parou**: o motor é determinístico e refaz o
-  registro. Recarregar não foge de encontro, não pula chefe e não desfaz uma
-  luta ruim. O registro grava a cada comando, a cada 1 s enquanto o tempo
-  corre e ao fechar a conexão. Vale também para a fase seguinte de um chefe
-  que ficou esperando atrás da tela de recompensas.
-- **Tempo de batalha na Campaign:** Active, Wait ou Turn, escolhido nas
-  opções (preferência do navegador).
-- **Multiplayer:** aparece bloqueado na escolha de modo até a história
-  liberar (fora deste arco).
+  grava no servidor (o auto save é outra coisa: o ponto de volta do Game
+  Over). **Progresso compartilhado da conta:** flags e nodes explorados (só a
+  Campaign libera; o Multiplayer vê o resto como barreira). **Save por modo:**
+  posição, party, inventário, Kalds, rank, missões e Templo. Um save de outra
+  **versão do conteúdo** (`epoch` em `start.json`) recomeça do zero.
+- **Batalha interrompida:** a batalha fica no save com o registro do que
+  aconteceu; ao voltar ela **continua exatamente de onde parou** (o motor é
+  determinístico e refaz o registro). Recarregar não foge, não pula chefe e
+  não desfaz uma luta ruim.
+- **Tempo de batalha na Campaign:** Active, Wait ou Turn (preferência do
+  navegador).
+- **Multiplayer:** bloqueado na escolha de modo até a história liberar.
 
-**Calibragem do arco** (`make sim-campaign`, com a IA jogando pela party):
-chega em Thornwood no nível 2, em Valcrest no 6, nas Catacumbas 3 no 8–9 e
-termina no 11; 2 a 6 derrotas no arco (quase todas em Grukk e no Guardião),
-26 a 40 minutos só de batalha. Um jogador de verdade, que escolhe alvos e usa
-poções melhor que a IA, deve perder menos.
+**Calibragem** (`make sim-campaign RUNS=8`, a IA jogando pela party e
+treinando antes dos chefes como um jogador faria): chega a Valcrest no nível
+5, desce ao nível 2 do esgoto no 8, enfrenta o Lich no 10 e termina o
+capítulo no **12–13**; 1 a 22 derrotas (a maioria no Lich e no Hobgoblin),
+26 a 75 minutos de batalha.
 
 **Como a tela funciona:** depois do login, `/play` mostra a escolha de modo.
 No mapa, as setas andam até o vizinho naquela direção (ou clique no node),
-Enter/Z usa o node (falar, abrir, lutar, comprar, descansar, sair), Esc abre a
-party (status, equipamento, poções) e M o mapa-múndi. A cidade é uma instância
-como as outras, com prédios como nodes (`Mapa da cidade` da §2).
+Enter/Z usa o node, Esc abre a party e M o mapa-múndi.
 
 ### Loop do jogo
 
@@ -1289,7 +1278,7 @@ serviço gerenciado.
 | 0. Esqueleto e padrões ✅ | Git local, workspace Rust, `web/`, Dockerfile, compose (app + db), Makefile, `make check` completo, `make docs`, `CLAUDE.md`, hook, backup do banco | `/api/health` respondendo em `localhost:8083`; `make check` verde |
 | 1. Engine headless ✅ | ATB, fila, comandos, fórmulas, status (incl. Distracted), emboscadas, IA por regras, PRNG com seed, conteúdo provisório em `content/`, primeiro cenário `sandbox/battle-basic.json` | Testes de replay passando; `make sim` roda uma batalha 3×3 até o fim e dá o mesmo resultado sempre |
 | 2. Cliente + servidor ✅ | Sala de um jogador, tela de batalha, barras, menus, alvos, efeitos básicos, modos Active/Wait, i18n `en-US`/`pt-BR`, sandbox com `battle-basic` e ferramentas de debug, primeiro teste e2e | `localhost:8083/sandbox/battle-basic` jogável do início ao fim, nos dois idiomas; e2e verde |
-| 3. Conteúdo e progressão ✅ | Contas, save, XP/nível, mapa-múndi com 3 regiões (Campanha do MVP), cidade, Catacumbas de 3 níveis com chefe, diálogos, fog of war, 16 inimigos e 2 chefes, loja e equipamento (arte provisória em SVG) | Região jogável do início ao chefe; save sobrevive a recarregar a página |
+| 3. Conteúdo e progressão ✅ | Contas, save, XP/nível, mapa-múndi com 3 regiões (capítulo 1 de `STORY.md`), cidade, esgoto de 2 níveis com chefe, diálogos, fog of war, missões e quadro, ranks, Game Over e auto save, 14 inimigos e 2 chefes, lojas e equipamento (arte provisória em SVG) | Região jogável do início ao chefe; save sobrevive a recarregar a página |
 | 4. Multiplayer | Guilda e Guerreiros recrutados, party, controle por jogador, validação, snapshots, reconexão | 3 navegadores em redes diferentes vencem uma batalha juntos via subdomínio; derrubar o Wi-Fi de um por 30 s e ele volta aos mesmos Guerreiros |
 | 5. Polimento | Chat e moderação, trocas, balanceamento, sons, mais conteúdo | A definir ao fim da fase 4 |
 
@@ -1329,7 +1318,8 @@ entram quando o jogo sair do sandbox para o Modo História.
 - [ ] Nomes em inglês de classes, status, comandos e itens — definir junto com o conteúdo.
 - [ ] Golpe especial próprio no lugar do Limit (que foi removido): desenhar uma mecânica nossa.
 - [ ] Nome do jogo.
-- [ ] Nomes da Campanha do MVP (heróis, lugares, chefes) — provisórios, revisar.
-- [ ] O arco da história depois do Guardião dos Ossos (quem usa a coroa de espinhos?).
+- [ ] O resto do capítulo 1 depois do esgoto (`STORY.md`, enredo).
+- [ ] Mastery tree, e as lojas de Magias e de Técnicas que dependem dela (hoje fechadas); runas.
+- [ ] Penalidade da ressurreição no Templo, no Multiplayer.
 - [ ] Arte de verdade para mapas, nodes, avatares e cenas (hoje: formas SVG provisórias).
 - [x] Contas: username e senha próprios, recovery key no cadastro (ver Contas, §5). E-mail e login social ficam para depois.

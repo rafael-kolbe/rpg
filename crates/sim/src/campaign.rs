@@ -4,9 +4,9 @@
 //! is the balancing tool for the arc.
 //!
 //! The bot follows a fixed route of objectives (`ROUTE`). It walks with
-//! the world's own trails, rests at temples before bosses, buys potions and
-//! better gear, and after a defeat grinds a few battles near the temple
-//! before trying again.
+//! the world's own trails, buys potions and better gear, and after a Game
+//! Over (back at the last auto save) grinds a few battles nearby before
+//! trying again.
 
 use std::collections::{BTreeMap, VecDeque};
 use std::fmt::Write as _;
@@ -37,55 +37,46 @@ enum Goal {
     Use,
     /// Walk there and shop.
     Shop,
+    /// Walk back and forth from there, fighting, until the story sets the
+    /// flag (a mission's scene on the way).
+    HuntUntil(&'static str),
+    /// Walk back and forth from there, fighting, until every hero who takes
+    /// orders reaches the level: a player training before a boss.
+    TrainTo(u8),
 }
 
-/// The first arc, in order: instance, node, goal.
+/// Chapter 1 (`STORY.md`), in order: instance, node, goal.
 const ROUTE: &[(&str, &str, Goal)] = &[
-    ("brookhollow", "elder", Goal::Use),
-    ("brookhollow", "store", Goal::Shop),
-    ("brookhollow", "riverbank", Goal::Use),
-    ("brookhollow", "old-mill", Goal::Use),
-    ("brookhollow", "chapel", Goal::Use),
-    ("brookhollow", "farm", Goal::Use),
-    ("brookhollow", "chapel", Goal::Use),
     ("brookhollow", "north-road", Goal::Use),
-    ("thornwood", "clearing", Goal::Visit),
-    ("thornwood", "glade", Goal::Use),
-    ("thornwood", "wayshrine", Goal::Use),
-    ("thornwood", "trader", Goal::Shop),
-    ("thornwood", "camp-gate", Goal::Use),
-    ("thornwood", "camp-yard", Goal::Use),
-    ("thornwood", "wayshrine", Goal::Use),
-    ("thornwood", "trader", Goal::Shop),
-    ("thornwood", "grukk-tent", Goal::Use),
-    ("thornwood", "north-gate", Goal::Use),
-    ("valcrest", "guild", Goal::Use),
-    ("valcrest", "guard-post", Goal::Use),
+    ("burrowood", "hollow", Goal::Use),
+    ("burrowood", "clearing", Goal::Visit),
+    ("burrowood", "fork", Goal::TrainTo(5)),
+    ("burrowood", "spring", Goal::Use),
+    ("burrowood", "camp", Goal::Use),
+    ("burrowood", "north-edge", Goal::Use),
+    ("valcrest", "army-post", Goal::Visit),
     ("valcrest", "apothecary", Goal::Shop),
-    ("valcrest", "armory", Goal::Shop),
-    ("valcrest", "temple", Goal::Use),
-    ("valcrest", "catacomb-gate", Goal::Use),
-    ("catacombs-1", "side-crypt", Goal::Use),
-    ("catacombs-1", "ossuary", Goal::Use),
-    ("catacombs-1", "tomb-row", Goal::Use),
-    ("catacombs-1", "stairs-down", Goal::Use),
-    ("catacombs-2", "flooded-hall", Goal::Use),
-    ("catacombs-2", "guard-room", Goal::Use),
-    ("catacombs-2", "cells", Goal::Visit),
-    ("catacombs-2", "stairs-down", Goal::Use),
-    ("catacombs-3", "altar", Goal::Use),
-    ("catacombs-3", "crypt-east", Goal::Use),
-    ("catacombs-3", "crypt-west", Goal::Use),
-    ("catacombs-3", "altar", Goal::Use),
-    ("catacombs-3", "knight-hall", Goal::Use),
-    ("catacombs-3", "altar", Goal::Use),
-    ("catacombs-3", "boss-chamber", Goal::Use),
-    ("catacombs-3", "hidden-stair", Goal::Use),
-    ("valcrest", "guard-post", Goal::Use),
+    ("valcrest", "arsenal", Goal::Shop),
+    ("valcrest", "inn", Goal::Use),
+    ("valcrest", "guild", Goal::Visit),
+    (
+        "valcrest-sewer-1",
+        "landing",
+        Goal::HuntUntil("squad-formed"),
+    ),
+    ("valcrest-sewer-1", "junction", Goal::TrainTo(8)),
+    ("valcrest-sewer-1", "maintenance", Goal::Use),
+    ("valcrest-sewer-1", "slime-trail", Goal::Visit),
+    ("valcrest-sewer-1", "torn-grate", Goal::Visit),
+    ("valcrest-sewer-1", "stairs-down", Goal::Use),
+    ("valcrest-sewer-2", "maintenance", Goal::Use),
+    ("valcrest-sewer-2", "deep-3", Goal::TrainTo(10)),
+    ("valcrest-sewer-2", "maintenance", Goal::Use),
+    ("valcrest-sewer-2", "hall", Goal::Visit),
 ];
 
-/// The flag the arc's last scene sets.
-const ARC_COMPLETE: &str = "arc-complete";
+/// The flag the chapter's last scene sets.
+const ARC_COMPLETE: &str = "sewer-closed";
 
 /// How a run went.
 #[derive(Debug, Clone, Default)]
@@ -133,7 +124,7 @@ enum Step {
 
 /// Why walking stopped early.
 enum Stop {
-    /// The party lost a battle and is back at the temple.
+    /// The party lost a battle and is back at the last auto save.
     Defeated,
 }
 
@@ -150,7 +141,7 @@ pub(crate) fn play(world: Arc<World>, seed: u64, log: bool) -> anyhow::Result<Re
     let game = Game::new(
         Arc::clone(&world),
         GameMode::Campaign,
-        Progress::default(),
+        Progress::new(&world),
         save,
     );
     let mut bot = Bot {
@@ -173,6 +164,8 @@ pub(crate) fn play(world: Arc<World>, seed: u64, log: bool) -> anyhow::Result<Re
     if !bot.game.progress().has(&Flag::new(ARC_COMPLETE)) {
         bail!("the route ended without `{ARC_COMPLETE}`");
     }
+    let levels = bot.game.save().party.iter().map(|h| h.level).collect();
+    bot.report.levels.push(("(end)".to_owned(), levels));
     Ok(bot.report)
 }
 
@@ -201,8 +194,8 @@ impl Bot {
                 })
                 .collect();
             println!(
-                "{instance}/{node}: {party:?}, {} crowns, {:?}",
-                view.crowns, view.inventory
+                "{instance}/{node}: {party:?}, {} kalds, {:?}",
+                view.kalds, view.inventory
             );
         }
         let target = Position {
@@ -229,11 +222,13 @@ impl Bot {
     }
 
     fn attempt(&mut self, target: &Position, goal: Goal) -> anyhow::Result<Result<(), Stop>> {
+        self.rest_when_hurt()?;
         if let Err(stop) = self.walk_to(target)? {
             return Ok(Err(stop));
         }
         match goal {
-            Goal::Visit => Ok(Ok(())),
+            // Its scenes may start a fight (a boss ambush).
+            Goal::Visit => self.settle_until_map(),
             Goal::Use => self.command(GameCommand::Interact { ambush: false }),
             Goal::Shop => {
                 self.game.act(GameCommand::Interact { ambush: false })?;
@@ -241,7 +236,93 @@ impl Bot {
                 self.game.act(GameCommand::Next)?;
                 Ok(Ok(()))
             }
+            Goal::HuntUntil(flag) => self.hunt_until(&Flag::new(flag)),
+            Goal::TrainTo(level) => self.train_to(level),
         }
+    }
+
+    /// Rests at the nearest temple of this instance when the party is below
+    /// half of its HP, like a player keeping its training safe.
+    fn rest_when_hurt(&mut self) -> anyhow::Result<()> {
+        let view = self.game.view();
+        let (hp, max): (u32, u32) = view.party.iter().fold((0, 0), |(hp, max), hero| {
+            (hp + u32::from(hero.hp), max + u32::from(hero.max_hp))
+        });
+        if hp * 2 >= max {
+            return Ok(());
+        }
+        let here = self.here();
+        let routes = self.routes();
+        let Some(instance) = self.world.map.instances.get(&here.instance) else {
+            return Ok(());
+        };
+        let temple = instance
+            .nodes
+            .iter()
+            .filter(|(_, node)| node.kind == NodeKind::Temple)
+            .map(|(id, _)| Position {
+                instance: here.instance.clone(),
+                node: id.clone(),
+            })
+            .filter_map(|position| routes.get(&position).map(|(d, _)| (*d, position)))
+            .min_by_key(|(distance, _)| *distance);
+        if let Some((_, temple)) = temple
+            && self.walk_to(&temple)?.is_ok()
+        {
+            self.command(GameCommand::Interact { ambush: false })?.ok();
+        }
+        Ok(())
+    }
+
+    /// Fights on the trails next to here until the heroes reach `level`.
+    fn train_to(&mut self, level: u8) -> anyhow::Result<Result<(), Stop>> {
+        let trained = |bot: &Self| {
+            bot.game
+                .save()
+                .party
+                .iter()
+                .filter(|hero| !hero.guest)
+                .all(|hero| hero.level >= level)
+        };
+        let home = self.here();
+        let next = self
+            .neighbors(&home)
+            .into_iter()
+            .find_map(|(position, step)| matches!(step, Step::Move(_)).then_some(position))
+            .context("nowhere to train")?;
+        for _ in 0..500 {
+            self.rest_when_hurt()?;
+            if trained(self) {
+                return Ok(Ok(()));
+            }
+            for end in [&next, &home] {
+                if let Err(stop) = self.walk_to(end)? {
+                    return Ok(Err(stop));
+                }
+            }
+        }
+        bail!("level {level} never came")
+    }
+
+    /// Fights on the trails next to here until the story sets `flag`.
+    fn hunt_until(&mut self, flag: &Flag) -> anyhow::Result<Result<(), Stop>> {
+        let home = self.here();
+        let next = self
+            .neighbors(&home)
+            .into_iter()
+            .find_map(|(position, step)| matches!(step, Step::Move(_)).then_some(position))
+            .context("nowhere to hunt")?;
+        for _ in 0..200 {
+            if self.game.progress().has(flag) {
+                return Ok(Ok(()));
+            }
+            for end in [&next, &home] {
+                if let Err(stop) = self.walk_to(end)? {
+                    return Ok(Err(stop));
+                }
+            }
+        }
+        bail!("`{flag}` never came")
     }
 
     /// Sends a command, fights what it starts, and clears the scenes after.
@@ -268,15 +349,21 @@ impl Bot {
                 SceneView::Dialogue { choices, .. } if choices > 0 => {
                     self.game.act(GameCommand::Choose { index: 0 })
                 }
-                SceneView::Defeat => {
-                    self.game.act(GameCommand::Next)?;
+                SceneView::Defeat | SceneView::GameOver => {
+                    if let Some(order) = self.game.act(GameCommand::Next)? {
+                        // A follow-up boss saved with its battle: fight again.
+                        let _retry: Result<(), Stop> = self.fight(order)?;
+                    }
+                    // A scene the auto save replays (a boss ambush) waits for
+                    // the next try.
                     return Ok(Err(Stop::Defeated));
                 }
                 SceneView::Shop { .. } | SceneView::Battle => bail!("unexpected scene"),
                 SceneView::Dialogue { .. }
                 | SceneView::Victory { .. }
                 | SceneView::Rested
-                | SceneView::Found { .. } => self.game.act(GameCommand::Next),
+                | SceneView::Found { .. }
+                | SceneView::Board { .. } => self.game.act(GameCommand::Next),
             }
             .map_err(|error| anyhow::anyhow!("scene refused: {error}"))?;
             if let Some(order) = order
@@ -392,6 +479,8 @@ impl Bot {
         routes
     }
 
+    /// Walks to `target`. Arriving where a scene moves the party elsewhere
+    /// (a cut to the next place of the story) counts as arriving.
     fn walk_to(&mut self, target: &Position) -> anyhow::Result<Result<(), Stop>> {
         while &self.here() != target {
             let step = self
@@ -399,6 +488,10 @@ impl Bot {
                 .remove(target)
                 .and_then(|(_, step)| step)
                 .with_context(|| format!("no open path from {:?} to {target:?}", self.here()))?;
+            let expected = self
+                .neighbors(&self.here())
+                .into_iter()
+                .find_map(|(position, s)| (s == step).then_some(position));
             self.patch_up()?;
             let command = match step {
                 Step::Move(node) => GameCommand::Move { node },
@@ -406,6 +499,13 @@ impl Bot {
             };
             if let Err(stop) = self.command(command)? {
                 return Ok(Err(stop));
+            }
+            let here = self.here();
+            if expected.as_ref().is_some_and(|expected| expected == target)
+                && &here != target
+                && here.instance != target.instance
+            {
+                return Ok(Ok(()));
             }
         }
         Ok(Ok(()))
@@ -431,9 +531,14 @@ impl Bot {
         Ok(())
     }
 
-    /// After a defeat (at the temple): wins a few battles on the nearest
-    /// trail with monsters, then rests at the temple again.
+    /// After a defeat: wins a few battles on the nearest trail with
+    /// monsters, then goes back to where it was (resting there when it is a
+    /// temple).
     fn grind(&mut self) -> anyhow::Result<()> {
+        if let Err(Stop::Defeated) = self.settle_until_map()? {
+            // The replayed scene was a boss ambush, lost again.
+            return Ok(());
+        }
         let home = self.here();
         let routes = self.routes();
         let world = Arc::clone(&self.world);
@@ -512,7 +617,7 @@ impl Bot {
                     .filter(|(id, _)| score(id) > current)
                     .max_by_key(|(id, _)| score(id));
                 if let Some((id, price)) = best
-                    && price <= self.game.save().crowns
+                    && price <= self.game.save().kalds
                 {
                     self.game.act(GameCommand::Buy {
                         good: ShopGood::Equipment { id },
@@ -542,7 +647,7 @@ impl Bot {
                 .get(&ItemId::new(item))
                 .copied()
                 .unwrap_or(0);
-            let affordable = self.game.save().crowns / entry.price.max(1);
+            let affordable = self.game.save().kalds / entry.price.max(1);
             let count = wanted.saturating_sub(owned).min(u16::try_from(affordable)?);
             if count > 0 {
                 self.game.act(GameCommand::Buy { good, count })?;

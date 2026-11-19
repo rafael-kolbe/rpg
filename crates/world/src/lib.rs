@@ -91,6 +91,8 @@ impl World {
             hp: Some(hero.hp.clamp(1, stats.max_hp)),
             mp: Some(hero.mp.min(stats.max_mp)),
             stats,
+            guest: hero.guest,
+            leader: false,
         })
     }
 
@@ -98,5 +100,26 @@ impl World {
     #[must_use]
     pub fn monster_setup(&self, monster: &MonsterId) -> Option<CombatantSetup> {
         Some(self.map.monsters.get(monster)?.battle.clone())
+    }
+
+    /// The creatures `enemies` can raise a fallen ally into
+    /// ([`engine::Effect::Reanimate`] names a monster id), and those the
+    /// raised ones can raise in turn.
+    #[must_use]
+    pub fn forms_for(&self, enemies: &[CombatantSetup]) -> BTreeMap<String, CombatantSetup> {
+        let mut forms = BTreeMap::new();
+        let mut pending: Vec<CombatantSetup> = enemies.to_vec();
+        while let Some(setup) = pending.pop() {
+            for action in setup.actions.iter().filter_map(|id| self.actions.get(id)) {
+                if let engine::Effect::Reanimate { into } = &action.effect
+                    && !forms.contains_key(into)
+                    && let Some(form) = self.monster_setup(&MonsterId::new(into))
+                {
+                    pending.push(form.clone());
+                    forms.insert(into.clone(), form);
+                }
+            }
+        }
+        forms
     }
 }

@@ -10,17 +10,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::World;
 use crate::def::Slot;
-use crate::def::{Condition, NodeDef, NodeKind, StoryEffect, TrailDef};
-use crate::ids::{DialogueId, EquipmentId, Flag, MonsterId, NodeId, Position, ShopId};
+use crate::def::{Condition, NodeDef, NodeKind, QuestGoal, StoryEffect, TrailDef, Weighted};
+use crate::ids::{DialogueId, EquipmentId, Flag, MonsterId, NodeId, Position, QuestId, ShopId};
 use crate::progression;
-use crate::save::{GameMode, HeroState, Progress, Save, SavedBattle};
+use crate::save::{Checkpoint, GameMode, HeroState, Progress, Save, SavedBattle};
 
 /// Chance that a random encounter is an enemy ambush, in percent.
 const ENEMY_AMBUSH_PERCENT: u8 = 5;
 /// Chance that the player's ambush on a fixed fight works, in percent.
 const PARTY_AMBUSH_PERCENT: u8 = 20;
 /// Most heroes in the party.
-pub const MAX_PARTY: usize = 3;
+pub const MAX_PARTY: usize = 4;
+/// Most enemies a trail throws at a party of up to this size.
+const BASE_ENEMIES: usize = 3;
 /// Most units of one item the bag holds.
 const MAX_STACK: u16 = 99;
 
@@ -82,6 +84,11 @@ pub enum GameCommand {
         /// Party index of the hero.
         hero: u8,
     },
+    /// Takes a mission from the board on screen.
+    AcceptQuest {
+        /// The mission.
+        quest: QuestId,
+    },
 }
 
 /// Something a shop trades.
@@ -136,8 +143,8 @@ pub enum GameError {
     #[error("not for sale")]
     NotForSale,
     /// Not enough money.
-    #[error("not enough crowns")]
-    NotEnoughCrowns,
+    #[error("not enough kalds")]
+    NotEnoughKalds,
     /// Not in the bag (or not enough of it).
     #[error("not owned")]
     NotOwned,
@@ -153,6 +160,18 @@ pub enum GameError {
     /// The bag holds at most 99 of an item.
     #[error("bag full")]
     BagFull,
+    /// The mission is not on this board.
+    #[error("not on the board")]
+    NotOnBoard,
+    /// The player's Guild rank is too low for it.
+    #[error("rank too low")]
+    RankTooLow,
+    /// Already under way or completed.
+    #[error("mission already taken")]
+    QuestTaken,
+    /// The place does not open yet.
+    #[error("closed")]
+    Sealed,
 }
 
 /// A battle the server must run, then report with [`Game::finish_battle`].
@@ -175,11 +194,13 @@ pub struct Rewards {
     /// Experience for each standing hero.
     pub xp: u32,
     /// Money.
-    pub crowns: u32,
+    pub kalds: u32,
     /// Dropped items.
     pub items: BTreeMap<ItemId, u16>,
     /// Heroes who reached a new level.
     pub level_ups: Vec<LevelUp>,
+    /// Missions this battle completed (their pay is in `kalds`).
+    pub quests_done: Vec<QuestId>,
 }
 
 /// A hero's new level after a battle.
@@ -205,7 +226,7 @@ pub struct Loot {
     /// Weapons and armor.
     pub equipment: Vec<EquipmentId>,
     /// Money.
-    pub crowns: u32,
+    pub kalds: u32,
 }
 
 /// What is on screen, and so which commands make sense.
@@ -225,12 +246,16 @@ pub(crate) enum Scene {
     /// plays the node's arrival scene, if due (after a random encounter on
     /// the way, or a boss's aftermath).
     Victory { rewards: Rewards },
-    /// Beaten: back at the Temple.
+    /// Beaten in the Multiplayer: back at the Temple.
     Defeat,
+    /// Beaten in the Campaign: back to the last auto save.
+    GameOver,
     /// Healed at a Temple.
     Rested,
     /// Opened a chest.
     Found(Loot),
+    /// A mission board.
+    Board { quests: Vec<QuestId> },
 }
 
 /// A player's game in one mode.
@@ -264,6 +289,9 @@ impl Game {
             game.scene = Scene::Battle;
         } else {
             game.arrive();
+        }
+        if game.save.checkpoint.is_none() {
+            game.autosave();
         }
         game
     }
@@ -307,13 +335,14 @@ impl Game {
             .iter()
             .filter_map(|hero| self.world.hero_setup(hero))
             .collect();
-        let enemies = battle
+        let enemies: Vec<_> = battle
             .monsters
             .iter()
             .filter_map(|monster| self.world.monster_setup(monster))
             .collect();
         let setup = BattleSetup {
             encounter: Encounter {
+                forms: self.world.forms_for(&enemies),
                 opening: battle.opening,
                 inventory: self.save.inventory.clone(),
                 party,
@@ -358,6 +387,7 @@ impl Game {
             GameCommand::Sell { good, count } => self.sell(&good, count).map(|()| None),
             GameCommand::Equip { hero, slot, id } => self.equip(hero, slot, id).map(|()| None),
             GameCommand::UseItem { item, hero } => self.use_item(&item, hero).map(|()| None),
+            GameCommand::AcceptQuest { quest } => self.accept_quest(&quest).map(|()| None),
         }
     }
 
@@ -441,9 +471,15 @@ impl Game {
         }
     }
 
-    /// Plays the current node's arrival scene, if its time has come.
+    /// Plays a scene waiting in line, or the current node's arrival scene
+    /// if its time has come.
     fn arrive(&mut self) {
         if self.mode != GameMode::Campaign {
+            return;
+        }
+        if !self.save.queued.is_empty() {
+            let dialogue = self.save.queued.remove(0);
+            self.scene = Scene::Dialogue { dialogue, line: 0 };
             return;
         }
         let event = self
@@ -482,33 +518,49 @@ impl Game {
         if self.mode == GameMode::Multiplayer && !self.progress.explored.contains(&target) {
             return Err(GameError::Barrier);
         }
-        let (chance, groups) = (trail.chance, trail.encounters.clone());
+        let (chance, pool) = (trail.chance, trail.monsters.clone());
+        // Saved one step before a boss ambush: a Game Over leaves the player
+        // free to rest and train before walking in again.
+        if self.boss_ambush_at(&target) {
+            self.autosave();
+        }
         self.save.position = target;
         self.explore();
 
-        let total: u64 = groups.iter().map(|g| u64::from(g.weight)).sum();
-        if total > 0 && self.rng.chance_percent(chance) {
-            let mut roll = self.rng.below(total);
-            let group = groups.iter().find(|g| {
-                let weight = u64::from(g.weight);
+        if !pool.is_empty() && self.rng.chance_percent(chance) {
+            let most = BASE_ENEMIES.max(self.save.party.len());
+            let count = 1 + self.rng.below(u64::try_from(most).unwrap_or(3));
+            let monsters: Vec<MonsterId> = (0..count)
+                .filter_map(|_| self.draw(&pool).cloned())
+                .collect();
+            let opening = if self.rng.chance_percent(ENEMY_AMBUSH_PERCENT) {
+                Opening::EnemyAmbush
+            } else {
+                Opening::Normal
+            };
+            return Ok(self.start_battle(monsters, None, Vec::new(), opening));
+        }
+        self.arrive();
+        Ok(None)
+    }
+
+    /// One monster from a trail's pool, by weight.
+    fn draw<'a>(&mut self, pool: &'a [Weighted]) -> Option<&'a MonsterId> {
+        let total: u64 = pool.iter().map(|w| u64::from(w.weight)).sum();
+        if total == 0 {
+            return None;
+        }
+        let mut roll = self.rng.below(total);
+        pool.iter()
+            .find(|w| {
+                let weight = u64::from(w.weight);
                 if roll < weight {
                     return true;
                 }
                 roll -= weight;
                 false
-            });
-            if let Some(group) = group {
-                let opening = if self.rng.chance_percent(ENEMY_AMBUSH_PERCENT) {
-                    Opening::EnemyAmbush
-                } else {
-                    Opening::Normal
-                };
-                let monsters = group.monsters.clone();
-                return Ok(self.start_battle(monsters, None, Vec::new(), opening));
-            }
-        }
-        self.arrive();
-        Ok(None)
+            })
+            .map(|w| &w.monster)
     }
 
     fn interact(&mut self, ambush: bool) -> Result<Option<BattleOrder>, GameError> {
@@ -522,6 +574,7 @@ impl Game {
                 }
                 self.save.position = to;
                 self.explore();
+                self.autosave();
                 self.arrive();
                 Ok(None)
             }
@@ -539,13 +592,13 @@ impl Game {
                 } else {
                     Opening::Normal
                 };
-                Ok(self.start_battle(monsters, Some(flag), on_win, opening))
+                Ok(self.start_fight(monsters, Some(flag), on_win, opening, boss))
             }
             NodeKind::Chest {
                 flag,
                 items,
                 equipment,
-                crowns,
+                kalds,
             } => {
                 if self.mode != GameMode::Campaign || self.progress.has(&flag) {
                     return Err(GameError::NothingHere);
@@ -557,11 +610,11 @@ impl Game {
                 for piece in &equipment {
                     self.add_equipment(piece);
                 }
-                self.save.crowns = self.save.crowns.saturating_add(crowns);
+                self.save.kalds = self.save.kalds.saturating_add(kalds);
                 self.scene = Scene::Found(Loot {
                     items,
                     equipment,
-                    crowns,
+                    kalds,
                 });
                 Ok(None)
             }
@@ -585,8 +638,92 @@ impl Game {
                     hero.heal(&self.world);
                 }
                 self.save.temple = self.save.position.clone();
+                self.autosave();
                 self.scene = Scene::Rested;
                 Ok(None)
+            }
+            NodeKind::Inn { price } => {
+                if self.save.kalds < price {
+                    return Err(GameError::NotEnoughKalds);
+                }
+                self.save.kalds -= price;
+                for hero in &mut self.save.party {
+                    hero.heal(&self.world);
+                }
+                self.autosave();
+                self.scene = Scene::Rested;
+                Ok(None)
+            }
+            NodeKind::Board { quests } => {
+                self.scene = Scene::Board { quests };
+                Ok(None)
+            }
+            NodeKind::Sealed => Err(GameError::Sealed),
+        }
+    }
+
+    // --- missions ------------------------------------------------------------
+
+    fn accept_quest(&mut self, quest: &QuestId) -> Result<(), GameError> {
+        let Scene::Board { quests } = &self.scene else {
+            return Err(GameError::Busy);
+        };
+        if !quests.contains(quest) {
+            return Err(GameError::NotOnBoard);
+        }
+        let def = self
+            .world
+            .map
+            .quests
+            .get(quest)
+            .ok_or(GameError::NotOnBoard)?;
+        if self.save.rank.is_none_or(|rank| rank < def.rank) {
+            return Err(GameError::RankTooLow);
+        }
+        if self.save.quests.contains_key(quest) || self.save.quests_done.contains(quest) {
+            return Err(GameError::QuestTaken);
+        }
+        self.save.quests.insert(quest.clone(), 0);
+        Ok(())
+    }
+
+    fn start_quest(&mut self, quest: &QuestId) {
+        if !self.save.quests.contains_key(quest) && !self.save.quests_done.contains(quest) {
+            self.save.quests.insert(quest.clone(), 0);
+        }
+    }
+
+    /// Counts the monsters a won battle defeated toward the missions under
+    /// way; queues the scenes reached and pays the missions completed.
+    fn count_kills(&mut self, monsters: &[MonsterId], rewards: &mut Rewards) {
+        let world = Arc::clone(&self.world);
+        let active: Vec<QuestId> = self.save.quests.keys().cloned().collect();
+        for quest in active {
+            let Some(def) = world.map.quests.get(&quest) else {
+                continue;
+            };
+            let QuestGoal::Kill {
+                monsters: kinds,
+                count,
+            } = &def.goal;
+            let killed = monsters.iter().filter(|m| kinds.contains(m)).count();
+            let before = self.save.quests[&quest];
+            let after = before
+                .saturating_add(u16::try_from(killed).unwrap_or(u16::MAX))
+                .min(*count);
+            for event in &def.events {
+                if before < event.at && event.at <= after {
+                    self.save.queued.push(event.dialogue.clone());
+                }
+            }
+            if after >= *count {
+                self.save.quests.remove(&quest);
+                self.save.quests_done.insert(quest.clone());
+                self.save.kalds = self.save.kalds.saturating_add(def.kalds);
+                rewards.kalds = rewards.kalds.saturating_add(def.kalds);
+                rewards.quests_done.push(quest);
+            } else {
+                self.save.quests.insert(quest, after);
             }
         }
     }
@@ -620,7 +757,12 @@ impl Game {
                 self.arrive();
                 Ok(None)
             }
-            Scene::Shop { .. } | Scene::Defeat | Scene::Rested | Scene::Found(_) => Ok(None),
+            Scene::Shop { .. } | Scene::Board { .. } | Scene::Defeat => Ok(None),
+            Scene::GameOver => Ok(self.load_checkpoint()),
+            Scene::Rested | Scene::Found(_) => {
+                self.arrive();
+                Ok(None)
+            }
             scene @ (Scene::Map | Scene::Battle) => {
                 self.scene = scene;
                 Err(GameError::Busy)
@@ -661,27 +803,44 @@ impl Game {
         if let Some(def) = self.world.map.dialogues.get(dialogue) {
             effects.extend(def.effects.iter().cloned());
         }
-        self.apply(&effects)
+        let order = self.apply(&effects);
+        // A scene the story queued, or the arrival scene of where it sent
+        // the party, plays next.
+        if order.is_none() && self.scene == Scene::Map {
+            self.arrive();
+        }
+        order
     }
 
     /// Runs story effects in order. A battle effect is always last (checked
-    /// with the content) and starts the battle.
+    /// with the content) and starts the battle. Before a boss, the Campaign
+    /// saves ahead of every effect, so a Game Over replays the whole scene.
     fn apply(&mut self, effects: &[StoryEffect]) -> Option<BattleOrder> {
+        // A boss that ambushes on arrival was saved for before the walk in.
+        if has_boss(effects) && !self.boss_ambush_at(&self.save.position) {
+            self.autosave();
+        }
         for effect in effects {
             match effect {
                 StoryEffect::SetFlag { flag } => self.set_flag(flag),
-                StoryEffect::Join { hero } => self.join(hero),
+                StoryEffect::Join { hero, level, guest } => self.join(hero, *level, *guest),
+                StoryEffect::Leave { hero } => self.leave(hero),
+                StoryEffect::Objective { message } => self.save.objective.clone_from(message),
+                StoryEffect::SetRank { rank } => self.save.rank = Some(*rank),
+                StoryEffect::StartQuest { quest } => self.start_quest(quest),
                 StoryEffect::Give { item, count } => self.add_item(item, *count),
                 StoryEffect::GiveEquipment { id } => self.add_equipment(id),
-                StoryEffect::Crowns { amount } => {
-                    self.save.crowns = self.save.crowns.saturating_add(*amount);
+                StoryEffect::Kalds { amount } => {
+                    self.save.kalds = self.save.kalds.saturating_add(*amount);
                 }
                 StoryEffect::Heal => {
                     for hero in &mut self.save.party {
                         hero.heal(&self.world);
                     }
                 }
-                StoryEffect::Battle { monsters, on_win } => {
+                StoryEffect::Battle {
+                    monsters, on_win, ..
+                } => {
                     return self.start_battle(
                         monsters.clone(),
                         None,
@@ -689,22 +848,38 @@ impl Game {
                         Opening::Normal,
                     );
                 }
+                StoryEffect::Autosave => self.autosave(),
+                StoryEffect::Travel { to } => {
+                    self.save.position = to.clone();
+                    self.explore();
+                }
+                StoryEffect::Scene { dialogue } => self.save.queued.push(dialogue.clone()),
             }
         }
         None
     }
 
-    fn join(&mut self, hero: &crate::HeroId) {
+    fn join(&mut self, hero: &crate::HeroId, level: Option<u8>, guest: bool) {
         if self.save.party.len() >= MAX_PARTY || self.save.party.iter().any(|h| &h.hero == hero) {
             return;
         }
-        let levels: u32 = self.save.party.iter().map(|h| u32::from(h.level)).sum();
-        let count = u32::try_from(self.save.party.len()).unwrap_or(1).max(1);
-        let level = u8::try_from((levels + count / 2) / count)
-            .unwrap_or(1)
-            .max(1);
-        let joined = HeroState::new(&self.world, hero, level);
+        let mut joined = self.save.benched.remove(hero).unwrap_or_else(|| {
+            let level = level.unwrap_or_else(|| {
+                let levels: u32 = self.save.party.iter().map(|h| u32::from(h.level)).sum();
+                let count = u32::try_from(self.save.party.len()).unwrap_or(1).max(1);
+                u8::try_from((levels + count / 2) / count).unwrap_or(1)
+            });
+            HeroState::new(&self.world, hero, level.max(1))
+        });
+        joined.guest = guest;
         self.save.party.push(joined);
+    }
+
+    fn leave(&mut self, hero: &crate::HeroId) {
+        if let Some(index) = self.save.party.iter().position(|h| &h.hero == hero) {
+            let left = self.save.party.remove(index);
+            self.save.benched.insert(left.hero.clone(), left);
+        }
     }
 
     fn add_item(&mut self, item: &ItemId, count: u16) {
@@ -745,17 +920,81 @@ impl Game {
         on_win: Vec<StoryEffect>,
         opening: Opening,
     ) -> Option<BattleOrder> {
+        self.start_fight(monsters, flag, on_win, opening, false)
+    }
+
+    /// Starts a battle; before a boss, the Campaign saves first, so a Game
+    /// Over comes back to the moment before it (free to prepare).
+    fn start_fight(
+        &mut self,
+        monsters: Vec<MonsterId>,
+        flag: Option<Flag>,
+        on_win: Vec<StoryEffect>,
+        opening: Opening,
+        boss: bool,
+    ) -> Option<BattleOrder> {
+        if boss {
+            self.autosave();
+        }
         self.owe_battle(monsters, flag, on_win, opening);
         self.scene = Scene::Battle;
         self.battle_order()
     }
 
+    /// The Campaign ends in a Game Over; the Multiplayer brings the party
+    /// back at its Temple.
     fn defeat(&mut self) {
+        if self.mode == GameMode::Campaign {
+            self.scene = Scene::GameOver;
+            return;
+        }
         for hero in &mut self.save.party {
             hero.heal(&self.world);
         }
         self.save.position = self.save.temple.clone();
         self.scene = Scene::Defeat;
+    }
+
+    /// Whether arriving at `position` plays a scene that starts a boss
+    /// battle (an ambush).
+    fn boss_ambush_at(&self, position: &Position) -> bool {
+        self.node_at(position)
+            .and_then(|node| node.event.as_ref())
+            .filter(|event| self.holds(&event.when))
+            .and_then(|event| self.world.map.dialogues.get(&event.dialogue))
+            .is_some_and(|dialogue| has_boss(&dialogue.effects))
+    }
+
+    /// Campaign only: remembers this moment for a Game Over.
+    fn autosave(&mut self) {
+        if self.mode != GameMode::Campaign {
+            return;
+        }
+        let mut save = self.save();
+        save.checkpoint = None;
+        self.save.checkpoint = Some(Box::new(Checkpoint {
+            save,
+            progress: self.progress.clone(),
+        }));
+    }
+
+    /// After a Game Over: back to the last auto save, the story as it was. A
+    /// follow-up boss saved with its battle resumes in it. The encounter luck
+    /// goes on rather than replaying, so the same ambush does not wait
+    /// right after every Game Over.
+    fn load_checkpoint(&mut self) -> Option<BattleOrder> {
+        let checkpoint = self.save.checkpoint.take()?;
+        self.save = checkpoint.save.clone();
+        self.progress = checkpoint.progress.clone();
+        self.save.checkpoint = Some(checkpoint);
+        self.explore();
+        if self.save.battle.is_some() {
+            self.scene = Scene::Battle;
+            return self.battle_order();
+        }
+        self.scene = Scene::Map;
+        self.arrive();
+        None
     }
 
     fn victory(&mut self, battle: SavedBattle, party: &[(u16, u16)]) {
@@ -766,7 +1005,7 @@ impl Game {
             .filter_map(|m| self.world.map.monsters.get(m))
         {
             rewards.xp = rewards.xp.saturating_add(monster.xp);
-            rewards.crowns = rewards.crowns.saturating_add(monster.crowns);
+            rewards.kalds = rewards.kalds.saturating_add(monster.kalds);
             for drop in &monster.drops {
                 if self.rng.chance_percent(drop.percent) {
                     *rewards.items.entry(drop.item.clone()).or_insert(0) += 1;
@@ -776,7 +1015,8 @@ impl Game {
         for (item, count) in &rewards.items {
             self.add_item(item, *count);
         }
-        self.save.crowns = self.save.crowns.saturating_add(rewards.crowns);
+        self.save.kalds = self.save.kalds.saturating_add(rewards.kalds);
+        self.count_kills(&battle.monsters, &mut rewards);
 
         let world = Arc::clone(&self.world);
         for (hero, &(hp, mp)) in self.save.party.iter_mut().zip(party) {
@@ -786,6 +1026,9 @@ impl Game {
                 continue;
             }
             hero.hp = hp;
+            if hero.guest {
+                continue;
+            }
             let class = world
                 .map
                 .heroes
@@ -815,8 +1058,16 @@ impl Game {
         let mut effects = battle.on_win;
         let follow_up = effects.pop_if(|effect| matches!(effect, StoryEffect::Battle { .. }));
         self.apply(&effects);
-        if let Some(StoryEffect::Battle { monsters, on_win }) = follow_up {
+        if let Some(StoryEffect::Battle {
+            monsters,
+            boss,
+            on_win,
+        }) = follow_up
+        {
             self.owe_battle(monsters, None, on_win, Opening::Normal);
+            if boss {
+                self.autosave();
+            }
         }
         self.scene = Scene::Victory { rewards };
     }
@@ -854,13 +1105,13 @@ impl Game {
         if count == 0 {
             return Err(GameError::NotForSale);
         }
-        if total > self.save.crowns {
-            return Err(GameError::NotEnoughCrowns);
+        if total > self.save.kalds {
+            return Err(GameError::NotEnoughKalds);
         }
         if self.held(good).saturating_add(count) > MAX_STACK {
             return Err(GameError::BagFull);
         }
-        self.save.crowns -= total;
+        self.save.kalds -= total;
         match good {
             ShopGood::Item { id } => self.add_item(id, count),
             ShopGood::Equipment { id } => {
@@ -886,9 +1137,9 @@ impl Game {
         }
         self.save.inventory.retain(|_, held| *held > 0);
         self.save.bag.retain(|_, held| *held > 0);
-        self.save.crowns = self
+        self.save.kalds = self
             .save
-            .crowns
+            .kalds
             .saturating_add(price.saturating_mul(u32::from(count)));
         Ok(())
     }
@@ -975,11 +1226,19 @@ impl Game {
     }
 }
 
+/// Whether the effects start a boss battle.
+fn has_boss(effects: &[StoryEffect]) -> bool {
+    effects
+        .iter()
+        .any(|effect| matches!(effect, StoryEffect::Battle { boss: true, .. }))
+}
+
 #[cfg(test)]
 mod tests {
     use engine::{Battle, PartyControl};
 
     use super::*;
+    use crate::def::Rank;
     use crate::test_world::{position, world};
     use crate::view::{Fog, NodeKindView, SceneView};
 
@@ -1011,6 +1270,11 @@ mod tests {
         let outcome = battle.outcome().unwrap();
         game.finish_battle(outcome, &party, battle.inventory());
         outcome
+    }
+
+    /// How many slimes a road battle brought (1 to 3).
+    fn slimes_met(order: &BattleOrder) -> u32 {
+        u32::try_from(order.setup.encounter.enemies.len()).unwrap()
     }
 
     fn finish(game: &mut Game, outcome: Outcome, party: &[(u16, u16)]) {
@@ -1056,15 +1320,20 @@ mod tests {
     #[test]
     fn a_victory_pays_experience_money_and_drops() {
         let mut game = new_game();
-        walk(&mut game, "road").unwrap();
+        let slimes = slimes_met(&walk(&mut game, "road").unwrap());
 
         finish(&mut game, Outcome::Victory, &[(40, 3)]);
 
         let hero = &game.save.party[0];
-        assert_eq!((hero.level, hero.xp), (2, 5));
-        assert_eq!(hero.hp, 40 + 10, "a new level adds its HP");
-        assert_eq!(game.save.crowns, 107);
-        assert_eq!(game.save.inventory[&ItemId::new("potion")], 2);
+        let (level, xp) = progression::add_xp(1, 0, 25 * slimes);
+        assert_eq!((hero.level, hero.xp), (level, xp));
+        assert_eq!(hero.hp, 40 + 10 * u16::from(level - 1), "new levels add HP");
+        assert_eq!(game.save.kalds, 100 + 7 * slimes);
+        assert_eq!(
+            u32::from(game.save.inventory[&ItemId::new("potion")]),
+            1 + slimes,
+            "each slime drops a potion"
+        );
         let SceneView::Victory { rewards } = game.view().scene else {
             panic!("expected the rewards");
         };
@@ -1072,6 +1341,133 @@ mod tests {
             rewards.level_ups[0].learned,
             vec![engine::ActionId::new("attack")]
         );
+    }
+
+    #[test]
+    fn a_trail_brings_one_to_three_monsters() {
+        let mut game = new_game();
+        let mut sizes = std::collections::BTreeSet::new();
+        for _ in 0..60 {
+            for node in ["road", "home"] {
+                if let Some(order) = walk(&mut game, node) {
+                    sizes.insert(order.setup.encounter.enemies.len());
+                    finish(&mut game, Outcome::Victory, &[(100, 10)]);
+                    game.act(GameCommand::Next).unwrap();
+                }
+                while game.scene != Scene::Map {
+                    game.act(GameCommand::Next).unwrap();
+                }
+            }
+        }
+
+        assert_eq!(sizes, std::collections::BTreeSet::from([1, 2, 3]));
+    }
+
+    #[test]
+    fn a_hero_who_leaves_comes_back_as_they_were_and_a_guest_acts_alone() {
+        let mut game = new_game();
+        let bea = crate::HeroId::new("bea");
+        game.apply(&[StoryEffect::Join {
+            hero: bea.clone(),
+            level: Some(3),
+            guest: false,
+        }]);
+        assert_eq!(game.save.party[1].level, 3);
+
+        game.apply(&[StoryEffect::Leave { hero: bea.clone() }]);
+        assert_eq!(game.save.party.len(), 1);
+        game.apply(&[StoryEffect::Join {
+            hero: bea,
+            level: Some(9),
+            guest: true,
+        }]);
+
+        let back = &game.save.party[1];
+        assert_eq!(back.level, 3, "a returning hero keeps their level");
+        assert!(game.world.hero_setup(back).unwrap().guest);
+    }
+
+    #[test]
+    fn the_story_can_move_the_party_and_queue_a_scene() {
+        let mut game = new_game();
+        game.apply(&[
+            StoryEffect::Travel {
+                to: position("cave", "entry"),
+            },
+            StoryEffect::Scene {
+                dialogue: DialogueId::new("found-chest"),
+            },
+        ]);
+        game.arrive();
+
+        assert_eq!(game.save.position, position("cave", "entry"));
+        assert!(game.progress.explored.contains(&position("cave", "entry")));
+        assert!(
+            matches!(&game.scene, Scene::Dialogue { dialogue, .. } if dialogue.as_str() == "found-chest")
+        );
+    }
+
+    #[test]
+    fn a_board_gives_the_missions_the_rank_allows() {
+        let mut game = new_game();
+        walk(&mut game, "road").unwrap();
+        finish(&mut game, Outcome::Victory, &[(100, 10)]);
+        game.act(GameCommand::Next).unwrap();
+        walk(&mut game, "board");
+        game.act(GameCommand::Interact { ambush: false }).unwrap();
+        let accept = |game: &mut Game, quest: &str| {
+            game.act(GameCommand::AcceptQuest {
+                quest: QuestId::new(quest),
+            })
+        };
+
+        assert_eq!(accept(&mut game, "slimes"), Err(GameError::RankTooLow));
+        game.apply(&[StoryEffect::SetRank { rank: Rank::Bronze }]);
+        assert_eq!(accept(&mut game, "slimes"), Ok(None));
+        assert_eq!(accept(&mut game, "slimes"), Err(GameError::QuestTaken));
+        assert_eq!(accept(&mut game, "dragon"), Err(GameError::RankTooLow));
+        assert_eq!(accept(&mut game, "nowhere"), Err(GameError::NotOnBoard));
+        assert_eq!(game.view().quests[0].count, 4);
+    }
+
+    #[test]
+    fn kills_advance_a_mission_play_its_scene_and_pay_it_once() {
+        let mut game = new_game();
+        let slimes = QuestId::new("slimes");
+        game.apply(&[StoryEffect::StartQuest {
+            quest: slimes.clone(),
+        }]);
+        let mut scenes = 0;
+        let mut paid = None;
+        for _ in 0..20 {
+            for node in ["road", "home"] {
+                if walk(&mut game, node).is_some() {
+                    let before = game.save.kalds;
+                    finish(&mut game, Outcome::Victory, &[(100, 10)]);
+                    if let SceneView::Victory { rewards } = game.view().scene
+                        && rewards.quests_done == [slimes.clone()]
+                    {
+                        paid = Some(game.save.kalds - before);
+                    }
+                    game.act(GameCommand::Next).unwrap();
+                }
+                while game.scene != Scene::Map {
+                    if matches!(&game.scene, Scene::Dialogue { dialogue, .. } if dialogue.as_str() == "found-chest")
+                    {
+                        scenes += 1;
+                    }
+                    game.act(GameCommand::Next).unwrap();
+                }
+            }
+        }
+
+        assert!(game.save.quests_done.contains(&slimes));
+        assert!(!game.save.quests.contains_key(&slimes));
+        assert!(
+            paid.is_some_and(|kalds| kalds >= 20),
+            "the pay comes with the rewards"
+        );
+        assert_eq!(scenes, 1, "the mission's scene plays once");
     }
 
     #[test]
@@ -1086,8 +1482,19 @@ mod tests {
     }
 
     #[test]
-    fn a_defeat_heals_and_returns_to_the_temple() {
-        let mut game = new_game();
+    fn a_multiplayer_defeat_heals_and_returns_to_the_temple() {
+        let world = world();
+        let explored = ["home", "road"].map(|node| position("field", node));
+        let mut game = Game::new(
+            Arc::clone(&world),
+            GameMode::Multiplayer,
+            Progress {
+                epoch: 0,
+                flags: std::collections::BTreeSet::new(),
+                explored: explored.into_iter().collect(),
+            },
+            Save::new(&world, 1),
+        );
         walk(&mut game, "road").unwrap();
 
         finish(&mut game, Outcome::Defeat, &[(0, 0)]);
@@ -1095,6 +1502,76 @@ mod tests {
         assert_eq!(game.save.position, position("field", "home"));
         assert_eq!(game.save.party[0].hp, 100);
         assert_eq!(game.view().scene, SceneView::Defeat);
+    }
+
+    #[test]
+    fn a_campaign_defeat_is_a_game_over_back_to_the_last_auto_save() {
+        let mut game = new_game();
+        walk(&mut game, "road").unwrap();
+        finish(&mut game, Outcome::Victory, &[(100, 10)]);
+        game.act(GameCommand::Next).unwrap();
+        let kalds_at_start = 100;
+        assert!(game.save.kalds > kalds_at_start);
+        game.apply(&[StoryEffect::SetFlag {
+            flag: Flag::new("later"),
+        }]);
+
+        walk(&mut game, "home").unwrap();
+        finish(&mut game, Outcome::Defeat, &[(0, 0)]);
+        assert_eq!(game.view().scene, SceneView::GameOver);
+        assert_eq!(game.act(GameCommand::Next), Ok(None));
+
+        assert_eq!(game.save.position, position("field", "home"));
+        assert_eq!(
+            game.save.kalds, kalds_at_start,
+            "back to the new game's save"
+        );
+        assert!(!game.progress.has(&Flag::new("later")), "and its story");
+    }
+
+    #[test]
+    fn a_boss_saved_before_it_starts_again_after_a_game_over() {
+        let mut game = new_game();
+        walk(&mut game, "road").unwrap();
+        finish(&mut game, Outcome::Victory, &[(100, 10)]);
+        game.act(GameCommand::Next).unwrap();
+        walk(&mut game, "elder");
+        game.act(GameCommand::Interact { ambush: false }).unwrap();
+        game.act(GameCommand::Next).unwrap();
+        game.act(GameCommand::Choose { index: 1 }).unwrap().unwrap();
+        finish(&mut game, Outcome::Victory, &[(100, 10)]);
+        let boss = game.act(GameCommand::Next).unwrap().unwrap();
+
+        finish(&mut game, Outcome::Defeat, &[(0, 0)]);
+        let again = game.act(GameCommand::Next).unwrap();
+
+        assert_eq!(again, Some(boss), "the same boss battle, from its start");
+        assert!(game.in_battle());
+    }
+
+    #[test]
+    fn a_game_over_at_a_story_boss_comes_back_before_its_scene() {
+        let mut game = new_game();
+        let order = game.apply(&[
+            StoryEffect::SetFlag {
+                flag: Flag::new("ambushed"),
+            },
+            StoryEffect::Battle {
+                monsters: vec![MonsterId::new("slime")],
+                boss: true,
+                on_win: Vec::new(),
+            },
+        ]);
+        assert!(order.is_some());
+
+        finish(&mut game, Outcome::Defeat, &[(0, 0)]);
+
+        assert_eq!(game.act(GameCommand::Next), Ok(None), "free to prepare");
+        assert!(
+            !game.progress.has(&Flag::new("ambushed")),
+            "the scene plays again"
+        );
+        assert!(!game.in_battle());
     }
 
     #[test]
@@ -1131,7 +1608,7 @@ mod tests {
     #[test]
     fn an_arrival_scene_plays_once_and_a_chest_opens_once() {
         let mut game = new_game();
-        walk(&mut game, "road").unwrap();
+        let slimes = slimes_met(&walk(&mut game, "road").unwrap());
         finish(&mut game, Outcome::Victory, &[(100, 10)]);
         game.act(GameCommand::Next).unwrap();
 
@@ -1145,7 +1622,7 @@ mod tests {
         game.act(GameCommand::Interact { ambush: false }).unwrap();
         game.act(GameCommand::Next).unwrap();
 
-        assert_eq!(game.save.crowns, 157);
+        assert_eq!(game.save.kalds, 150 + 7 * slimes);
         assert_eq!(game.save.bag[&EquipmentId::new("sword")], 1);
         assert_eq!(
             game.act(GameCommand::Interact { ambush: false }),
@@ -1180,13 +1657,13 @@ mod tests {
             game.act(GameCommand::Choose { index: 5 }),
             Err(GameError::NoSuchChoice)
         );
-        let crowns = game.save.crowns;
+        let kalds = game.save.kalds;
         assert!(
             game.act(GameCommand::Choose { index: 0 })
                 .unwrap()
                 .is_none()
         );
-        assert_eq!(game.save.crowns, crowns + 5);
+        assert_eq!(game.save.kalds, kalds + 5);
 
         game.act(GameCommand::Interact { ambush: false }).unwrap();
         game.act(GameCommand::Next).unwrap();
@@ -1200,7 +1677,7 @@ mod tests {
     #[test]
     fn the_shop_buys_sells_and_the_bag_equips() {
         let mut game = new_game();
-        walk(&mut game, "road").unwrap();
+        let slimes = slimes_met(&walk(&mut game, "road").unwrap());
         finish(&mut game, Outcome::Victory, &[(100, 10)]);
         game.act(GameCommand::Next).unwrap();
         walk(&mut game, "shop");
@@ -1214,14 +1691,14 @@ mod tests {
                 good: sword.clone(),
                 count: 2
             }),
-            Err(GameError::NotEnoughCrowns)
+            Err(GameError::NotEnoughKalds)
         );
         game.act(GameCommand::Buy {
             good: sword.clone(),
             count: 1,
         })
         .unwrap();
-        assert_eq!(game.save.crowns, 107 - 60);
+        assert_eq!(game.save.kalds, 100 + 7 * slimes - 60);
         game.act(GameCommand::Equip {
             hero: 0,
             slot: Slot::Weapon,
@@ -1249,7 +1726,7 @@ mod tests {
             count: 1,
         })
         .unwrap();
-        assert_eq!(game.save.crowns, 47 + 30);
+        assert_eq!(game.save.kalds, 100 + 7 * slimes - 60 + 30);
     }
 
     #[test]
@@ -1309,6 +1786,7 @@ mod tests {
             Arc::clone(&world),
             GameMode::Multiplayer,
             Progress {
+                epoch: 0,
                 flags: std::collections::BTreeSet::new(),
                 explored: std::collections::BTreeSet::from([position("field", "home")]),
             },

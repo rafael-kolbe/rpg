@@ -122,6 +122,7 @@ impl Content {
                 dialogues: read_json(&world.join("dialogues.json"))?,
                 shops: read_json(&world.join("shops.json"))?,
                 equipment: read_json(&world.join("equipment.json"))?,
+                quests: read_json(&world.join("quests.json"))?,
             },
             actions: self.actions.clone(),
             items: self.items.clone(),

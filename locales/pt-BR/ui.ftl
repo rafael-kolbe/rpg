@@ -45,6 +45,7 @@ ui-item-count = ×{ $count }
 ui-popup-miss = Miss
 ui-popup-resist = Resist
 ui-popup-immune = Immune
+ui-popup-cover = Cover
 ui-outcome-victory = Vitória!
 ui-outcome-defeat = Derrota…
 ui-outcome-restart = Lutar de novo
@@ -60,6 +61,7 @@ ui-status-slow = Lentidão
 ui-status-barrier = Barreira
 ui-status-magic_barrier = Barreira Mágica
 ui-status-distracted = Distraído
+ui-status-cover = Proteção
 
 ## Comandos recusados e erros
 
@@ -112,6 +114,7 @@ ui-log-revive = { $target } revive com { $hp } de HP
 ui-log-poison = { $target } perde { $amount } de HP pelo veneno
 ui-log-regen = { $target } regenera { $amount } de HP
 ui-log-miss = Miss em { $target }
+ui-log-cover = { $protector } protege { $target }
 ui-log-status-gain = { $target } recebe { $status }
 ui-log-status-lose = { $target } perde { $status }
 ui-log-resist = { $target } resiste a { $status }
@@ -169,7 +172,10 @@ ui-mode-new = Novo jogo
 ui-mode-continue = Continuar
 ui-mode-locked = Bloqueado
 ui-mode-locked-hint = O Multiplayer é liberado mais adiante na história da Campanha.
-ui-crowns = { $amount } coroas
+ui-kalds = { $amount } { $amount ->
+        [one] Kald
+       *[other] Kalds
+    }
 ui-continue = Continuar
 ui-close = Fechar
 ui-world-map = Mapa-múndi
@@ -192,7 +198,10 @@ ui-shop-keys = ↑↓ escolhe · Enter/Z compra ou vende um · ←/→ comprar o
 ui-shop-leave = Sair
 ui-victory-title = Vitória!
 ui-victory-xp = { $xp } de experiência
-ui-victory-crowns = { $amount } coroas
+ui-victory-kalds = { $amount } { $amount ->
+        [one] Kald
+       *[other] Kalds
+    }
 ui-found-item = { $name } ×{ $count }
 ui-level-up = { $name } chegou ao nível { $level }!
 ui-learned = Aprendeu { $action }
@@ -223,9 +232,37 @@ ui-game-error-barrier = A Campanha ainda não abriu este caminho.
 ui-game-error-nothing_here = Nada para fazer aqui.
 ui-game-error-no_such_choice = Essa resposta não existe.
 ui-game-error-not_for_sale = A loja não negocia isso.
-ui-game-error-not_enough_crowns = Coroas insuficientes.
+ui-game-error-not_enough_kalds = Kalds insuficientes.
 ui-game-error-not_owned = Você não tem isso.
 ui-game-error-cannot_equip = Esse herói não pode usar isso.
 ui-game-error-not_usable_here = Isso não faz nada agora.
 ui-game-error-no_such_hero = Herói inexistente.
 ui-game-error-bag_full = Não cabe mais disso.
+
+# Missions, ranks, Game Over
+ui-node-inn = Descansar ({ $price } { $price ->
+        [one] Kald
+       *[other] Kalds
+    })
+ui-node-board = Ver as missões
+ui-node-sealed = Fechado por enquanto.
+ui-board-title = Quadro de missões
+ui-board-empty = Nenhuma missão no quadro.
+ui-board-accept = Aceitar
+ui-board-locked = Rank insuficiente
+ui-board-taken = Em andamento
+ui-board-done = Concluída
+ui-quest-done = Missão concluída: { $name }
+ui-game-over-title = Game Over
+ui-game-over-text = A party caiu. Continuar volta ao último ponto salvo.
+ui-game-error-not_on_board = Essa missão não está neste quadro.
+ui-game-error-rank_too_low = Seu rank na Guilda é baixo demais para isso.
+ui-game-error-quest_taken = Você já pegou essa missão.
+ui-game-error-sealed = Fechado por enquanto.
+ui-rank-bronze = Bronze
+ui-rank-silver = Prata
+ui-rank-gold = Ouro
+ui-rank-platinum = Platina
+ui-rank-diamond = Diamante
+ui-rank-orichalcum = Oricalco
+ui-rank-dracite = Draconita

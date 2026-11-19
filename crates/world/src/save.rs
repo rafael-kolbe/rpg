@@ -3,12 +3,14 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
+use crate::def::Rank;
+
 use engine::{BattleRecord, ItemId, Opening};
 use serde::{Deserialize, Serialize};
 
 use crate::World;
 use crate::def::StoryEffect;
-use crate::ids::{EquipmentId, Flag, HeroId, MonsterId, Position};
+use crate::ids::{DialogueId, EquipmentId, Flag, HeroId, MonsterId, Position, QuestId};
 use crate::progression;
 
 /// Campaign (Story Mode) or Multiplayer (Online Mode).
@@ -27,6 +29,9 @@ pub enum GameMode {
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Progress {
+    /// Content version it was made with ([`crate::def::StartDef::epoch`]).
+    #[serde(default)]
+    pub epoch: u32,
     /// Story flags set so far.
     pub flags: BTreeSet<Flag>,
     /// Nodes the player has stood on.
@@ -37,6 +42,21 @@ pub struct Progress {
 pub const MULTIPLAYER_FLAG: &str = "multiplayer-unlocked";
 
 impl Progress {
+    /// No progress, for the world's current content.
+    #[must_use]
+    pub fn new(world: &World) -> Self {
+        Self {
+            epoch: world.map.start.epoch,
+            ..Self::default()
+        }
+    }
+
+    /// Whether it was made with the world's current content.
+    #[must_use]
+    pub fn is_current(&self, world: &World) -> bool {
+        self.epoch == world.map.start.epoch
+    }
+
     /// Whether `flag` is set.
     #[must_use]
     pub fn has(&self, flag: &Flag) -> bool {
@@ -54,18 +74,24 @@ impl Progress {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Save {
+    /// Content version it was made with ([`crate::def::StartDef::epoch`]).
+    #[serde(default)]
+    pub epoch: u32,
     /// Where the player stands.
     pub position: Position,
     /// Where a defeat sends the party back (the last Temple).
     pub temple: Position,
     /// The heroes, in battle order.
     pub party: Vec<HeroState>,
+    /// Heroes who left the party, as they were, for when they come back.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub benched: BTreeMap<HeroId, HeroState>,
     /// Items, by id (never zero).
     pub inventory: BTreeMap<ItemId, u16>,
     /// Weapons and armor not worn, by id (never zero).
     pub bag: BTreeMap<EquipmentId, u16>,
     /// Money.
-    pub crowns: u32,
+    pub kalds: u32,
     /// State of the random generator for encounters and drops.
     pub rng: u64,
     /// The battle under way, or a boss's next phase waiting behind the
@@ -73,6 +99,35 @@ pub struct Save {
     /// page neither skips nor restarts a fight.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub battle: Option<SavedBattle>,
+    /// Guild rank, once registered.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rank: Option<Rank>,
+    /// The campaign's next step (a Fluent message id).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub objective: Option<String>,
+    /// Missions under way and their progress.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub quests: BTreeMap<QuestId, u16>,
+    /// Missions completed.
+    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+    pub quests_done: BTreeSet<QuestId>,
+    /// Scenes waiting to play once the screen is free (a mission's scene
+    /// reached during a battle).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub queued: Vec<DialogueId>,
+    /// The Campaign's last auto save: where a Game Over sends the player.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub checkpoint: Option<Box<Checkpoint>>,
+}
+
+/// A moment the Campaign can return to: the save and the story as they were.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Checkpoint {
+    /// The save (without its own checkpoint).
+    pub save: Save,
+    /// The story progress.
+    pub progress: Progress,
 }
 
 /// A battle the game owes the player: enough to rebuild it exactly where it
@@ -114,23 +169,40 @@ pub struct HeroState {
     pub weapon: Option<EquipmentId>,
     /// Worn armor.
     pub armor: Option<EquipmentId>,
+    /// A guest: fights on its own AI; the player does not command it.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub guest: bool,
 }
 
 impl Save {
+    /// Whether it was made with the world's current content.
+    #[must_use]
+    pub fn is_current(&self, world: &World) -> bool {
+        self.epoch == world.map.start.epoch
+    }
+
     /// A new game, from `content/world/start.json`, with `seed` for the
     /// random generator.
     #[must_use]
     pub fn new(world: &World, seed: u64) -> Self {
         let start = &world.map.start;
         let mut save = Self {
+            epoch: start.epoch,
             position: start.position.clone(),
             temple: start.position.clone(),
             party: Vec::new(),
+            benched: BTreeMap::new(),
             inventory: start.inventory.clone(),
             bag: BTreeMap::new(),
-            crowns: start.crowns,
+            kalds: start.kalds,
             rng: seed,
             battle: None,
+            rank: None,
+            objective: None,
+            quests: BTreeMap::new(),
+            quests_done: BTreeSet::new(),
+            queued: Vec::new(),
+            checkpoint: None,
         };
         for hero in &start.party {
             save.party.push(HeroState::new(world, hero, 1));
@@ -152,6 +224,7 @@ impl HeroState {
             mp: 0,
             weapon: def.and_then(|def| def.weapon.clone()),
             armor: def.and_then(|def| def.armor.clone()),
+            guest: false,
         };
         if let Some(stats) = world.hero_stats(&state) {
             state.hp = stats.max_hp;

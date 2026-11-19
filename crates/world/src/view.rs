@@ -8,9 +8,11 @@ use std::collections::BTreeMap;
 use engine::{ActionId, ItemId};
 use serde::Serialize;
 
-use crate::def::{NodeKind, Slot, Terrain};
+use crate::def::{NodeKind, Rank, Slot, Terrain};
 use crate::game::{Game, Loot, Rewards, Scene};
-use crate::ids::{DialogueId, EquipmentId, HeroId, InstanceId, NodeId, Position, RegionId, ShopId};
+use crate::ids::{
+    DialogueId, EquipmentId, HeroId, InstanceId, NodeId, Position, QuestId, RegionId, ShopId,
+};
 use crate::save::GameMode;
 use crate::{ShopGood, progression};
 
@@ -32,11 +34,60 @@ pub struct GameView {
     /// The heroes.
     pub party: Vec<HeroView>,
     /// Money.
-    pub crowns: u32,
+    pub kalds: u32,
     /// Items.
     pub inventory: BTreeMap<ItemId, u16>,
     /// Weapons and armor not worn.
     pub bag: Vec<BagEntry>,
+    /// Guild rank, once registered.
+    pub rank: Option<Rank>,
+    /// The campaign's next step (a Fluent message id).
+    pub objective: Option<String>,
+    /// Missions under way.
+    pub quests: Vec<QuestView>,
+}
+
+/// A mission under way (name: `quest-<id>`).
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QuestView {
+    /// The mission.
+    pub quest: QuestId,
+    /// Progress so far.
+    pub progress: u16,
+    /// Progress that completes it.
+    pub count: u16,
+}
+
+/// A mission on a board.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BoardEntry {
+    /// The mission.
+    pub quest: QuestId,
+    /// Lowest rank allowed.
+    pub rank: Rank,
+    /// Progress that completes it.
+    pub count: u16,
+    /// Where the player stands with it.
+    pub status: BoardStatus,
+}
+
+/// Whether a board mission can be taken.
+#[cfg_attr(feature = "ts", derive(ts_rs::TS))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum BoardStatus {
+    /// Can be taken.
+    Open,
+    /// Needs a higher rank.
+    Locked,
+    /// Under way.
+    Taken,
+    /// Completed.
+    Done,
 }
 
 /// The current instance.
@@ -125,6 +176,15 @@ pub enum NodeKindView {
     Shop,
     /// Heal and return point.
     Temple,
+    /// Paid rest.
+    Inn {
+        /// Kalds per night.
+        price: u32,
+    },
+    /// Missions to take.
+    Board,
+    /// Does not open yet.
+    Sealed,
 }
 
 /// A trail.
@@ -268,6 +328,13 @@ pub enum SceneView {
         /// What it held.
         loot: Loot,
     },
+    /// A mission board.
+    Board {
+        /// Its missions.
+        entries: Vec<BoardEntry>,
+    },
+    /// Beaten in the Campaign: Continue goes back to the last auto save.
+    GameOver,
 }
 
 /// A shop line.
@@ -277,7 +344,7 @@ pub enum SceneView {
 pub struct ShopEntry {
     /// What.
     pub good: ShopGood,
-    /// Price in crowns (selling gives half).
+    /// Price in kalds (selling gives half).
     pub price: u32,
     /// How many the player has.
     pub owned: u16,
@@ -328,7 +395,7 @@ impl Game {
                     })
                 })
                 .collect(),
-            crowns: self.save.crowns,
+            kalds: self.save.kalds,
             inventory,
             bag: self
                 .save
@@ -341,6 +408,21 @@ impl Game {
                         slot: def.slot,
                         classes: def.classes.iter().map(ToString::to_string).collect(),
                         count,
+                    })
+                })
+                .collect(),
+            rank: self.save.rank,
+            objective: self.save.objective.clone(),
+            quests: self
+                .save
+                .quests
+                .iter()
+                .filter_map(|(quest, &progress)| {
+                    let def = world.map.quests.get(quest)?;
+                    Some(QuestView {
+                        quest: quest.clone(),
+                        progress,
+                        count: def.goal.count(),
                     })
                 })
                 .collect(),
@@ -395,6 +477,30 @@ impl Game {
             Scene::Defeat => SceneView::Defeat,
             Scene::Rested => SceneView::Rested,
             Scene::Found(loot) => SceneView::Found { loot: loot.clone() },
+            Scene::GameOver => SceneView::GameOver,
+            Scene::Board { quests } => SceneView::Board {
+                entries: quests
+                    .iter()
+                    .filter_map(|quest| {
+                        let def = self.world.map.quests.get(quest)?;
+                        let status = if self.save.quests_done.contains(quest) {
+                            BoardStatus::Done
+                        } else if self.save.quests.contains_key(quest) {
+                            BoardStatus::Taken
+                        } else if self.save.rank.is_some_and(|rank| rank >= def.rank) {
+                            BoardStatus::Open
+                        } else {
+                            BoardStatus::Locked
+                        };
+                        Some(BoardEntry {
+                            quest: quest.clone(),
+                            rank: def.rank,
+                            count: def.goal.count(),
+                            status,
+                        })
+                    })
+                    .collect(),
+            },
         }
     }
 
@@ -488,6 +594,9 @@ impl Game {
             NodeKind::Npc { name, .. } => NodeKindView::Npc { name: name.clone() },
             NodeKind::Shop { .. } => NodeKindView::Shop,
             NodeKind::Temple => NodeKindView::Temple,
+            NodeKind::Inn { price } => NodeKindView::Inn { price: *price },
+            NodeKind::Board { .. } => NodeKindView::Board,
+            NodeKind::Sealed => NodeKindView::Sealed,
         }
     }
 

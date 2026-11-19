@@ -14,7 +14,7 @@ interface Props {
   party: HeroView[]
   bag: BagEntry[]
   inventory: Partial<Record<ItemId, number>>
-  crowns: number
+  kalds: number
   onEquip: (hero: number, slot: Slot, id: EquipmentId | null) => void
   onUse: (item: ItemId, hero: number) => void
   onClose: () => void
@@ -26,7 +26,7 @@ const FIELD_ITEMS: ItemId[] = ['potion', 'hi-potion', 'ether']
 const NONE = ''
 
 /** Heroes, their stats and gear, and the items usable on the map. Esc closes. */
-export function PartyWindow({ party, bag, inventory, crowns, onEquip, onUse, onClose }: Props) {
+export function PartyWindow({ party, bag, inventory, kalds, onEquip, onUse, onClose }: Props) {
   const { t } = useTranslation()
   useMenuKeys((key) => {
     if (key !== 'cancel') return false
@@ -60,7 +60,7 @@ export function PartyWindow({ party, bag, inventory, crowns, onEquip, onUse, onC
     <Window className="game-window party-window" testId="party-window">
       <div className="game-window__head">
         <h2>{t('ui-party-title')}</h2>
-        <span className="crowns">{t('ui-crowns', { amount: crowns })}</span>
+        <span className="kalds">{t('ui-kalds', { amount: kalds })}</span>
       </div>
       <div className="party-window__heroes">
         {party.map((hero, index) => (

@@ -75,6 +75,10 @@ content_id!(
     /// A weapon or armor.
     EquipmentId
 );
+content_id!(
+    /// A mission (`sewer-rats`).
+    QuestId
+);
 
 /// Where the player stands: a node of an instance.
 #[cfg_attr(feature = "ts", derive(ts_rs::TS))]

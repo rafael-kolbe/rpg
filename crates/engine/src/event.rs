@@ -158,6 +158,13 @@ pub enum BattleEvent {
         /// Why it ended.
         reason: StatusEndReason,
     },
+    /// A combatant with Cover took a single-target attack meant for an ally.
+    Covered {
+        /// Who took the attack.
+        protector: CombatantId,
+        /// Who was aimed at.
+        protected: CombatantId,
+    },
     /// HP reached 0. Statuses are cleared and queued actions cancelled.
     KnockedOut {
         /// Who.

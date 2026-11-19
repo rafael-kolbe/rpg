@@ -4,69 +4,91 @@
   "nodes": {
     "south-gate": {
       "x": 500,
-      "y": 910,
-      "kind": { "type": "exit", "to": { "instance": "thornwood", "node": "north-gate" } },
-      "event": { "dialogue": "arrive-valcrest", "when": { "forbids": ["valcrest-arrived"] } }
+      "y": 940,
+      "label": "label-south-gate",
+      "kind": {"type": "exit", "to": {"instance": "burrowood", "node": "north-edge"}}
     },
-    "plaza": { "x": 500, "y": 620, "label": "label-plaza", "kind": { "type": "path" } },
-    "temple": { "x": 260, "y": 680, "label": "label-temple", "kind": { "type": "temple" } },
-    "apothecary": {
-      "x": 760,
-      "y": 720,
-      "label": "label-apothecary",
-      "kind": { "type": "shop", "shop": "valcrest-apothecary" }
-    },
-    "armory": {
-      "x": 770,
-      "y": 520,
-      "label": "label-armory",
-      "kind": { "type": "shop", "shop": "valcrest-armory" }
+    "plaza": {"x": 500, "y": 720, "label": "label-plaza", "kind": {"type": "path"}},
+    "army-post": {
+      "x": 780,
+      "y": 800,
+      "label": "label-army-post",
+      "kind": {
+        "type": "npc",
+        "name": "npc-garrick",
+        "talks": [{"dialogue": "garrick-later", "when": {"requires": ["report-done"]}}]
+      },
+      "event": {
+        "dialogue": "the-report",
+        "when": {"requires": ["camp-destroyed"], "forbids": ["report-done"]}
+      }
     },
     "guild": {
-      "x": 250,
-      "y": 440,
+      "x": 500,
+      "y": 540,
       "label": "label-guild",
       "kind": {
         "type": "npc",
-        "name": "npc-clerk",
-        "talks": [
-          { "dialogue": "guild-register", "when": { "forbids": ["guild-registered"] } },
-          { "dialogue": "guild-later" }
-        ]
+        "name": "npc-delia",
+        "talks": [{"dialogue": "delia-later", "when": {"requires": ["registered"]}}]
+      },
+      "event": {
+        "dialogue": "guild-register",
+        "when": {"requires": ["report-done"], "forbids": ["registered"]}
       }
     },
-    "guard-post": {
-      "x": 500,
-      "y": 330,
-      "label": "label-guard-post",
-      "kind": {
-        "type": "npc",
-        "name": "npc-holt",
-        "talks": [
-          {
-            "dialogue": "holt-ending",
-            "when": { "requires": ["warden-defeated"], "forbids": ["arc-complete"] }
-          },
-          { "dialogue": "holt-after", "when": { "requires": ["arc-complete"] } },
-          { "dialogue": "holt-catacombs", "when": { "requires": ["mission-reported"] } },
-          { "dialogue": "holt-report" }
-        ]
-      }
+    "guild-board": {
+      "x": 320,
+      "y": 500,
+      "label": "label-guild-board",
+      "kind": {"type": "board", "quests": ["sewer-rats", "burrowood-goblins", "burrowood-wolves"]}
     },
-    "catacomb-gate": {
-      "x": 760,
-      "y": 170,
-      "label": "label-catacomb-gate",
-      "kind": { "type": "exit", "to": { "instance": "catacombs-1", "node": "entry" } }
+    "arsenal": {
+      "x": 230,
+      "y": 650,
+      "label": "label-arsenal",
+      "kind": {"type": "shop", "shop": "valcrest-arsenal"}
+    },
+    "apothecary": {
+      "x": 240,
+      "y": 800,
+      "label": "label-apothecary",
+      "kind": {"type": "shop", "shop": "valcrest-apothecary"}
+    },
+    "market": {
+      "x": 740,
+      "y": 620,
+      "label": "label-market",
+      "kind": {"type": "shop", "shop": "valcrest-market"}
+    },
+    "magic-shop": {"x": 330, "y": 330, "label": "label-magic-shop", "kind": {"type": "sealed"}},
+    "technique-shop": {"x": 670, "y": 330, "label": "label-technique-shop", "kind": {"type": "sealed"}},
+    "inn": {"x": 800, "y": 470, "label": "label-inn", "kind": {"type": "inn", "price": 20}},
+    "temple": {"x": 500, "y": 330, "label": "label-temple", "kind": {"type": "temple"}},
+    "tavern": {"x": 860, "y": 640, "label": "label-tavern", "kind": {"type": "sealed"}},
+    "castle": {"x": 500, "y": 110, "label": "label-castle", "kind": {"type": "sealed"}},
+    "sewer-gate": {
+      "x": 120,
+      "y": 900,
+      "label": "label-sewer-gate",
+      "kind": {"type": "exit", "to": {"instance": "valcrest-sewer-1", "node": "ladder"}},
+      "when": {"forbids": ["sewer-closed"]}
     }
   },
   "trails": [
-    { "a": "south-gate", "b": "plaza" },
-    { "a": "plaza", "b": "temple" },
-    { "a": "plaza", "b": "apothecary" },
-    { "a": "plaza", "b": "armory" },
-    { "a": "plaza", "b": "guild" },
-    { "a": "plaza", "b": "guard-post" },
-    { "a": "guard-post", "b": "catacomb-gate", "when": { "requires": ["mission-reported"] } }
+    {"a": "south-gate", "b": "plaza"},
+    {"a": "plaza", "b": "army-post"},
+    {"a": "plaza", "b": "guild"},
+    {"a": "guild", "b": "guild-board"},
+    {"a": "plaza", "b": "arsenal"},
+    {"a": "arsenal", "b": "apothecary"},
+    {"a": "plaza", "b": "market"},
+    {"a": "market", "b": "tavern"},
+    {"a": "guild", "b": "magic-shop"},
+    {"a": "guild", "b": "technique-shop"},
+    {"a": "market", "b": "inn"},
+    {"a": "guild", "b": "temple"},
+    {"a": "temple", "b": "castle"},
+    {"a": "apothecary", "b": "sewer-gate"}
   ]
 }

@@ -10,7 +10,7 @@ export type ShopEntry = {
  */
 good: ShopGood, 
 /**
- * Price in crowns (selling gives half).
+ * Price in kalds (selling gives half).
  */
 price: number, 
 /**

@@ -51,6 +51,8 @@ pub(crate) fn fighter(name: &str) -> CombatantSetup {
         }),
         hp: None,
         mp: None,
+        guest: false,
+        leader: false,
     }
 }
 
@@ -64,6 +66,43 @@ fn action(category: ActionCategory, target: TargetRule, mp_cost: u16, effect: Ef
     }
 }
 
+/// Cover, Devour and Reanimate (into the `skeleton` form).
+fn guardian_actions() -> [(ActionId, ActionDef); 3] {
+    use ActionCategory as C;
+    use TargetRule as T;
+
+    [
+        (
+            ActionId::new("cover"),
+            action(
+                C::Technic,
+                T::User,
+                0,
+                Effect::ApplyStatus {
+                    status: StatusKind::Cover,
+                    duration_ticks: Some(600),
+                    accuracy: 100,
+                },
+            ),
+        ),
+        (
+            ActionId::new("devour"),
+            action(C::Magic, T::SingleAlly, 0, Effect::Devour),
+        ),
+        (
+            ActionId::new("raise"),
+            action(
+                C::Magic,
+                T::SingleAlly,
+                0,
+                Effect::Reanimate {
+                    into: "skeleton".to_owned(),
+                },
+            ),
+        ),
+    ]
+}
+
 pub(crate) fn catalog_setup(
     party: Vec<CombatantSetup>,
     enemies: Vec<CombatantSetup>,
@@ -71,7 +110,7 @@ pub(crate) fn catalog_setup(
     use ActionCategory as C;
     use TargetRule as T;
 
-    let actions = BTreeMap::from([
+    let mut actions = BTreeMap::from([
         (
             ActionId::new("attack"),
             action(
@@ -122,6 +161,7 @@ pub(crate) fn catalog_setup(
             action(C::Item, T::SingleAlly, 0, Effect::Revive { hp_percent: 25 }),
         ),
     ]);
+    actions.extend(guardian_actions());
     let items = BTreeMap::from([
         (
             ItemId::new("potion"),
@@ -143,6 +183,7 @@ pub(crate) fn catalog_setup(
             inventory: BTreeMap::from([(ItemId::new("potion"), 2)]),
             party,
             enemies,
+            forms: BTreeMap::from([("skeleton".to_owned(), fighter("skeleton"))]),
         },
         actions,
         items,

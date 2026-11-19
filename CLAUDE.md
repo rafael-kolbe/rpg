@@ -33,16 +33,16 @@ change.
 | Loading content and scenarios | `crates/content/src/lib.rs` |
 | Content validation (`content-check`) | `crates/content/src/validation.rs` |
 | Battle simulator CLI | `crates/sim/src/main.rs` |
-| Campaign bot (plays the first arc; balancing and the arc test) | `crates/sim/src/campaign.rs` |
-| Campaign content types (regions, instances, nodes, trails, heroes, monsters, dialogues, shops, equipment) | `crates/world/src/def.rs` |
-| A game in progress: commands, scenes, story effects, battles ordered, rewards | `crates/world/src/game.rs` |
+| Campaign bot (plays chapter 1, trains before bosses; balancing and the arc test) | `crates/sim/src/campaign.rs` |
+| Campaign content types (regions, instances, nodes, trails, heroes, monsters, dialogues, shops, equipment, missions, Guild ranks, story effects) | `crates/world/src/def.rs` |
+| A game in progress: commands, scenes, story effects, battles ordered, rewards, missions, auto saves and Game Over | `crates/world/src/game.rs` |
 | Levels, experience, hero stats and gear | `crates/world/src/progression.rs` |
-| What is saved: shared progress, per-mode save, modes | `crates/world/src/save.rs` |
+| What is saved: shared progress, per-mode save, modes, checkpoints, content epoch | `crates/world/src/save.rs` |
 | What the player sees of a game (fog of war, party, scene) | `crates/world/src/view.rs` |
 | World content checks and needed messages | `crates/world/src/validate.rs` |
 | World unit-test fixture | `crates/world/src/test_world.rs` |
 | Actions and items (data) | `content/actions.json`, `content/items.json` |
-| Campaign world (data) | `content/world/*.json`, `content/world/instances/<id>.json` |
+| Campaign world (data; `start.json` holds the content epoch) | `content/world/*.json`, `content/world/instances/<id>.json` |
 | Sandbox scenarios (data) | `sandbox/*.json` |
 | Sandbox-only engine tools (KO, apply status, fill gauge) | `crates/engine/src/debug.rs` |
 | Generic Rust helpers (numbers, text…) | `crates/utils/src/` |
@@ -70,7 +70,7 @@ change.
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
 | Sign-up, login and recovery pages, recovery key notice, account status | `web/src/account/` |
-| Mode choice, game screen, instance map, dialogue, shop, party and world map windows | `web/src/game/` |
+| Mode choice, game screen, instance map, dialogue, shop, party, world map and mission board windows, mission tracker | `web/src/game/` |
 | Generic TypeScript helpers (classNames, percentOf, fetchJson…) | `web/src/utils/` |
 | Shared UI components (Window, MenuList, Gauge, Button, Select…) and menu keyboard keys (`useMenuKeys`) | `web/src/ui/` |
 | App-level components (language picker) | `web/src/components/` |
@@ -237,8 +237,10 @@ Generic helpers live in **`crates/utils`** (Rust) and **`web/src/utils/`**
   change; an idea becomes canon only when the user approves it.
 - Every date, age or "X years ago" is checked against the timeline in
   `STORY.md`; a line never reveals a fact before its "when the player finds
-  out" moment. The story now in the game is a discarded pilot (see
-  `STORY.md`), not canon.
+  out" moment.
+- A content change that leaves old saves pointing at places or flags that no
+  longer exist raises `epoch` in `content/world/start.json`: saves of another
+  epoch start over.
 - Lines follow the speaker's sheet in `STORY.md` (personality, values, voice),
   never the mood of the day; a character or region without a filled sheet gets
   one before its lines. A line that contradicts a sheet is flagged: it is

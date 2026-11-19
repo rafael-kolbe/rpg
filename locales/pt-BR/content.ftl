@@ -62,30 +62,37 @@ item-hi-potion = Superpoção
 
 class-warrior = Guerreiro
 class-archer = Arqueira
-class-cleric = Clérigo
-hero-taren = Taren
+class-guard = Guarda
+class-soldier = Soldado
+hero-tauryen = Tauryen
 hero-lyra = Lyra
-hero-corin = Corin
+hero-merrick = Cabo Merrick
+hero-tobin = Tobin
 
 ## Monstros (campanha)
 
-monster-wild-wolf = Lobo Selvagem
-monster-wild-boar = Javali
-monster-giant-hornet = Vespa Gigante
 monster-goblin = Goblin
 monster-goblin-archer = Goblin Arqueiro
 monster-goblin-shaman = Goblin Xamã
-monster-grukk = Grukk, o Hobgoblin
+monster-bandit = Saqueador
+monster-hobgoblin = Hobgoblin
+monster-sewer-rat = Rato de Esgoto
 monster-giant-rat = Rato Gigante
-monster-crypt-bat = Morcego da Cripta
+monster-sewer-slime = Gosma de Esgoto
+monster-giant-roach = Barata Gigante
+monster-mutant-rat = Rato Mutante
+monster-giant-leech = Sanguessuga Gigante
+monster-sewer-crawler = Rastejador do Esgoto
+monster-injured-lich = Lich Ferido
+monster-zombie = Zumbi
 monster-skeleton = Esqueleto
-monster-ghoul = Carniçal
-monster-crypt-spider = Aranha da Cripta
-monster-skeleton-archer = Esqueleto Arqueiro
-monster-will-o-wisp = Fogo-fátuo
-monster-wraith = Espectro
-monster-skeleton-knight = Cavaleiro Esqueleto
-monster-bone-warden = O Guardião dos Ossos
+
+## Ações de monstros e convidados
+
+action-cover = Proteger
+action-devour = Devorar
+action-raise-dead = Erguer os Mortos
+action-dark-bolt = Raio Sombrio
 
 ## Equipamentos
 
@@ -95,22 +102,18 @@ equipment-steel-sword = Espada de Aço
 equipment-short-bow = Arco Curto
 equipment-hunting-bow = Arco de Caça
 equipment-longbow = Arco Longo
-equipment-oak-mace = Maça de Carvalho
-equipment-iron-mace = Maça de Ferro
 equipment-cloth-tunic = Túnica de Pano
 equipment-leather-vest = Colete de Couro
 equipment-chain-mail = Cota de Malha
 equipment-scout-coat = Casaco de Batedora
-equipment-acolyte-robe = Manto de Acólito
 
 ## Mundo
 
 region-brookhollow = Brookhollow
-region-thornwood = Floresta de Thornwood
+region-burrowood = Floresta de Burrowood
 region-valcrest = Valcrest
 instance-brookhollow = Brookhollow
-instance-thornwood = Estrada do Rei, Thornwood
-instance-valcrest = Cidade de Valcrest
-instance-catacombs-1 = Catacumbas de Valcrest — Nível 1
-instance-catacombs-2 = Catacumbas de Valcrest — Nível 2
-instance-catacombs-3 = Catacumbas de Valcrest — Nível 3
+instance-burrowood = Floresta de Burrowood
+instance-valcrest = Valcrest
+instance-valcrest-sewer-1 = Esgoto de Valcrest — Nível 1
+instance-valcrest-sewer-2 = Esgoto de Valcrest — Nível 2

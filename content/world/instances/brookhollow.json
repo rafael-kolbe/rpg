@@ -2,131 +2,52 @@
   "region": "brookhollow",
   "terrain": "fields",
   "nodes": {
+    "home": {
+      "x": 260,
+      "y": 640,
+      "label": "label-tauryen-home",
+      "kind": {"type": "npc", "name": "npc-brenna", "talks": [{"dialogue": "brenna-later"}]},
+      "event": {"dialogue": "farewell", "when": {"forbids": ["farewell-done"]}}
+    },
+    "hilda": {
+      "x": 140,
+      "y": 540,
+      "label": "label-hilda-home",
+      "kind": {"type": "npc", "name": "npc-hilda", "talks": [{"dialogue": "hilda-later"}]}
+    },
     "square": {
-      "x": 500,
-      "y": 690,
-      "label": "label-village-square",
-      "kind": { "type": "path" },
-      "event": { "dialogue": "intro", "when": { "forbids": ["intro-done"] } }
-    },
-    "chapel": { "x": 360, "y": 790, "label": "label-chapel", "kind": { "type": "temple" } },
-    "store": {
-      "x": 640,
-      "y": 790,
-      "label": "label-store",
-      "kind": { "type": "shop", "shop": "brookhollow-store" }
-    },
-    "elder": {
-      "x": 500,
-      "y": 860,
-      "kind": {
-        "type": "npc",
-        "name": "npc-elder",
-        "talks": [
-          { "dialogue": "elder-farm", "when": { "forbids": ["farm-saved"] } },
-          { "dialogue": "elder-later" }
-        ]
-      }
-    },
-    "fields": { "x": 450, "y": 520, "kind": { "type": "path" } },
-    "farm": {
-      "x": 200,
+      "x": 470,
       "y": 560,
-      "label": "label-farm",
-      "kind": {
-        "type": "battle",
-        "monsters": ["wild-wolf", "wild-wolf"],
-        "flag": "farm-saved",
-        "onWin": [{ "type": "crowns", "amount": 40 }]
-      },
-      "event": {
-        "dialogue": "farm-thanks",
-        "when": { "requires": ["farm-saved"], "forbids": ["farm-thanked"] }
-      }
+      "label": "label-well-square",
+      "kind": {"type": "npc", "name": "npc-jory", "talks": [{"dialogue": "jory-later"}]}
     },
-    "riverbank": {
-      "x": 770,
-      "y": 560,
-      "kind": { "type": "chest", "flag": "riverbank-chest", "items": { "antidote": 2 }, "crowns": 30 }
-    },
-    "old-mill": {
-      "x": 830,
-      "y": 370,
-      "label": "label-old-mill",
-      "kind": { "type": "chest", "flag": "mill-chest", "items": { "potion": 3 } }
-    },
-    "hill": { "x": 420, "y": 320, "kind": { "type": "path" } },
+    "bertram": {"x": 600, "y": 440, "label": "label-bertram-home", "kind": {"type": "path"}},
+    "barn": {"x": 680, "y": 600, "label": "label-barn", "kind": {"type": "path"}},
+    "mill": {"x": 580, "y": 740, "label": "label-mill", "kind": {"type": "path"}},
+    "river-mouth": {"x": 560, "y": 920, "label": "label-river-mouth", "kind": {"type": "path"}},
+    "fields": {"x": 300, "y": 420, "label": "label-wheat-fields", "kind": {"type": "path"}},
+    "oak": {"x": 130, "y": 330, "label": "label-old-oak", "kind": {"type": "path"}},
+    "cemetery": {"x": 800, "y": 300, "label": "label-hill-cemetery", "kind": {"type": "path"}},
+    "village-gate": {"x": 470, "y": 280, "kind": {"type": "path"}},
     "north-road": {
-      "x": 500,
-      "y": 110,
-      "kind": { "type": "exit", "to": { "instance": "thornwood", "node": "south-gate" } }
+      "x": 470,
+      "y": 90,
+      "label": "label-north-road",
+      "kind": {"type": "exit", "to": {"instance": "burrowood", "node": "south-edge"}}
     }
   },
   "trails": [
-    { "a": "square", "b": "chapel" },
-    { "a": "square", "b": "store" },
-    { "a": "square", "b": "elder" },
-    {
-      "a": "square",
-      "b": "fields",
-      "chance": 30,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet"] }
-      ]
-    },
-    {
-      "a": "fields",
-      "b": "farm",
-      "chance": 25,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet"] }
-      ]
-    },
-    {
-      "a": "fields",
-      "b": "riverbank",
-      "chance": 40,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet"] }
-      ]
-    },
-    {
-      "a": "riverbank",
-      "b": "old-mill",
-      "chance": 45,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf", "wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet", "giant-hornet"] },
-        { "weight": 1, "monsters": ["wild-boar", "wild-wolf"] }
-      ]
-    },
-    {
-      "a": "fields",
-      "b": "hill",
-      "chance": 40,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet"] }
-      ]
-    },
-    {
-      "a": "hill",
-      "b": "north-road",
-      "chance": 50,
-      "encounters": [
-        { "weight": 3, "monsters": ["wild-wolf", "wild-wolf"] },
-        { "weight": 2, "monsters": ["wild-boar"] },
-        { "weight": 2, "monsters": ["giant-hornet", "giant-hornet"] },
-        { "weight": 1, "monsters": ["wild-boar", "wild-wolf"] }
-      ]
-    }
+    {"a": "home", "b": "hilda"},
+    {"a": "home", "b": "square"},
+    {"a": "home", "b": "fields"},
+    {"a": "fields", "b": "oak"},
+    {"a": "square", "b": "bertram"},
+    {"a": "square", "b": "barn"},
+    {"a": "barn", "b": "mill"},
+    {"a": "mill", "b": "river-mouth"},
+    {"a": "bertram", "b": "cemetery"},
+    {"a": "square", "b": "village-gate"},
+    {"a": "fields", "b": "village-gate"},
+    {"a": "village-gate", "b": "north-road"}
   ]
 }

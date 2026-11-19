@@ -42,6 +42,10 @@ pub struct Encounter {
     pub party: Vec<CombatantSetup>,
     /// The monsters, in display order.
     pub enemies: Vec<CombatantSetup>,
+    /// Creatures an enemy can raise a fallen ally into ([`Effect::Reanimate`]),
+    /// by key.
+    #[serde(default)]
+    pub forms: BTreeMap<String, CombatantSetup>,
 }
 
 /// How a battle opens.
@@ -87,6 +91,14 @@ pub struct CombatantSetup {
     /// MP it enters with, when not full. `0..=maxMp`.
     #[serde(default)]
     pub mp: Option<u16>,
+    /// A guest in the party: acts on its own `ai` even when the player
+    /// commands the party.
+    #[serde(default)]
+    pub guest: bool,
+    /// An enemy whose fall ends the battle: once every leader is knocked
+    /// out, the enemies it commands fall with it.
+    #[serde(default)]
+    pub leader: bool,
 }
 
 /// Why a [`BattleSetup`] was rejected.
@@ -150,6 +162,22 @@ pub enum SetupError {
         /// Display name id of the combatant.
         name: String,
     },
+    /// A guest outside the party or a leader outside the enemies.
+    #[error("combatant `{name}`: {reason}")]
+    MisplacedRole {
+        /// Display name id of the combatant.
+        name: String,
+        /// The broken rule.
+        reason: &'static str,
+    },
+    /// An action raises a fallen ally into a form the encounter lacks.
+    #[error("`{owner}` can raise into form `{form}`, which the encounter lacks")]
+    UnknownForm {
+        /// Who knows the action.
+        owner: String,
+        /// The missing form key.
+        form: String,
+    },
     /// An AI profile is malformed or refers to something the combatant cannot do.
     #[error("combatant `{name}` AI: {reason}")]
     InvalidAi {
@@ -195,10 +223,25 @@ impl BattleSetup {
                     count: members.len(),
                 });
             }
-            let engine_controlled = side == Side::Enemies || party_control == PartyControl::Ai;
             for member in members {
+                let misplaced = match side {
+                    Side::Party if member.leader => Some("only enemies can be leaders"),
+                    Side::Enemies if member.guest => Some("only party members can be guests"),
+                    _ => None,
+                };
+                if let Some(reason) = misplaced {
+                    return Err(SetupError::MisplacedRole {
+                        name: member.name.clone(),
+                        reason,
+                    });
+                }
+                let engine_controlled =
+                    side == Side::Enemies || party_control == PartyControl::Ai || member.guest;
                 self.validate_combatant(member, engine_controlled)?;
             }
+        }
+        for form in self.encounter.forms.values() {
+            self.validate_combatant(form, true)?;
         }
         Ok(())
     }
@@ -248,6 +291,14 @@ impl BattleSetup {
                 &[ActionCategory::Magic, ActionCategory::Technic],
                 "a spell or technic",
             )?;
+            if let Effect::Reanimate { into } = &action.effect
+                && !self.encounter.forms.contains_key(into)
+            {
+                return Err(SetupError::UnknownForm {
+                    owner: name.to_owned(),
+                    form: into.clone(),
+                });
+            }
         }
 
         match &member.ai {
@@ -307,7 +358,7 @@ impl BattleSetup {
                     },
                 };
                 let action = self.action(&member.name, action_id)?;
-                if !pick_fits(rule.target, action) {
+                if !pick_fits(&rule.target, action) {
                     return Err(invalid(format!(
                         "target {:?} does not fit action `{action_id}`",
                         rule.target
@@ -346,6 +397,9 @@ fn validate_action(id: &ActionId, action: &ActionDef) -> Result<(), SetupError> 
         Effect::Revive { .. } if !action.target.on_own_side() => {
             invalid("revive must target the user's side")
         }
+        Effect::Devour | Effect::Reanimate { .. } if action.target != TargetRule::SingleAlly => {
+            invalid("devour and reanimate target a single ally")
+        }
         Effect::ApplyStatus { accuracy, .. } if !(1..=100).contains(accuracy) => {
             invalid("accuracy must be 1..=100")
         }
@@ -382,7 +436,7 @@ fn expect_category(
 }
 
 /// Whether an AI target pick can aim the given action.
-fn pick_fits(pick: TargetPick, action: &ActionDef) -> bool {
+fn pick_fits(pick: &TargetPick, action: &ActionDef) -> bool {
     let revive = action.effect.targets_knocked_out();
     match action.target {
         TargetRule::SingleEnemy => matches!(
@@ -391,10 +445,16 @@ fn pick_fits(pick: TargetPick, action: &ActionDef) -> bool {
                 | TargetPick::LowestHpOpponent
                 | TargetPick::OpponentWithStatus { .. }
         ),
-        TargetRule::SingleAlly if revive => pick == TargetPick::KnockedOutAlly,
+        TargetRule::SingleAlly if revive => matches!(
+            pick,
+            TargetPick::KnockedOutAlly | TargetPick::KnockedOutAllyNamed { .. }
+        ),
         TargetRule::SingleAlly => matches!(
             pick,
-            TargetPick::User | TargetPick::RandomAlly | TargetPick::LowestHpAlly
+            TargetPick::User
+                | TargetPick::RandomAlly
+                | TargetPick::LowestHpAlly
+                | TargetPick::AllyNamed { .. }
         ),
         TargetRule::AllEnemies | TargetRule::AllAllies | TargetRule::User => true,
     }
@@ -410,6 +470,43 @@ mod tests {
         let setup = catalog_setup(vec![fighter("hero")], vec![fighter("wolf")]);
 
         assert_eq!(setup.validate(PartyControl::Player), Ok(()));
+    }
+
+    #[test]
+    fn guests_belong_to_the_party_and_leaders_to_the_enemies() {
+        let mut guest = fighter("wolf");
+        guest.guest = true;
+        let setup = catalog_setup(vec![fighter("hero")], vec![guest]);
+
+        assert!(matches!(
+            setup.validate(PartyControl::Player),
+            Err(SetupError::MisplacedRole { .. })
+        ));
+
+        let mut leader = fighter("hero");
+        leader.leader = true;
+        let setup = catalog_setup(vec![leader], vec![fighter("wolf")]);
+
+        assert!(matches!(
+            setup.validate(PartyControl::Player),
+            Err(SetupError::MisplacedRole { .. })
+        ));
+    }
+
+    #[test]
+    fn a_creature_can_only_be_raised_into_a_form_of_the_encounter() {
+        let mut lich = fighter("lich");
+        lich.actions.push(ActionId::new("raise"));
+        let mut setup = catalog_setup(vec![fighter("hero")], vec![lich]);
+        setup.encounter.forms.clear();
+
+        assert_eq!(
+            setup.validate(PartyControl::Player),
+            Err(SetupError::UnknownForm {
+                owner: "lich".to_owned(),
+                form: "skeleton".to_owned(),
+            })
+        );
     }
 
     #[test]

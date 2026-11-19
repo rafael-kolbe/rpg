@@ -1,0 +1,119 @@
+{
+  "region": "valcrest",
+  "terrain": "crypt",
+  "nodes": {
+    "ladder": {
+      "x": 500,
+      "y": 970,
+      "label": "label-sewer-ladder",
+      "kind": {"type": "exit", "to": {"instance": "valcrest", "node": "sewer-gate"}}
+    },
+    "landing": {"x": 500, "y": 850, "kind": {"type": "path"}},
+    "tunnel-a": {"x": 280, "y": 720, "kind": {"type": "path"}},
+    "tunnel-b": {"x": 720, "y": 720, "kind": {"type": "path"}},
+    "junction": {"x": 500, "y": 560, "kind": {"type": "path"}},
+    "maintenance": {"x": 820, "y": 560, "label": "label-maintenance-room", "kind": {"type": "temple"}},
+    "slime-trail": {
+      "x": 250,
+      "y": 410,
+      "kind": {"type": "path"},
+      "event": {"dialogue": "clue-slime", "when": {"requires": ["squad-formed"], "forbids": ["clue-1"]}}
+    },
+    "torn-grate": {
+      "x": 740,
+      "y": 380,
+      "label": "label-torn-grate",
+      "kind": {"type": "path"},
+      "event": {"dialogue": "clue-grate", "when": {"requires": ["clue-1"], "forbids": ["clue-2"]}}
+    },
+    "stairs-down": {
+      "x": 500,
+      "y": 150,
+      "label": "label-stairs-down",
+      "kind": {"type": "exit", "to": {"instance": "valcrest-sewer-2", "node": "stairs-up"}},
+      "when": {"requires": ["clue-2"]}
+    }
+  },
+  "trails": [
+    {"a": "ladder", "b": "landing", "when": {"forbids": ["sewer-hunt"]}},
+    {
+      "a": "landing",
+      "b": "tunnel-a",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "landing",
+      "b": "tunnel-b",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "tunnel-a",
+      "b": "junction",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "tunnel-b",
+      "b": "junction",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "junction",
+      "b": "slime-trail",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "junction",
+      "b": "torn-grate",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {
+      "a": "slime-trail",
+      "b": "torn-grate",
+      "chance": 40,
+      "monsters": [
+        {"monster": "sewer-rat", "weight": 4},
+        {"monster": "giant-rat", "weight": 2},
+        {"monster": "sewer-slime", "weight": 2},
+        {"monster": "giant-roach", "weight": 1}
+      ]
+    },
+    {"a": "junction", "b": "stairs-down", "when": {"requires": ["clue-2"]}},
+    {"a": "junction", "b": "maintenance"}
+  ]
+}

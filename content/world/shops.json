@@ -1,36 +1,25 @@
 {
-  "brookhollow-store": {
-    "items": [{ "id": "potion", "price": 30 }, { "id": "antidote", "price": 20 }],
-    "equipment": [{ "id": "leather-vest", "price": 180 }]
-  },
-  "forest-trader": {
-    "items": [
-      { "id": "potion", "price": 35 },
-      { "id": "antidote", "price": 25 },
-      { "id": "ether", "price": 160 }
-    ],
-    "equipment": [{ "id": "iron-sword", "price": 420 }, { "id": "hunting-bow", "price": 450 }]
+  "valcrest-arsenal": {
+    "equipment": [
+      {"id": "iron-sword", "price": 400},
+      {"id": "steel-sword", "price": 1300},
+      {"id": "hunting-bow", "price": 430},
+      {"id": "longbow", "price": 1400},
+      {"id": "leather-vest", "price": 180},
+      {"id": "chain-mail", "price": 900},
+      {"id": "scout-coat", "price": 850}
+    ]
   },
   "valcrest-apothecary": {
     "items": [
-      { "id": "potion", "price": 30 },
-      { "id": "hi-potion", "price": 120 },
-      { "id": "ether", "price": 150 },
-      { "id": "antidote", "price": 20 },
-      { "id": "revive-feather", "price": 300 }
+      {"id": "potion", "price": 30},
+      {"id": "hi-potion", "price": 120},
+      {"id": "ether", "price": 150},
+      {"id": "antidote", "price": 20},
+      {"id": "revive-feather", "price": 300}
     ]
   },
-  "valcrest-armory": {
-    "equipment": [
-      { "id": "iron-sword", "price": 400 },
-      { "id": "steel-sword", "price": 1300 },
-      { "id": "hunting-bow", "price": 430 },
-      { "id": "longbow", "price": 1400 },
-      { "id": "iron-mace", "price": 650 },
-      { "id": "chain-mail", "price": 900 },
-      { "id": "scout-coat", "price": 850 },
-      { "id": "acolyte-robe", "price": 700 },
-      { "id": "leather-vest", "price": 180 }
-    ]
+  "valcrest-market": {
+    "items": [{"id": "potion", "price": 32}, {"id": "antidote", "price": 22}, {"id": "ether", "price": 160}]
   }
 }

@@ -6,8 +6,8 @@
 use engine::{Battle, BattleSetup, Encounter, ItemId, Opening, PartyControl};
 
 use crate::World;
-use crate::def::{NodeKind, StoryEffect};
-use crate::ids::{DialogueId, EquipmentId, HeroId, MonsterId, Position};
+use crate::def::{NodeKind, QuestGoal, StoryEffect};
+use crate::ids::{DialogueId, EquipmentId, HeroId, MonsterId, Position, QuestId};
 use crate::progression::MAX_LEVEL;
 use crate::save::HeroState;
 
@@ -28,6 +28,7 @@ pub fn problems(world: &World) -> Vec<String> {
     check.dialogues();
     check.shops();
     check.equipment();
+    check.quests();
     check.problems
 }
 
@@ -42,6 +43,20 @@ pub fn message_ids(world: &World) -> Vec<String> {
     ids.extend(map.heroes.keys().map(|id| format!("hero-{id}")));
     ids.extend(map.monsters.keys().map(|id| format!("monster-{id}")));
     ids.extend(map.equipment.keys().map(|id| format!("equipment-{id}")));
+    ids.extend(map.quests.keys().map(|id| format!("quest-{id}")));
+    for dialogue in map.dialogues.values() {
+        objective_ids(&dialogue.effects, &mut ids);
+        for choice in &dialogue.choices {
+            objective_ids(&choice.effects, &mut ids);
+        }
+    }
+    for instance in map.instances.values() {
+        for node in instance.nodes.values() {
+            if let NodeKind::Battle { on_win, .. } = &node.kind {
+                objective_ids(on_win, &mut ids);
+            }
+        }
+    }
     for (id, dialogue) in &map.dialogues {
         for (n, speaker) in dialogue.lines.iter().enumerate() {
             ids.push(format!("dialogue-{id}-{}", n + 1));
@@ -60,6 +75,19 @@ pub fn message_ids(world: &World) -> Vec<String> {
     ids.sort();
     ids.dedup();
     ids
+}
+
+/// The objective messages effects show, including after their battles.
+fn objective_ids(effects: &[StoryEffect], ids: &mut Vec<String>) {
+    for effect in effects {
+        match effect {
+            StoryEffect::Objective {
+                message: Some(message),
+            } => ids.push(message.clone()),
+            StoryEffect::Battle { on_win, .. } => objective_ids(on_win, ids),
+            _ => {}
+        }
+    }
 }
 
 struct Checker<'a> {
@@ -111,6 +139,36 @@ impl Checker<'_> {
         }
     }
 
+    fn quest(&mut self, owner: &str, quest: &QuestId) {
+        if !self.world.map.quests.contains_key(quest) {
+            self.report(format!("{owner}: unknown quest `{quest}`"));
+        }
+    }
+
+    fn quests(&mut self) {
+        for (id, quest) in &self.world.map.quests {
+            let owner = format!("quest `{id}`");
+            let QuestGoal::Kill { monsters, count } = &quest.goal;
+            if *count == 0 {
+                self.report(format!("{owner}: goal of 0"));
+            }
+            for monster in monsters {
+                if !self.world.map.monsters.contains_key(monster) {
+                    self.report(format!("{owner}: unknown monster `{monster}`"));
+                }
+            }
+            for event in &quest.events {
+                self.dialogue(&owner, &event.dialogue);
+                if event.at == 0 || event.at > *count {
+                    self.report(format!(
+                        "{owner}: event at {} outside 1..={count}",
+                        event.at
+                    ));
+                }
+            }
+        }
+    }
+
     fn fight(&mut self, owner: &str, monsters: &[MonsterId]) {
         if monsters.is_empty() || monsters.len() > MAX_ENEMIES {
             self.report(format!("{owner}: a fight needs 1..={MAX_ENEMIES} monsters"));
@@ -125,11 +183,27 @@ impl Checker<'_> {
     fn effects(&mut self, owner: &str, effects: &[StoryEffect]) {
         for (index, effect) in effects.iter().enumerate() {
             match effect {
-                StoryEffect::SetFlag { .. } | StoryEffect::Crowns { .. } | StoryEffect::Heal => {}
-                StoryEffect::Join { hero } => self.hero(owner, hero),
+                StoryEffect::SetFlag { .. }
+                | StoryEffect::Kalds { .. }
+                | StoryEffect::Heal
+                | StoryEffect::Objective { .. }
+                | StoryEffect::SetRank { .. }
+                | StoryEffect::Autosave => {}
+                StoryEffect::Join { hero, level, .. } => {
+                    self.hero(owner, hero);
+                    if level.is_some_and(|level| level == 0 || level > MAX_LEVEL) {
+                        self.report(format!("{owner}: join level out of 1..=99"));
+                    }
+                }
+                StoryEffect::Leave { hero } => self.hero(owner, hero),
+                StoryEffect::StartQuest { quest } => self.quest(owner, quest),
+                StoryEffect::Travel { to } => self.position(owner, to),
+                StoryEffect::Scene { dialogue } => self.dialogue(owner, dialogue),
                 StoryEffect::Give { item, .. } => self.item(owner, item),
                 StoryEffect::GiveEquipment { id } => self.piece(owner, id),
-                StoryEffect::Battle { monsters, on_win } => {
+                StoryEffect::Battle {
+                    monsters, on_win, ..
+                } => {
                     if index + 1 != effects.len() {
                         self.report(format!("{owner}: a battle effect must be the last"));
                     }
@@ -151,6 +225,7 @@ impl Checker<'_> {
             encounter: Encounter {
                 opening: Opening::Normal,
                 inventory: std::collections::BTreeMap::new(),
+                forms: self.world.forms_for(std::slice::from_ref(&enemy)),
                 party,
                 enemies: vec![enemy],
             },
@@ -241,8 +316,8 @@ impl Checker<'_> {
                 if trail.chance > 100 {
                     self.report(format!("{owner}: trail chance above 100%"));
                 }
-                for group in &trail.encounters {
-                    self.fight(&owner, &group.monsters);
+                for weighted in &trail.monsters {
+                    self.fight(&owner, std::slice::from_ref(&weighted.monster));
                 }
             }
             for (node_id, node) in &instance.nodes {
@@ -254,7 +329,13 @@ impl Checker<'_> {
                     self.dialogue(&owner, &event.dialogue);
                 }
                 match &node.kind {
-                    NodeKind::Path | NodeKind::Temple => {}
+                    NodeKind::Path | NodeKind::Temple | NodeKind::Inn { .. } | NodeKind::Sealed => {
+                    }
+                    NodeKind::Board { quests } => {
+                        for quest in quests {
+                            self.quest(&owner, quest);
+                        }
+                    }
                     NodeKind::Exit { to } => self.position(&owner, to),
                     NodeKind::Battle {
                         monsters, on_win, ..

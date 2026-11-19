@@ -8,10 +8,12 @@ use crate::def::{ClassDef, EquipmentDef, StatLine};
 /// Highest level.
 pub const MAX_LEVEL: u8 = 99;
 
-/// Experience needed to go from `level` to the next: `20 × level²`.
+/// Experience needed to go from `level` to the next: `12 × level³`. Steep
+/// on purpose: early levels come fast, later ones take the world's
+/// tougher places (`STORY.md`, Mecânicas que a história pede).
 #[must_use]
 pub fn xp_to_next(level: u8) -> u32 {
-    20 * u32::from(level) * u32::from(level)
+    12 * u32::from(level).pow(3)
 }
 
 /// `base + growth × (level − 1) / 10`, capped at `max`.
@@ -142,9 +144,10 @@ mod tests {
     }
 
     #[test]
-    fn the_next_level_costs_twenty_times_the_level_squared() {
-        assert_eq!(xp_to_next(1), 20);
-        assert_eq!(xp_to_next(10), 2000);
+    fn the_next_level_costs_twelve_times_the_level_cubed() {
+        assert_eq!(xp_to_next(1), 12);
+        assert_eq!(xp_to_next(10), 12_000);
+        assert_eq!(xp_to_next(98), 11_294_304);
     }
 
     #[test]
@@ -181,9 +184,9 @@ mod tests {
 
     #[test]
     fn experience_can_cross_several_levels_at_once() {
-        assert_eq!(add_xp(1, 10, 5), (1, 15));
-        assert_eq!(add_xp(1, 10, 10), (2, 0));
-        assert_eq!(add_xp(1, 0, 20 + 80 + 5), (3, 5));
+        assert_eq!(add_xp(1, 5, 5), (1, 10));
+        assert_eq!(add_xp(1, 10, 2), (2, 0));
+        assert_eq!(add_xp(1, 0, 12 + 96 + 5), (3, 5));
         assert_eq!(add_xp(98, 0, u32::MAX), (99, 0));
     }
 

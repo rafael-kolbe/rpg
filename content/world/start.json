@@ -1,6 +1,7 @@
 {
-  "position": { "instance": "brookhollow", "node": "square" },
-  "party": ["taren"],
-  "crowns": 50,
-  "inventory": { "potion": 2 }
+  "epoch": 1,
+  "position": {"instance": "brookhollow", "node": "home"},
+  "party": ["tauryen"],
+  "kalds": 50,
+  "inventory": {"potion": 2}
 }

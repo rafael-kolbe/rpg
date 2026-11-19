@@ -17,4 +17,4 @@ equipment: Array<EquipmentId>,
 /**
  * Money.
  */
-crowns: number, };
+kalds: number, };

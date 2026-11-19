@@ -24,4 +24,8 @@ done: boolean, } | { "type": "npc",
 /**
  * Fluent message id of the name.
  */
-name: string, } | { "type": "shop" } | { "type": "temple" };
+name: string, } | { "type": "shop" } | { "type": "temple" } | { "type": "inn", 
+/**
+ * Kalds per night.
+ */
+price: number, } | { "type": "board" } | { "type": "sealed" };

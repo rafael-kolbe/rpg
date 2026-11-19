@@ -185,7 +185,15 @@ status: StatusKind,
 /**
  * Why it ended.
  */
-reason: StatusEndReason, } | { "type": "knocked_out", 
+reason: StatusEndReason, } | { "type": "covered", 
+/**
+ * Who took the attack.
+ */
+protector: CombatantId, 
+/**
+ * Who was aimed at.
+ */
+protected: CombatantId, } | { "type": "knocked_out", 
 /**
  * Who.
  */

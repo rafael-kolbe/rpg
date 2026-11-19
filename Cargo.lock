@@ -1456,6 +1456,7 @@ dependencies = [
  "engine",
  "getrandom 0.4.3",
  "protocol",
+ "serde",
  "serde_json",
  "sha2",
  "sqlx",

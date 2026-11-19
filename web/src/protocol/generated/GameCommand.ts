@@ -2,6 +2,7 @@
 import type { EquipmentId } from "./EquipmentId";
 import type { ItemId } from "./ItemId";
 import type { NodeId } from "./NodeId";
+import type { QuestId } from "./QuestId";
 import type { ShopGood } from "./ShopGood";
 import type { Slot } from "./Slot";
 
@@ -56,4 +57,8 @@ item: ItemId,
 /**
  * Party index of the hero.
  */
-hero: number, };
+hero: number, } | { "type": "accept_quest", 
+/**
+ * The mission.
+ */
+quest: QuestId, };

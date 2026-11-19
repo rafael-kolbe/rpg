@@ -1,5 +1,6 @@
 {
-  "taren": { "class": "warrior", "weapon": "bronze-sword", "armor": "cloth-tunic" },
-  "lyra": { "class": "archer", "weapon": "short-bow", "armor": "leather-vest" },
-  "corin": { "class": "cleric", "weapon": "oak-mace", "armor": "cloth-tunic" }
+  "tauryen": {"class": "warrior", "weapon": "bronze-sword", "armor": "cloth-tunic"},
+  "lyra": {"class": "archer", "weapon": "short-bow", "armor": "leather-vest"},
+  "merrick": {"class": "guard", "weapon": "iron-sword", "armor": "chain-mail"},
+  "tobin": {"class": "soldier", "weapon": "iron-sword", "armor": "leather-vest"}
 }
