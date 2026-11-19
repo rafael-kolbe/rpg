@@ -42,6 +42,9 @@ export function AccountStatus() {
       return (
         <p className="account-status" data-testid="account-status">
           {t('ui-account-logged-in', { username: session.username })}{' '}
+          <a href="/play" data-testid="play">
+            {t('ui-play')}
+          </a>{' '}
           <Button onClick={() => void leave()} testId="account-log-out">
             {t('ui-account-log-out')}
           </Button>

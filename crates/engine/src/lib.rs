@@ -53,6 +53,8 @@
 //!             }],
 //!         }],
 //!     }),
+//!     hp: None,
+//!     mp: None,
 //! };
 //!
 //! let setup = BattleSetup {
@@ -92,6 +94,7 @@ mod debug;
 mod effects;
 mod event;
 mod ids;
+mod record;
 mod rng;
 mod setup;
 mod stats;
@@ -110,6 +113,8 @@ pub use battle::{Battle, Command, CommandError, CommandKind, Outcome, PartyContr
 pub use combatant::{Combatant, TurnState};
 pub use event::{BattleEvent, CancelReason, FailReason, StatusEndReason};
 pub use ids::{ActionId, CombatantId, ItemId, Side};
+pub use record::{BattleRecord, RecordedCommand, ReplayError};
+pub use rng::Rng;
 pub use setup::{BattleSetup, CombatantSetup, Encounter, Opening, SetupError};
 pub use stats::{Attributes, Equipment, Stats};
 pub use status::{StatusKind, StatusTimer};

@@ -1,0 +1,23 @@
+[package]
+name = "world"
+version = "0.1.0"
+description = "Pure campaign rules: map, fog of war, story flags, dialogues, encounters, progression. No I/O."
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+ts = ["dep:ts-rs", "engine/ts"]
+
+[dependencies]
+engine = { version = "0.1.0", path = "../engine" }
+serde = { version = "1.0.229", features = ["derive"] }
+thiserror = "2.0.21"
+ts-rs = { version = "12.0.1", optional = true, features = ["no-serde-warnings"] }
+
+[dev-dependencies]
+serde_json = "1.0.154"

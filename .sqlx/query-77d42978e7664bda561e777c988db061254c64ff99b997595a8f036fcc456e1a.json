@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT data AS \"data: Json<Save>\" FROM saves WHERE account_id = $1 AND mode = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data: Json<Save>",
+        "type_info": "Jsonb",
+        "origin": {
+          "Table": {
+            "table": "saves",
+            "name": "data"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "77d42978e7664bda561e777c988db061254c64ff99b997595a8f036fcc456e1a"
+}

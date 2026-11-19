@@ -1,0 +1,454 @@
+/* Game screen: instance map, dialogue, windows (web/src/game). */
+
+.game {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.game__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.game__place {
+  flex: 1;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.game__error {
+  margin: 0;
+  color: var(--color-warning);
+}
+
+.crowns {
+  color: #f0d77a;
+  font-weight: 700;
+}
+
+/* The map and what lays over it share this box. */
+.game__stage {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+/* --- instance map ------------------------------------------------------- */
+
+.instance-map {
+  width: min(100%, 68vh);
+  aspect-ratio: 1;
+  justify-self: center;
+  border: 2px solid #8a93b8;
+  border-radius: var(--radius);
+}
+
+.instance-map--fields .instance-map__ground {
+  fill: #4f7a3a;
+}
+
+.instance-map--forest .instance-map__ground {
+  fill: #23452a;
+}
+
+.instance-map--town .instance-map__ground {
+  fill: #7d7461;
+}
+
+.instance-map--crypt .instance-map__ground {
+  fill: #2f2b33;
+}
+
+.instance-map__fog {
+  fill: #0d0f16;
+  opacity: 0.94;
+}
+
+.trail {
+  stroke: #f1e6c8;
+  stroke-width: 7;
+  stroke-dasharray: 18 14;
+  stroke-linecap: round;
+  opacity: 0.85;
+}
+
+.trail--closed {
+  stroke: #d9534f;
+  opacity: 0.6;
+}
+
+.map-node {
+  cursor: default;
+}
+
+.map-node--reachable,
+.map-node--here {
+  cursor: pointer;
+}
+
+.map-node--reachable:hover .node-icon > circle:first-child,
+.map-node--reachable:hover.node-icon {
+  stroke: #fff;
+  stroke-width: 4;
+}
+
+.map-node__marker {
+  fill: none;
+  stroke: #ffe066;
+  stroke-width: 5;
+  animation: hero-marker 1.4s ease-in-out infinite;
+}
+
+@keyframes hero-marker {
+  50% {
+    r: 40px;
+    opacity: 0.4;
+  }
+}
+
+.map-node__name {
+  fill: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  paint-order: stroke fill;
+  stroke: #000;
+  stroke-width: 5px;
+  pointer-events: none;
+}
+
+.node-icon > circle:first-child,
+.node-icon--path {
+  fill: #1c2030;
+  stroke: #f1e6c8;
+  stroke-width: 3;
+}
+
+.node-icon path,
+.node-icon rect {
+  fill: none;
+  stroke: #f1e6c8;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.node-icon--path {
+  fill: #f1e6c8;
+}
+
+.node-icon--battle > circle:first-child {
+  fill: #6b2323;
+}
+
+.node-icon--boss > circle:first-child {
+  fill: #3d0d0d;
+  stroke: #ff6b5a;
+}
+
+.node-icon--boss path {
+  fill: #f1e6c8;
+}
+
+.node-icon__hole {
+  fill: #3d0d0d;
+}
+
+.node-icon--chest > circle:first-child {
+  fill: #6b4b16;
+}
+
+.node-icon--npc > circle:first-child {
+  fill: #23406b;
+}
+
+.node-icon--npc > circle:nth-child(2) {
+  fill: none;
+  stroke: #f1e6c8;
+  stroke-width: 3;
+}
+
+.node-icon--shop > circle:first-child {
+  fill: #2f6b4b;
+}
+
+.node-icon--temple > circle:first-child {
+  fill: #e8e3cf;
+}
+
+.node-icon--temple path {
+  stroke: #6b4b16;
+}
+
+.node-icon--exit > circle:first-child {
+  fill: #3a3a66;
+}
+
+.node-icon[data-done='true'] {
+  opacity: 0.4;
+}
+
+.node-icon--glimpsed circle {
+  fill: #3a3d4d;
+  stroke: #9a9cab;
+  stroke-width: 3;
+}
+
+.node-icon--glimpsed text {
+  fill: #9a9cab;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.node-icon--barrier circle {
+  fill: #2a1d1d;
+  stroke: #d9534f;
+  stroke-width: 3;
+}
+
+.node-icon--barrier path {
+  stroke: #d9534f;
+}
+
+/* --- panels and windows -------------------------------------------------- */
+
+.node-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.node-panel__hint,
+.game-window__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.node-panel__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.game-window {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 48px);
+  overflow-y: auto;
+  display: grid;
+  gap: 10px;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 60%);
+}
+
+.game-window h2 {
+  margin: 0;
+}
+
+.game-window__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.game-window__empty {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.shop__modes {
+  display: flex;
+  gap: 8px;
+}
+
+.notice__lines {
+  margin: 0;
+  padding-left: 20px;
+}
+
+/* --- dialogue -------------------------------------------------------------- */
+
+.dialogue {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 12px;
+}
+
+.dialogue__avatar {
+  display: grid;
+  place-content: center;
+  width: 84px;
+  height: 84px;
+  border: 2px solid #8a93b8;
+  border-radius: var(--radius);
+  background: #23306a;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.dialogue__box {
+  grid-column: 2;
+  position: relative;
+  min-height: 100px;
+  padding: 12px 16px;
+  border: 2px solid #8a93b8;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #23306a 0%, #121a3d 100%);
+  cursor: pointer;
+}
+
+.dialogue__speaker {
+  margin: 0 0 4px;
+  color: #ffe066;
+  font-weight: 700;
+}
+
+.dialogue__text {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.dialogue__text--narration {
+  font-style: italic;
+  color: #d8d4c4;
+}
+
+.dialogue__next {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  animation: dialogue-next 1s ease-in-out infinite;
+}
+
+@keyframes dialogue-next {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* --- party window ---------------------------------------------------------- */
+
+.party-window {
+  width: min(980px, calc(100% - 32px));
+}
+
+.party-window__heroes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 300px));
+  justify-content: center;
+  gap: 12px;
+}
+
+.hero-card {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: var(--radius);
+}
+
+.hero-card h3 {
+  margin: 0;
+}
+
+.hero-card h3 small {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.hero-card__xp,
+.hero-card__actions {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.hero-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.hero-card__stats div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.hero-card__stats dt {
+  color: var(--color-muted);
+}
+
+.hero-card__stats dd {
+  margin: 0;
+}
+
+.hero-card__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* --- world map ------------------------------------------------------------- */
+
+.world-map__svg {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+}
+
+.world-map__fog {
+  fill: #1a1d29;
+}
+
+.region path {
+  fill: #4f7a3a;
+  stroke: #f1e6c8;
+  stroke-width: 4;
+}
+
+.region--current path {
+  fill: #6f9a4a;
+  stroke: #ffe066;
+  stroke-width: 7;
+}
+
+.region text {
+  fill: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  paint-order: stroke fill;
+  stroke: #000;
+  stroke-width: 6px;
+}
+
+/* --- mode select ------------------------------------------------------------- */
+
+.mode-select {
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.mode-select h1 {
+  margin: 0;
+}
+
+.mode-select__hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}

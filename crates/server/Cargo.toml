@@ -17,7 +17,7 @@ workspace = true
 [features]
 # Sandbox scenarios and debug tools (`/sandbox/*`, `/api/sandbox`). For local
 # testing only: production images are built without it.
-sandbox = ["engine/sandbox", "dep:content"]
+sandbox = ["engine/sandbox"]
 
 [dependencies]
 anyhow = "1.0.104"
@@ -25,18 +25,19 @@ argon2 = "0.6.0"
 axum = { version = "0.8.9", features = ["ws"] }
 axum-extra = { version = "0.12.6", features = ["cookie"] }
 base64 = "0.23.1"
-content = { version = "0.1.0", path = "../content", optional = true }
+content = { version = "0.1.0", path = "../content" }
 engine = { version = "0.1.0", path = "../engine" }
 getrandom = "0.4.3"
 protocol = { version = "0.1.0", path = "../protocol" }
 serde_json = "1.0.154"
 sha2 = "0.11.1"
-sqlx = { version = "0.9.1", default-features = false, features = ["runtime-tokio", "postgres", "macros", "migrate"] }
+sqlx = { version = "0.9.1", default-features = false, features = ["runtime-tokio", "postgres", "macros", "migrate", "json"] }
 time = "0.3.55"
 tokio = { version = "1.54.1", features = ["macros", "rt-multi-thread", "net", "signal", "io-util", "time"] }
 tower-http = { version = "0.7.1", features = ["fs", "trace"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
+world = { version = "0.1.0", path = "../world" }
 
 [dev-dependencies]
 serde_json = "1.0.154"

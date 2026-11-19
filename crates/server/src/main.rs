@@ -13,8 +13,10 @@ mod accounts;
 mod config;
 mod healthcheck;
 mod http;
+mod open_games;
 #[cfg(feature = "sandbox")]
 mod sandbox;
+mod saves;
 mod ws;
 
 use std::net::{Ipv4Addr, SocketAddr};
@@ -58,9 +60,18 @@ async fn serve(config: Config) -> anyhow::Result<()> {
     };
     tokio::spawn(migrate(db.clone()));
 
+    let content = content::Content::load(&config.content_dir)?;
+    let world = content.load_world(&config.content_dir)?;
+    let problems = world::validate::problems(&world);
+    if !problems.is_empty() {
+        bail!("invalid world content:\n{}", problems.join("\n"));
+    }
+
     let state = http::AppState {
         db,
         attempts: std::sync::Arc::default(),
+        open_games: std::sync::Arc::default(),
+        world: std::sync::Arc::new(world),
         #[cfg(feature = "sandbox")]
         sandbox,
     };

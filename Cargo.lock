@@ -340,6 +340,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "utils",
+ "world",
 ]
 
 [[package]]
@@ -1249,6 +1250,7 @@ dependencies = [
  "serde",
  "serde_json",
  "ts-rs",
+ "world",
 ]
 
 [[package]]
@@ -1464,6 +1466,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "world",
 ]
 
 [[package]]
@@ -1526,6 +1529,7 @@ dependencies = [
  "clap",
  "content",
  "engine",
+ "world",
 ]
 
 [[package]]
@@ -1639,7 +1643,9 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx-core",
+ "sqlx-mysql",
  "sqlx-postgres",
+ "sqlx-sqlite",
  "syn 2.0.119",
  "thiserror",
  "tokio",
@@ -2324,6 +2330,17 @@ name = "wit-bindgen"
 version = "0.57.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
+
+[[package]]
+name = "world"
+version = "0.1.0"
+dependencies = [
+ "engine",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "ts-rs",
+]
 
 [[package]]
 name = "writeable"

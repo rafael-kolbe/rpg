@@ -31,7 +31,8 @@ use protocol::{
 };
 
 pub(crate) use self::rate_limit::Attempts;
-use self::store::{AccountId, InsertError};
+pub(crate) use self::store::AccountId;
+use self::store::InsertError;
 use crate::http::AppState;
 
 /// Name of the session cookie.
@@ -43,6 +44,19 @@ pub(crate) fn routes() -> axum::Router<AppState> {
         .route("/accounts", post(sign_up))
         .route("/accounts/recover", post(recover))
         .route("/session", get(session).post(log_in).delete(log_out))
+}
+
+/// The logged-in account of a request, from its session cookie; `None`
+/// without a valid session (or when the database is down).
+pub(crate) async fn account_of(state: &AppState, jar: &CookieJar) -> Option<AccountId> {
+    let cookie = jar.get(SESSION_COOKIE)?;
+    match store::session_account(&state.db, &credentials::digest(cookie.value())).await {
+        Ok(account) => account,
+        Err(error) => {
+            tracing::error!(%error, "session lookup failed");
+            None
+        }
+    }
 }
 
 /// A failed account request: status code and error body.

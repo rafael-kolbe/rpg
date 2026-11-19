@@ -6,6 +6,7 @@ and Online Mode (co-op); every rule runs on the server.
 - **Game design (current, in Portuguese):** `PLAN.md`. Read the relevant section
   before implementing a feature; it is the source of truth for rules.
 - **Why things are the way they are:** `docs/decisions/` (one ADR per decision).
+- **The story (canon, open questions, ideas, in Portuguese):** `STORY.md`.
 - **This file:** where things live and how to work here. Keep it current.
 
 ## Where things live
@@ -27,11 +28,21 @@ change.
 | Battle setup and its validation | `crates/engine/src/setup.rs` |
 | Battle events | `crates/engine/src/event.rs` |
 | Deterministic RNG | `crates/engine/src/rng.rs` |
+| Battle record and replay (resume a battle where it was) | `crates/engine/src/record.rs` |
 | Engine unit-test fixtures | `crates/engine/src/test_support.rs` |
 | Loading content and scenarios | `crates/content/src/lib.rs` |
 | Content validation (`content-check`) | `crates/content/src/validation.rs` |
 | Battle simulator CLI | `crates/sim/src/main.rs` |
+| Campaign bot (plays the first arc; balancing and the arc test) | `crates/sim/src/campaign.rs` |
+| Campaign content types (regions, instances, nodes, trails, heroes, monsters, dialogues, shops, equipment) | `crates/world/src/def.rs` |
+| A game in progress: commands, scenes, story effects, battles ordered, rewards | `crates/world/src/game.rs` |
+| Levels, experience, hero stats and gear | `crates/world/src/progression.rs` |
+| What is saved: shared progress, per-mode save, modes | `crates/world/src/save.rs` |
+| What the player sees of a game (fog of war, party, scene) | `crates/world/src/view.rs` |
+| World content checks and needed messages | `crates/world/src/validate.rs` |
+| World unit-test fixture | `crates/world/src/test_world.rs` |
 | Actions and items (data) | `content/actions.json`, `content/items.json` |
+| Campaign world (data) | `content/world/*.json`, `content/world/instances/<id>.json` |
 | Sandbox scenarios (data) | `sandbox/*.json` |
 | Sandbox-only engine tools (KO, apply status, fill gauge) | `crates/engine/src/debug.rs` |
 | Generic Rust helpers (numbers, text…) | `crates/utils/src/` |
@@ -42,20 +53,24 @@ change.
 | Account routes, session cookie | `crates/server/src/accounts/mod.rs` |
 | Username/password rules, password hashing, recovery keys, session tokens | `crates/server/src/accounts/credentials.rs` |
 | Account and session queries | `crates/server/src/accounts/store.rs` |
+| Game saves (progress, per-mode save) | `crates/server/src/saves.rs` |
+| Wire protocol: `GET /api/game` | `crates/protocol/src/game.rs` |
 | Failed login/recovery rate limit | `crates/server/src/accounts/rate_limit.rs` |
+| One live game per account (a newer tab closes the older) | `crates/server/src/open_games.rs` |
 | Database schema (SQLx migrations, applied at server startup) | `migrations/` |
 | Checked query metadata for offline builds (generated, committed) | `.sqlx/` |
-| Battle session per WebSocket connection (`/ws`) | `crates/server/src/ws.rs` |
+| Game and battle session per WebSocket connection (`/ws`), handshake origin check, message limits | `crates/server/src/ws.rs` |
 | Sandbox scenarios loaded by the server | `crates/server/src/sandbox.rs` |
 | Generated TS types of the protocol (never edit) | `web/src/protocol/generated/` |
 | Server entry point, CLI commands | `crates/server/src/main.rs` |
 | Server configuration (env vars) | `crates/server/src/config.rs` |
 | HTTP routes (`/api/*`, static client) | `crates/server/src/http.rs` |
 | Docker healthcheck command | `crates/server/src/healthcheck.rs` |
-| UI text and game text, per language | `locales/<locale>/*.ftl` |
+| UI text and game text, per language (story lines in `story.ftl`) | `locales/<locale>/*.ftl` |
 | i18n runtime in the client | `web/src/i18n/` |
 | API calls from the client | `web/src/api/` |
 | Sign-up, login and recovery pages, recovery key notice, account status | `web/src/account/` |
+| Mode choice, game screen, instance map, dialogue, shop, party and world map windows | `web/src/game/` |
 | Generic TypeScript helpers (classNames, percentOf, fetchJson…) | `web/src/utils/` |
 | Shared UI components (Window, MenuList, Gauge, Button, Select…) and menu keyboard keys (`useMenuKeys`) | `web/src/ui/` |
 | App-level components (language picker) | `web/src/components/` |
@@ -67,9 +82,10 @@ change.
 | Quality scripts used by `make check` | `scripts/`, `web/scripts/` |
 | Database backup job | `scripts/backup.sh` (run by the `backup` service) |
 
-Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
-`server` → all; `engine` never depends on I/O, network, clock or OS randomness;
-`utils` depends on nothing and anyone may use it.
+Dependency direction (enforced by Cargo): `world` → `engine`; `protocol`,
+`content` → `engine`, `world`; `server` and `sim` → all; `engine` and `world`
+never depend on I/O, network, clock or OS randomness; `utils` depends on
+nothing and anyone may use it.
 
 ## Commands
 
@@ -83,8 +99,10 @@ Dependency direction (enforced by Cargo): `protocol`, `content` → `engine`;
 | `make sqlx-prepare` | Refresh `.sqlx/` after adding or changing a query (needs the dev database, started for you) |
 | `make docs` | Build and open rustdoc for the whole workspace |
 | `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`) |
+| `make sim-campaign` / `RUNS=8` | A bot plays the campaign's first arc: full log / levels, defeats and battle time per seed |
 | `make e2e` | Build the client and run the Playwright browser tests (starts its own sandbox server) |
 | Sandbox in the browser | `make dev-server` + `make dev-web`, open `/sandbox/battle-basic` (`?seed=42&auto=1&speed=400`) |
+| Play the campaign | `make dev-db` + `make dev-server` + `make dev-web`, open `/signup` (or `/play` when logged in) |
 
 Builds use `SQLX_OFFLINE=true` (set by the Makefile, Playwright and the
 Dockerfile): queries are checked against `.sqlx/`, never a live database. A
@@ -96,8 +114,8 @@ shell, `source ~/.cargo/env` first.
 ## Conventions
 
 Everything in the repository is in **English**: code, identifiers, content ids,
-comments, commit messages, docs. Exception: `PLAN.md` (design conversation, in
-Portuguese).
+comments, commit messages, docs. Exceptions: `PLAN.md` and `STORY.md` (design
+conversation, in Portuguese).
 
 | Where | Convention | Example |
 | --- | --- | --- |
@@ -202,13 +220,29 @@ Generic helpers live in **`crates/utils`** (Rust) and **`web/src/utils/`**
 ## Sandbox
 
 - Built only with the `sandbox` Cargo feature (`server/sandbox` → `engine/sandbox`).
-  `make dev-server` and `make e2e` enable it; Docker builds it when `.env` has
-  `SANDBOX=true` (fine on localhost, **never** in a published image).
+  `make dev-server` and `make e2e` enable it; Docker builds it only when `.env`
+  has `SANDBOX=true` (default `false`; localhost only, **never** in a published
+  image).
 - A new scenario is a JSON file in `sandbox/`; the server and `content-check`
   validate it at startup / check time. Prefer a scenario over manual setup when
   testing a mechanic.
 
 ## Content rules
+
+- The story is data: a new scene is a dialogue in `content/world/dialogues.json`
+  plus its lines in `locales/*/story.ftl`; flags gate trails, nodes, events
+  and talks. Run `make sim-campaign` after balance changes: the arc test fails
+  if the bot can no longer finish it.
+- A story change (a line, a scene, a name) updates `STORY.md` in the same
+  change; an idea becomes canon only when the user approves it.
+- Every date, age or "X years ago" is checked against the timeline in
+  `STORY.md`; a line never reveals a fact before its "when the player finds
+  out" moment. The story now in the game is a discarded pilot (see
+  `STORY.md`), not canon.
+- Lines follow the speaker's sheet in `STORY.md` (personality, values, voice),
+  never the mood of the day; a character or region without a filled sheet gets
+  one before its lines. A line that contradicts a sheet is flagged: it is
+  either fixed or a deliberate arc change recorded in the sheet.
 
 - Content is data: `content/` (game) and `sandbox/` (test scenarios). The engine
   never hard-codes an action, item or monster.

@@ -26,6 +26,10 @@ pub(crate) struct AppState {
     pub(crate) db: PgPool,
     /// Failed login and recovery attempts.
     pub(crate) attempts: std::sync::Arc<crate::accounts::Attempts>,
+    /// Each account's live game (one tab at a time).
+    pub(crate) open_games: std::sync::Arc<crate::open_games::OpenGames>,
+    /// The campaign world and the definitions battles need.
+    pub(crate) world: std::sync::Arc<world::World>,
     #[cfg(feature = "sandbox")]
     pub(crate) sandbox: std::sync::Arc<crate::sandbox::Sandbox>,
 }
@@ -34,6 +38,7 @@ pub(crate) struct AppState {
 pub(crate) fn router(state: AppState, web_dir: &Path) -> Router {
     let api = Router::new()
         .route("/health", get(health))
+        .route("/game", get(game_summary))
         .merge(crate::accounts::routes());
     #[cfg(feature = "sandbox")]
     let api = api.route("/sandbox", get(sandbox_list));
@@ -70,6 +75,28 @@ async fn health(State(state): State<AppState>) -> (StatusCode, Json<HealthRespon
     };
 
     (code, Json(body))
+}
+
+/// `GET /api/game`: the logged-in player's games, for the mode choice.
+async fn game_summary(
+    State(state): State<AppState>,
+    jar: axum_extra::extract::cookie::CookieJar,
+) -> Result<Json<protocol::GameSummary>, StatusCode> {
+    let account = crate::accounts::account_of(&state, &jar)
+        .await
+        .ok_or(StatusCode::UNAUTHORIZED)?;
+    let progress = crate::saves::progress(&state.db, account).await;
+    let campaign = crate::saves::save(&state.db, account, world::GameMode::Campaign).await;
+    match (progress, campaign) {
+        (Ok(progress), Ok(campaign)) => Ok(Json(protocol::GameSummary {
+            campaign_started: campaign.is_some(),
+            multiplayer_unlocked: progress.multiplayer_unlocked(),
+        })),
+        (Err(db_error), _) | (_, Err(db_error)) => {
+            tracing::error!(%db_error, "cannot read the game summary");
+            Err(StatusCode::SERVICE_UNAVAILABLE)
+        }
+    }
 }
 
 /// `GET /api/sandbox`: names of the sandbox scenarios.
@@ -136,7 +163,16 @@ pub(crate) mod tests {
         AppState {
             db: unreachable_database(),
             attempts: std::sync::Arc::default(),
+            open_games: std::sync::Arc::default(),
+            world: test_world(),
         }
+    }
+
+    /// The repository's world.
+    pub(crate) fn test_world() -> std::sync::Arc<world::World> {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../content");
+        let content = content::Content::load(&dir).unwrap();
+        std::sync::Arc::new(content.load_world(&dir).unwrap())
     }
 
     #[cfg(feature = "sandbox")]
@@ -153,6 +189,8 @@ pub(crate) mod tests {
         AppState {
             db: unreachable_database(),
             attempts: std::sync::Arc::default(),
+            open_games: std::sync::Arc::default(),
+            world: test_world(),
             sandbox: std::sync::Arc::new(sandbox),
         }
     }

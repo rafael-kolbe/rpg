@@ -1,0 +1,79 @@
+{
+  "intro": {
+    "lines": [null, "hero-taren", "npc-elder", "hero-taren"],
+    "effects": [
+      { "type": "set_flag", "flag": "intro-done" },
+      { "type": "give", "item": "potion", "count": 3 }
+    ]
+  },
+  "elder-farm": { "lines": ["npc-elder", "npc-elder"] },
+  "elder-later": { "lines": ["npc-elder"] },
+  "farm-thanks": {
+    "lines": ["npc-farmer", "hero-taren", "npc-farmer"],
+    "effects": [
+      { "type": "set_flag", "flag": "farm-thanked" },
+      { "type": "give_equipment", "id": "leather-vest" }
+    ]
+  },
+  "meet-lyra": {
+    "lines": [null, "hero-lyra", "hero-taren", "hero-lyra", "hero-taren", "hero-lyra", null],
+    "effects": [
+      { "type": "join", "hero": "lyra" },
+      { "type": "set_flag", "flag": "lyra-joined" },
+      { "type": "battle", "monsters": ["goblin", "goblin"] }
+    ]
+  },
+  "lyra-insists": {
+    "lines": ["hero-lyra", "hero-taren"],
+    "effects": [{ "type": "set_flag", "flag": "lyra-insisted" }]
+  },
+  "after-grukk": {
+    "lines": [null, "hero-lyra", "hero-taren", "hero-lyra"],
+    "effects": [
+      { "type": "set_flag", "flag": "grukk-aftermath" },
+      { "type": "crowns", "amount": 200 }
+    ]
+  },
+  "arrive-valcrest": {
+    "lines": [null, "hero-taren", "hero-lyra"],
+    "effects": [{ "type": "set_flag", "flag": "valcrest-arrived" }]
+  },
+  "guild-register": {
+    "lines": ["npc-clerk", "hero-taren", "npc-clerk"],
+    "effects": [
+      { "type": "set_flag", "flag": "guild-registered" },
+      { "type": "give", "item": "potion", "count": 2 }
+    ]
+  },
+  "guild-later": { "lines": ["npc-clerk"] },
+  "holt-report": {
+    "lines": ["npc-holt", "hero-lyra", "npc-holt", "npc-holt", "hero-taren", "npc-holt"],
+    "effects": [
+      { "type": "set_flag", "flag": "mission-reported" },
+      { "type": "crowns", "amount": 500 },
+      { "type": "give", "item": "hi-potion", "count": 2 }
+    ]
+  },
+  "holt-catacombs": { "lines": ["npc-holt"] },
+  "enter-catacombs": {
+    "lines": [null, "hero-lyra", "hero-taren"],
+    "effects": [{ "type": "set_flag", "flag": "catacombs-entered" }]
+  },
+  "free-corin": {
+    "lines": [null, "hero-corin", "hero-taren", "hero-corin", "hero-lyra", "hero-corin", null],
+    "effects": [
+      { "type": "join", "hero": "corin" },
+      { "type": "set_flag", "flag": "corin-joined" },
+      { "type": "heal" }
+    ]
+  },
+  "after-warden": {
+    "lines": [null, "hero-corin", "hero-lyra", "hero-taren"],
+    "effects": [{ "type": "set_flag", "flag": "warden-aftermath" }]
+  },
+  "holt-ending": {
+    "lines": ["npc-holt", "hero-lyra", "npc-holt", "hero-taren", null],
+    "effects": [{ "type": "set_flag", "flag": "arc-complete" }, { "type": "crowns", "amount": 1000 }]
+  },
+  "holt-after": { "lines": ["npc-holt"] }
+}

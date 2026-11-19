@@ -19,7 +19,7 @@ export function LoginPage() {
     setBusy(true)
     const result = await logIn({ username, password })
     setBusy(false)
-    if (result.ok) window.location.assign('/')
+    if (result.ok) window.location.assign('/play')
     else setError(result.error)
   }
 

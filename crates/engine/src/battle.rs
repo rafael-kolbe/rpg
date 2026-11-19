@@ -10,6 +10,7 @@ use crate::atb::{ATB_FULL, Speed, gain_per_tick};
 use crate::combatant::{Combatant, TurnState};
 use crate::event::{BattleEvent, CancelReason, FailReason, StatusEndReason};
 use crate::ids::{ActionId, CombatantId, ItemId, Side};
+use crate::record::RecordedCommand;
 use crate::rng::Rng;
 use crate::setup::{BattleSetup, Opening, SetupError};
 use crate::status::{ActiveStatus, StatusKind};
@@ -141,6 +142,8 @@ pub struct Battle {
     pub(crate) busy_ticks: u16,
     pub(crate) rng: Rng,
     pub(crate) outcome: Option<Outcome>,
+    /// The player's accepted commands, for [`Battle::record`].
+    pub(crate) commands: Vec<RecordedCommand>,
 }
 
 impl Battle {
@@ -189,6 +192,7 @@ impl Battle {
             busy_ticks: 0,
             rng: Rng::new(seed),
             outcome: None,
+            commands: Vec::new(),
         };
         battle.open(encounter.opening);
         Ok(battle)
@@ -289,6 +293,10 @@ impl Battle {
 
         let mut events = Vec::new();
         self.perform(command.actor, &command.kind, command.target, &mut events)?;
+        self.commands.push(RecordedCommand {
+            tick: self.tick,
+            command: command.clone(),
+        });
         Ok(events)
     }
 
@@ -960,6 +968,39 @@ mod tests {
             .unwrap();
 
         assert_eq!(battle.inventory().get(&potion), Some(&0));
+    }
+
+    #[test]
+    fn a_combatant_can_enter_with_the_hp_and_mp_it_carries() {
+        let mut hero = crate::test_support::fighter("hero");
+        hero.hp = Some(7);
+        hero.mp = Some(0);
+        let setup = crate::test_support::catalog_setup(
+            vec![hero],
+            vec![crate::test_support::fighter("wolf")],
+        );
+
+        let battle = Battle::new(setup, 1, PartyControl::Player).unwrap();
+
+        assert_eq!(battle.combatants()[0].hp(), 7);
+        assert_eq!(battle.combatants()[0].mp(), 0);
+    }
+
+    #[test]
+    fn entering_with_zero_or_too_much_hp_is_refused() {
+        for hp in [0, 60_000] {
+            let mut hero = crate::test_support::fighter("hero");
+            hero.hp = Some(hp);
+            let setup = crate::test_support::catalog_setup(
+                vec![hero],
+                vec![crate::test_support::fighter("wolf")],
+            );
+
+            assert!(matches!(
+                Battle::new(setup, 1, PartyControl::Player),
+                Err(crate::SetupError::InvalidStats { .. })
+            ));
+        }
     }
 
     #[test]

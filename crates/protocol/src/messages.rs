@@ -4,6 +4,9 @@ use engine::{BattleEvent, CombatantId, Command, CommandError, StatusKind};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use world::view::GameView;
+use world::{GameCommand, GameError, GameMode};
+
 use crate::state::{BattleState, Catalog};
 
 /// Client → server.
@@ -27,6 +30,17 @@ pub enum ClientMessage {
         /// The engine plays the party too (auto-battle).
         #[serde(default)]
         auto: bool,
+    },
+    /// Opens the logged-in player's game in a mode (a new one the first
+    /// time). Needs the session cookie on the WebSocket.
+    StartGame {
+        /// Campaign or Multiplayer.
+        mode: GameMode,
+    },
+    /// A command outside battle for the open game.
+    Game {
+        /// The command.
+        command: GameCommand,
     },
     /// A command for a party member whose turn is ready.
     Command {
@@ -67,8 +81,8 @@ pub enum ClientMessage {
 pub enum ServerMessage {
     /// A battle began; replaces any previous one.
     BattleStarted {
-        /// Scenario name.
-        scenario: String,
+        /// Sandbox scenario name; `None` for a battle of the game.
+        scenario: Option<String>,
         /// Seed in use (to replay the same battle).
         seed: u32,
         /// What the menus need about actions and items.
@@ -82,6 +96,16 @@ pub enum ServerMessage {
         events: Vec<BattleEvent>,
         /// State after the events.
         state: BattleState,
+    },
+    /// The game as the player sees it, after every change.
+    GameUpdate {
+        /// The view.
+        view: GameView,
+    },
+    /// A game command was refused; nothing changed.
+    GameRejected {
+        /// Why.
+        error: GameError,
     },
     /// A command was refused; nothing changed.
     CommandRejected {
@@ -202,6 +226,18 @@ pub enum ErrorCode {
     UnknownScenario,
     /// Speed not allowed.
     InvalidSpeed,
+    /// The game needs a logged-in player.
+    NotLoggedIn,
+    /// The story has not unlocked this mode yet.
+    ModeLocked,
+    /// No game is open on this connection.
+    NoGame,
+    /// The saves could not be read or written; try again later.
+    Unavailable,
+    /// The same game was opened in another tab or device; this one closed.
+    OpenedElsewhere,
+    /// Messages came faster than any player sends them; some were dropped.
+    TooManyMessages,
 }
 
 #[cfg(test)]

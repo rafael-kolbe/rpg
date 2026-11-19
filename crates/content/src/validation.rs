@@ -23,6 +23,10 @@ pub struct Summary {
     pub items: usize,
     /// Sandbox scenarios checked.
     pub scenarios: usize,
+    /// World instances checked.
+    pub instances: usize,
+    /// Monster kinds checked.
+    pub monsters: usize,
     /// Locales checked.
     pub locales: usize,
 }
@@ -81,6 +85,19 @@ pub fn check(root: &Path) -> Result<Summary, Vec<String>> {
         }
     }
 
+    let world = match content.load_world(&root.join("content")) {
+        Ok(world) => Some(world),
+        Err(error) => {
+            problems.push(error.to_string());
+            None
+        }
+    };
+    if let Some(world) = &world {
+        check_world_ids(world, &mut problems);
+        problems.extend(world::validate::problems(world));
+        needed.extend(world::validate::message_ids(world));
+    }
+
     for (locale, ids) in &locales {
         for id in needed.difference(ids) {
             problems.push(format!("locales/{locale}: missing message `{id}`"));
@@ -92,10 +109,37 @@ pub fn check(root: &Path) -> Result<Summary, Vec<String>> {
             actions: content.actions.len(),
             items: content.items.len(),
             scenarios: scenarios.len(),
+            instances: world.as_ref().map_or(0, |w| w.map.instances.len()),
+            monsters: world.as_ref().map_or(0, |w| w.map.monsters.len()),
             locales: locales.len(),
         })
     } else {
         Err(problems)
+    }
+}
+
+/// Every id of the world follows the content id rule.
+fn check_world_ids(world: &world::World, problems: &mut Vec<String>) {
+    let map = &world.map;
+    let ids = map
+        .regions
+        .keys()
+        .map(|id| ("region", id.as_str()))
+        .chain(map.instances.keys().map(|id| ("instance", id.as_str())))
+        .chain(map.classes.keys().map(|id| ("class", id.as_str())))
+        .chain(map.heroes.keys().map(|id| ("hero", id.as_str())))
+        .chain(map.monsters.keys().map(|id| ("monster", id.as_str())))
+        .chain(map.dialogues.keys().map(|id| ("dialogue", id.as_str())))
+        .chain(map.shops.keys().map(|id| ("shop", id.as_str())))
+        .chain(map.equipment.keys().map(|id| ("equipment", id.as_str())))
+        .chain(
+            map.instances
+                .values()
+                .flat_map(|instance| instance.nodes.keys())
+                .map(|id| ("node", id.as_str())),
+        );
+    for (kind, id) in ids {
+        check_id(kind, id, problems);
     }
 }
 

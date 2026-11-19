@@ -27,7 +27,7 @@ export HOST_GID := $(shell id -g)
 .PHONY: help network require-env up up-d down logs ps build \
         dev-db dev-db-down dev-server dev-web \
         check check-rust check-content check-web check-protocol check-skipped-tests check-utils-docs \
-        check-sqlx fmt docs protocol-types sqlx-prepare sim e2e
+        check-sqlx fmt docs protocol-types sqlx-prepare sim sim-campaign e2e
 
 help:
 	@echo "Run (production-like, http://127.0.0.1:8083):"
@@ -54,6 +54,7 @@ help:
 	@echo "Battle simulator (AI vs AI on a sandbox scenario):"
 	@echo "  make sim           one battle, full log (SEED=42 SCENARIO=sandbox/battle-basic.json)"
 	@echo "  make sim RUNS=1000 summary over many seeds"
+	@echo "  make sim-campaign  a bot plays the campaign's first arc (RUNS=5 for a summary per seed)"
 
 # --- Run ----------------------------------------------------------------------
 
@@ -156,3 +157,6 @@ SCENARIO ?= sandbox/battle-basic.json
 
 sim:
 	cargo run --quiet --release -p sim -- --scenario $(SCENARIO) --seed $(SEED) --runs $(RUNS)
+
+sim-campaign:
+	cargo run --quiet --release -p sim -- --campaign --seed $(SEED) --runs $(RUNS)

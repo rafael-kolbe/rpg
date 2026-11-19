@@ -80,6 +80,13 @@ pub struct CombatantSetup {
     /// party members when the party is AI-controlled.
     #[serde(default)]
     pub ai: Option<AiProfile>,
+    /// HP it enters with, when not full (a hero carrying damage from the
+    /// previous battle). `1..=maxHp`.
+    #[serde(default)]
+    pub hp: Option<u16>,
+    /// MP it enters with, when not full. `0..=maxMp`.
+    #[serde(default)]
+    pub mp: Option<u16>,
 }
 
 /// Why a [`BattleSetup`] was rejected.
@@ -206,6 +213,21 @@ impl BattleSetup {
             return Err(SetupError::InvalidStats {
                 name: name.to_owned(),
                 reason,
+            });
+        }
+        if member
+            .hp
+            .is_some_and(|hp| hp == 0 || hp > member.stats.max_hp)
+        {
+            return Err(SetupError::InvalidStats {
+                name: name.to_owned(),
+                reason: "hp must be in 1..=maxHp".to_owned(),
+            });
+        }
+        if member.mp.is_some_and(|mp| mp > member.stats.max_mp) {
+            return Err(SetupError::InvalidStats {
+                name: name.to_owned(),
+                reason: "mp must be in 0..=maxMp".to_owned(),
             });
         }
 

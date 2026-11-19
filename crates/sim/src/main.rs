@@ -5,10 +5,16 @@
 //! - `--runs N` plays N battles with seeds `seed..seed+N` and prints a
 //!   summary: win rate, duration, HP left. This is the balancing tool.
 //!
+//! - `--campaign` plays the campaign's first arc with a bot instead (see
+//!   `campaign.rs`); with `--runs N`, N games and a summary of each.
+//!
 //! ```text
 //! cargo run -p sim -- --seed 42
 //! cargo run -p sim -- --runs 1000
+//! cargo run -p sim -- --campaign --runs 5
 //! ```
+
+mod campaign;
 
 use std::path::PathBuf;
 
@@ -35,11 +41,22 @@ struct Args {
     /// Ticks after which a battle counts as a timeout (6000 = 10 minutes).
     #[arg(long, default_value_t = 6000)]
     max_ticks: u32,
+    /// Play the campaign's first arc with a bot instead of a scenario.
+    #[arg(long)]
+    campaign: bool,
 }
 
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     let content = Content::load(&args.content)?;
+    if args.campaign {
+        let world = std::sync::Arc::new(content.load_world(&args.content)?);
+        for seed in args.seed..args.seed + args.runs.max(1) {
+            let report = campaign::play(std::sync::Arc::clone(&world), seed, args.runs <= 1)?;
+            print!("seed {seed}: {}", report.describe());
+        }
+        return Ok(());
+    }
     let encounter = load_encounter(&args.scenario)?;
     let new_battle = |seed| {
         Battle::new(

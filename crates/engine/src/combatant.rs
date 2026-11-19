@@ -60,8 +60,8 @@ impl Combatant {
         Self {
             id,
             side,
-            hp: setup.stats.max_hp,
-            mp: setup.stats.max_mp,
+            hp: setup.hp.unwrap_or(setup.stats.max_hp),
+            mp: setup.mp.unwrap_or(setup.stats.max_mp),
             name: setup.name,
             stats: setup.stats,
             attack: setup.attack,

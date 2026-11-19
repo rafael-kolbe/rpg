@@ -1,0 +1,5 @@
+{
+  "taren": { "class": "warrior", "weapon": "bronze-sword", "armor": "cloth-tunic" },
+  "lyra": { "class": "archer", "weapon": "short-bow", "armor": "leather-vest" },
+  "corin": { "class": "cleric", "weapon": "oak-mace", "armor": "cloth-tunic" }
+}

@@ -13,8 +13,13 @@ fn main() -> ExitCode {
     match content::check(&root) {
         Ok(summary) => {
             println!(
-                "Content ok: {} actions, {} items, {} scenarios, {} locales.",
-                summary.actions, summary.items, summary.scenarios, summary.locales
+                "Content ok: {} actions, {} items, {} scenarios, {} instances, {} monsters, {} locales.",
+                summary.actions,
+                summary.items,
+                summary.scenarios,
+                summary.instances,
+                summary.monsters,
+                summary.locales
             );
             ExitCode::SUCCESS
         }

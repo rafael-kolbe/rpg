@@ -62,7 +62,8 @@ export function SandboxPage({ scenario }: Props) {
             rejection={rejection}
             send={send}
             subscribe={subscribe}
-            onRestart={() => restart(null, false)}
+            outcomeLabel={t('ui-outcome-restart')}
+            onOutcome={() => restart(null, false)}
           />
           <DebugPanel
             battle={battle}

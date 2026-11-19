@@ -4,18 +4,29 @@
 //! replay identically forever, and a dependency update must never be able to
 //! change the sequence. It is not cryptographic, and does not need to be.
 
-/// Deterministic random number generator owned by a battle.
+/// Deterministic random number generator, owned by a battle (and by the
+/// world rules, for encounters and drops). The whole sequence follows from
+/// [`Rng::state`], so saving it resumes the same sequence.
 #[derive(Debug, Clone)]
-pub(crate) struct Rng {
+pub struct Rng {
     state: u64,
 }
 
 impl Rng {
-    pub(crate) fn new(seed: u64) -> Self {
+    /// A generator starting from `seed` (or from a saved [`Rng::state`]).
+    #[must_use]
+    pub fn new(seed: u64) -> Self {
         Self { state: seed }
     }
 
-    pub(crate) fn next_u64(&mut self) -> u64 {
+    /// The current state; [`Rng::new`] with it continues the sequence.
+    #[must_use]
+    pub fn state(&self) -> u64 {
+        self.state
+    }
+
+    /// The next raw 64-bit value.
+    pub fn next_u64(&mut self) -> u64 {
         self.state = self.state.wrapping_add(0x9E37_79B9_7F4A_7C15);
         let mut z = self.state;
         z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -23,11 +34,15 @@ impl Rng {
         z ^ (z >> 31)
     }
 
-    /// Uniform value in `0..bound`. `bound` must be greater than zero.
+    /// Uniform value in `0..bound`.
+    ///
+    /// # Panics
+    ///
+    /// When `bound` is 0.
     ///
     /// Rejection sampling keeps the distribution exactly uniform (a plain
     /// modulo would favor small values).
-    pub(crate) fn below(&mut self, bound: u64) -> u64 {
+    pub fn below(&mut self, bound: u64) -> u64 {
         debug_assert!(bound > 0, "Rng::below called with bound 0");
         let zone = u64::MAX - (u64::MAX % bound);
         loop {
@@ -39,7 +54,7 @@ impl Rng {
     }
 
     /// A uniformly chosen element of `items`, or `None` when it is empty.
-    pub(crate) fn pick<T: Copy>(&mut self, items: &[T]) -> Option<T> {
+    pub fn pick<T: Copy>(&mut self, items: &[T]) -> Option<T> {
         if items.is_empty() {
             return None;
         }
@@ -48,7 +63,7 @@ impl Rng {
     }
 
     /// `true` with probability `percent` / 100 (clamped to 0..=100).
-    pub(crate) fn chance_percent(&mut self, percent: u8) -> bool {
+    pub fn chance_percent(&mut self, percent: u8) -> bool {
         self.below(100) < u64::from(percent.min(100))
     }
 }

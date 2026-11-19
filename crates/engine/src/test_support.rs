@@ -49,6 +49,8 @@ pub(crate) fn fighter(name: &str) -> CombatantSetup {
                 }],
             }],
         }),
+        hp: None,
+        mp: None,
     }
 }
 

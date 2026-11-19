@@ -16,10 +16,13 @@ async function signUp(page: Page, username: string, password: string): Promise<s
   return key ?? ''
 }
 
+/** Confirms the key was saved, lands on the mode choice, then goes home. */
 async function continueHome(page: Page) {
   await expect(page.getByTestId('recovery-key-continue')).toBeDisabled()
   await page.getByTestId('recovery-key-saved').check()
   await page.getByTestId('recovery-key-continue').click()
+  await expect(page.getByTestId('mode-select')).toBeVisible()
+  await page.goto('/')
 }
 
 async function logIn(page: Page, username: string, password: string) {
@@ -27,6 +30,13 @@ async function logIn(page: Page, username: string, password: string) {
   await page.getByTestId('account-username').fill(username)
   await page.getByTestId('account-password-current').fill(password)
   await page.getByTestId('account-submit').click()
+}
+
+/** A successful login lands on the mode choice; back home to read the status. */
+async function expectLoggedIn(page: Page, username: string) {
+  await expect(page.getByTestId('mode-select')).toBeVisible()
+  await page.goto('/')
+  await expect(page.getByTestId('account-status')).toContainText(username)
 }
 
 test('a player signs up, keeps the recovery key, logs out and back in', async ({
@@ -48,7 +58,7 @@ test('a player signs up, keeps the recovery key, logs out and back in', async ({
   await logIn(page, username, 'wrong-pass')
   await expect(page.getByTestId('account-error')).toBeVisible()
   await logIn(page, username.toUpperCase(), 'first-pass')
-  await expect(page.getByTestId('account-status')).toContainText(username)
+  await expectLoggedIn(page, username)
 })
 
 test('a username with symbols or a taken one is refused', async ({ page }) => {
@@ -89,5 +99,5 @@ test('the recovery key changes a forgotten password and is replaced', async ({ p
   await logIn(page, username, 'first-pass')
   await expect(page.getByTestId('account-error')).toBeVisible()
   await logIn(page, username, 'second-pass')
-  await expect(page.getByTestId('account-status')).toContainText(username)
+  await expectLoggedIn(page, username)
 })

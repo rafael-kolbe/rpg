@@ -1,0 +1,684 @@
+{
+  "wild-wolf": {
+    "battle": {
+      "name": "monster-wild-wolf",
+      "stats": {
+        "level": 2,
+        "maxHp": 40,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 9,
+          "dexterity": 24,
+          "vitality": 6,
+          "magic": 2,
+          "spirit": 4,
+          "luck": 6
+        },
+        "equipment": { "weaponAttack": 3 }
+      },
+      "attack": "bite",
+      "affinities": { "fire": "weak" },
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 14,
+    "crowns": 9,
+    "drops": [{ "item": "potion", "percent": 8 }]
+  },
+  "wild-boar": {
+    "battle": {
+      "name": "monster-wild-boar",
+      "stats": {
+        "level": 3,
+        "maxHp": 62,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 12,
+          "dexterity": 14,
+          "vitality": 10,
+          "magic": 2,
+          "spirit": 4,
+          "luck": 5
+        },
+        "equipment": { "weaponAttack": 4 }
+      },
+      "attack": "bite",
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 20,
+    "crowns": 14,
+    "drops": [{ "item": "potion", "percent": 10 }]
+  },
+  "giant-hornet": {
+    "battle": {
+      "name": "monster-giant-hornet",
+      "stats": {
+        "level": 3,
+        "maxHp": 32,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 8,
+          "dexterity": 30,
+          "vitality": 5,
+          "magic": 2,
+          "spirit": 5,
+          "luck": 8
+        },
+        "equipment": { "evasion": 10 }
+      },
+      "attack": "bite",
+      "actions": ["venom-sting"],
+      "affinities": { "fire": "weak" },
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "venom-sting" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 19,
+    "crowns": 10,
+    "drops": [{ "item": "antidote", "percent": 15 }]
+  },
+  "goblin": {
+    "battle": {
+      "name": "monster-goblin",
+      "stats": {
+        "level": 4,
+        "maxHp": 72,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 14,
+          "dexterity": 22,
+          "vitality": 9,
+          "magic": 3,
+          "spirit": 6,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 6 }
+      },
+      "attack": "attack",
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 34,
+    "crowns": 21,
+    "drops": [{ "item": "potion", "percent": 10 }]
+  },
+  "goblin-archer": {
+    "battle": {
+      "name": "monster-goblin-archer",
+      "stats": {
+        "level": 5,
+        "maxHp": 62,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 15,
+          "dexterity": 30,
+          "vitality": 8,
+          "magic": 3,
+          "spirit": 6,
+          "luck": 10
+        },
+        "equipment": { "weaponAttack": 8 }
+      },
+      "attack": "arrow-shot",
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 40,
+    "crowns": 24,
+    "drops": [{ "item": "potion", "percent": 10 }]
+  },
+  "goblin-shaman": {
+    "battle": {
+      "name": "monster-goblin-shaman",
+      "stats": {
+        "level": 5,
+        "maxHp": 56,
+        "maxMp": 40,
+        "attributes": {
+          "strength": 8,
+          "dexterity": 22,
+          "vitality": 8,
+          "magic": 14,
+          "spirit": 12,
+          "luck": 8
+        }
+      },
+      "attack": "attack",
+      "actions": ["fire"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 2,
+                "act": { "type": "action", "id": "fire" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 1, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 46,
+    "crowns": 30,
+    "drops": [{ "item": "ether", "percent": 8 }]
+  },
+  "venom-serpent": {
+    "battle": {
+      "name": "monster-venom-serpent",
+      "stats": {
+        "level": 5,
+        "maxHp": 82,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 14,
+          "dexterity": 24,
+          "vitality": 10,
+          "magic": 3,
+          "spirit": 8,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 5 }
+      },
+      "attack": "bite",
+      "actions": ["poison-fang"],
+      "affinities": { "ice": "weak" },
+      "statusImmunities": ["poison"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "poison-fang" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 43,
+    "crowns": 22,
+    "drops": [{ "item": "antidote", "percent": 20 }]
+  },
+  "grukk": {
+    "battle": {
+      "name": "monster-grukk",
+      "stats": {
+        "level": 6,
+        "maxHp": 480,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 17,
+          "dexterity": 26,
+          "vitality": 16,
+          "magic": 4,
+          "spirit": 10,
+          "luck": 10
+        },
+        "equipment": { "weaponAttack": 6 }
+      },
+      "attack": "attack",
+      "actions": ["crushing-blow", "war-cry"],
+      "statusImmunities": ["sleep"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "crushing-blow" },
+                "target": { "type": "lowest_hp_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          },
+          {
+            "fromHpPercent": 45,
+            "rules": [
+              { "weight": 1, "act": { "type": "action", "id": "war-cry" }, "target": { "type": "user" } },
+              {
+                "weight": 2,
+                "act": { "type": "action", "id": "crushing-blow" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 500,
+    "crowns": 300,
+    "drops": [{ "item": "hi-potion", "percent": 100 }]
+  },
+  "giant-rat": {
+    "battle": {
+      "name": "monster-giant-rat",
+      "stats": {
+        "level": 7,
+        "maxHp": 95,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 18,
+          "dexterity": 28,
+          "vitality": 10,
+          "magic": 3,
+          "spirit": 8,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 6 }
+      },
+      "attack": "claw",
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 74,
+    "crowns": 33,
+    "drops": [{ "item": "potion", "percent": 12 }]
+  },
+  "crypt-bat": {
+    "battle": {
+      "name": "monster-crypt-bat",
+      "stats": {
+        "level": 7,
+        "maxHp": 70,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 15,
+          "dexterity": 42,
+          "vitality": 8,
+          "magic": 6,
+          "spirit": 10,
+          "luck": 12
+        },
+        "equipment": { "weaponAttack": 5, "evasion": 20 }
+      },
+      "attack": "bite",
+      "affinities": { "lightning": "weak" },
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 71,
+    "crowns": 30
+  },
+  "skeleton": {
+    "battle": {
+      "name": "monster-skeleton",
+      "stats": {
+        "level": 8,
+        "maxHp": 135,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 22,
+          "dexterity": 22,
+          "vitality": 18,
+          "magic": 3,
+          "spirit": 10,
+          "luck": 6
+        },
+        "equipment": { "weaponAttack": 8, "armorDefense": 6 }
+      },
+      "attack": "attack",
+      "affinities": { "fire": "weak", "ice": "resist" },
+      "statusImmunities": ["poison", "sleep"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 96,
+    "crowns": 45,
+    "drops": [{ "item": "antidote", "percent": 10 }]
+  },
+  "ghoul": {
+    "battle": {
+      "name": "monster-ghoul",
+      "stats": {
+        "level": 9,
+        "maxHp": 175,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 24,
+          "dexterity": 20,
+          "vitality": 16,
+          "magic": 4,
+          "spirit": 10,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 8 }
+      },
+      "attack": "claw",
+      "actions": ["venom-sting"],
+      "affinities": { "fire": "weak" },
+      "statusImmunities": ["poison"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "venom-sting" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 124,
+    "crowns": 51,
+    "drops": [{ "item": "antidote", "percent": 20 }]
+  },
+  "crypt-spider": {
+    "battle": {
+      "name": "monster-crypt-spider",
+      "stats": {
+        "level": 9,
+        "maxHp": 125,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 20,
+          "dexterity": 34,
+          "vitality": 12,
+          "magic": 6,
+          "spirit": 12,
+          "luck": 10
+        },
+        "equipment": { "weaponAttack": 6 }
+      },
+      "attack": "bite",
+      "actions": ["web"],
+      "affinities": { "fire": "weak" },
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "web" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 118,
+    "crowns": 45,
+    "drops": [{ "item": "potion", "percent": 15 }]
+  },
+  "skeleton-archer": {
+    "battle": {
+      "name": "monster-skeleton-archer",
+      "stats": {
+        "level": 9,
+        "maxHp": 120,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 22,
+          "dexterity": 30,
+          "vitality": 14,
+          "magic": 3,
+          "spirit": 10,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 10 }
+      },
+      "attack": "arrow-shot",
+      "affinities": { "fire": "weak" },
+      "statusImmunities": ["poison", "sleep"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 121,
+    "crowns": 51,
+    "drops": [{ "item": "hi-potion", "percent": 6 }]
+  },
+  "will-o-wisp": {
+    "battle": {
+      "name": "monster-will-o-wisp",
+      "stats": {
+        "level": 10,
+        "maxHp": 115,
+        "maxMp": 80,
+        "attributes": {
+          "strength": 6,
+          "dexterity": 40,
+          "vitality": 10,
+          "magic": 24,
+          "spirit": 20,
+          "luck": 12
+        },
+        "equipment": { "evasion": 25 }
+      },
+      "attack": "attack",
+      "actions": ["fire"],
+      "affinities": { "ice": "weak", "fire": "immune" },
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 3,
+                "act": { "type": "action", "id": "fire" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 1, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 163,
+    "crowns": 60,
+    "drops": [{ "item": "ether", "percent": 12 }]
+  },
+  "wraith": {
+    "battle": {
+      "name": "monster-wraith",
+      "stats": {
+        "level": 11,
+        "maxHp": 165,
+        "maxMp": 80,
+        "attributes": {
+          "strength": 12,
+          "dexterity": 30,
+          "vitality": 12,
+          "magic": 22,
+          "spirit": 24,
+          "luck": 14
+        },
+        "equipment": { "armorDefense": 40 }
+      },
+      "attack": "attack",
+      "actions": ["hush", "ice"],
+      "affinities": { "fire": "weak" },
+      "statusImmunities": ["poison"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "hush" },
+                "target": { "type": "random_opponent" }
+              },
+              {
+                "weight": 2,
+                "act": { "type": "action", "id": "ice" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 1, "act": { "type": "attack" }, "target": { "type": "random_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 186,
+    "crowns": 66,
+    "drops": [{ "item": "ether", "percent": 10 }]
+  },
+  "skeleton-knight": {
+    "battle": {
+      "name": "monster-skeleton-knight",
+      "stats": {
+        "level": 11,
+        "maxHp": 270,
+        "maxMp": 0,
+        "attributes": {
+          "strength": 28,
+          "dexterity": 22,
+          "vitality": 26,
+          "magic": 4,
+          "spirit": 12,
+          "luck": 8
+        },
+        "equipment": { "weaponAttack": 12, "armorDefense": 14 }
+      },
+      "attack": "attack",
+      "affinities": { "fire": "weak" },
+      "statusImmunities": ["poison", "sleep"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [{ "act": { "type": "attack" }, "target": { "type": "random_opponent" } }]
+          }
+        ]
+      }
+    },
+    "xp": 202,
+    "crowns": 75,
+    "drops": [{ "item": "hi-potion", "percent": 12 }]
+  },
+  "bone-warden": {
+    "battle": {
+      "name": "monster-bone-warden",
+      "stats": {
+        "level": 13,
+        "maxHp": 2400,
+        "maxMp": 200,
+        "attributes": {
+          "strength": 30,
+          "dexterity": 30,
+          "vitality": 24,
+          "magic": 20,
+          "spirit": 20,
+          "luck": 12
+        },
+        "equipment": { "weaponAttack": 14, "armorDefense": 10 }
+      },
+      "attack": "attack",
+      "actions": ["bone-storm", "gravity-crush", "war-cry"],
+      "affinities": { "fire": "weak" },
+      "statusImmunities": ["poison", "sleep", "silence"],
+      "ai": {
+        "phases": [
+          {
+            "fromHpPercent": 100,
+            "rules": [
+              {
+                "weight": 1,
+                "act": { "type": "action", "id": "bone-storm" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 3, "act": { "type": "attack" }, "target": { "type": "lowest_hp_opponent" } }
+            ]
+          },
+          {
+            "fromHpPercent": 50,
+            "rules": [
+              { "weight": 1, "act": { "type": "action", "id": "war-cry" }, "target": { "type": "user" } },
+              {
+                "weight": 2,
+                "act": { "type": "action", "id": "gravity-crush" },
+                "target": { "type": "random_opponent" }
+              },
+              {
+                "weight": 2,
+                "act": { "type": "action", "id": "bone-storm" },
+                "target": { "type": "random_opponent" }
+              },
+              { "weight": 2, "act": { "type": "attack" }, "target": { "type": "lowest_hp_opponent" } }
+            ]
+          }
+        ]
+      }
+    },
+    "xp": 1500,
+    "crowns": 900,
+    "drops": [{ "item": "revive-feather", "percent": 100 }]
+  }
+}

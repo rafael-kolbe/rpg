@@ -6,6 +6,8 @@
 //! | --- | --- |
 //! | `content/actions.json` | Every action, by id ([`engine::ActionDef`]) |
 //! | `content/items.json` | Every item, by id ([`engine::ItemDef`]) |
+//! | `content/world/*.json` | The campaign world ([`world::WorldDef`]): `start`, `regions`, `classes`, `heroes`, `monsters`, `dialogues`, `shops`, `equipment` |
+//! | `content/world/instances/<id>.json` | One instance each ([`world::def::InstanceDef`]) |
 //! | `sandbox/<scenario>.json` | Test battles ([`engine::Encounter`]) |
 //! | `locales/<locale>/*.ftl` | Display names of everything above |
 //!
@@ -20,6 +22,7 @@ use std::path::{Path, PathBuf};
 
 use engine::{ActionDef, ActionId, BattleSetup, Encounter, ItemDef, ItemId};
 use serde::de::DeserializeOwned;
+use world::{InstanceId, World, WorldDef};
 
 pub use validation::{Summary, check};
 
@@ -76,6 +79,53 @@ impl Content {
             actions: self.actions.clone(),
             items: self.items.clone(),
         }
+    }
+}
+
+impl Content {
+    /// Loads the campaign world from `dir/world` (the repository's
+    /// `content/` directory), bundled with these definitions.
+    ///
+    /// # Errors
+    ///
+    /// [`ContentError`] when a file is missing or malformed.
+    pub fn load_world(&self, dir: &Path) -> Result<World, ContentError> {
+        let world = dir.join("world");
+        let instances_dir = world.join("instances");
+        let entries = fs::read_dir(&instances_dir).map_err(|source| ContentError::Read {
+            path: instances_dir.clone(),
+            source,
+        })?;
+        let mut instances = BTreeMap::new();
+        for entry in entries {
+            let path = entry
+                .map_err(|source| ContentError::Read {
+                    path: instances_dir.clone(),
+                    source,
+                })?
+                .path();
+            let Some(stem) = path.file_stem().and_then(|stem| stem.to_str()) else {
+                continue;
+            };
+            if path.extension().is_some_and(|ext| ext == "json") {
+                instances.insert(InstanceId::new(stem), read_json(&path)?);
+            }
+        }
+        Ok(World {
+            map: WorldDef {
+                start: read_json(&world.join("start.json"))?,
+                regions: read_json(&world.join("regions.json"))?,
+                instances,
+                classes: read_json(&world.join("classes.json"))?,
+                heroes: read_json(&world.join("heroes.json"))?,
+                monsters: read_json(&world.join("monsters.json"))?,
+                dialogues: read_json(&world.join("dialogues.json"))?,
+                shops: read_json(&world.join("shops.json"))?,
+                equipment: read_json(&world.join("equipment.json"))?,
+            },
+            actions: self.actions.clone(),
+            items: self.items.clone(),
+        })
     }
 }
 

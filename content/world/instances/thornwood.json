@@ -1,0 +1,199 @@
+{
+  "region": "thornwood",
+  "terrain": "forest",
+  "nodes": {
+    "south-gate": {
+      "x": 500,
+      "y": 930,
+      "kind": { "type": "exit", "to": { "instance": "brookhollow", "node": "north-road" } }
+    },
+    "road-south": { "x": 500, "y": 790, "kind": { "type": "path" } },
+    "glade": {
+      "x": 280,
+      "y": 720,
+      "kind": { "type": "chest", "flag": "glade-chest", "items": { "potion": 2 }, "crowns": 60 }
+    },
+    "clearing": {
+      "x": 520,
+      "y": 630,
+      "kind": { "type": "path" },
+      "event": { "dialogue": "meet-lyra", "when": { "forbids": ["lyra-joined"] } }
+    },
+    "wayshrine": { "x": 740, "y": 660, "label": "label-wayshrine", "kind": { "type": "temple" } },
+    "trader": {
+      "x": 760,
+      "y": 500,
+      "label": "label-trader",
+      "kind": { "type": "shop", "shop": "forest-trader" }
+    },
+    "fork": { "x": 500, "y": 470, "kind": { "type": "path" } },
+    "side-path": { "x": 290, "y": 430, "kind": { "type": "path" } },
+    "camp-gate": {
+      "x": 170,
+      "y": 310,
+      "label": "label-goblin-camp",
+      "kind": {
+        "type": "battle",
+        "monsters": ["goblin", "goblin-archer", "goblin"],
+        "flag": "camp-gate-cleared"
+      }
+    },
+    "camp-yard": {
+      "x": 330,
+      "y": 200,
+      "kind": {
+        "type": "chest",
+        "flag": "camp-chest",
+        "items": { "potion": 3, "ether": 1 },
+        "crowns": 120
+      }
+    },
+    "grukk-tent": {
+      "x": 150,
+      "y": 100,
+      "label": "label-grukk-tent",
+      "kind": {
+        "type": "battle",
+        "monsters": ["grukk", "goblin"],
+        "flag": "grukk-defeated",
+        "boss": true
+      },
+      "event": {
+        "dialogue": "after-grukk",
+        "when": { "requires": ["grukk-defeated"], "forbids": ["grukk-aftermath"] }
+      }
+    },
+    "road-north": {
+      "x": 560,
+      "y": 290,
+      "kind": { "type": "path" },
+      "event": {
+        "dialogue": "lyra-insists",
+        "when": { "requires": ["lyra-joined"], "forbids": ["grukk-defeated", "lyra-insisted"] }
+      }
+    },
+    "north-gate": {
+      "x": 560,
+      "y": 80,
+      "kind": { "type": "exit", "to": { "instance": "valcrest", "node": "south-gate" } }
+    }
+  },
+  "trails": [
+    {
+      "a": "south-gate",
+      "b": "road-south",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 1, "monsters": ["wild-wolf", "wild-wolf"] }
+      ]
+    },
+    {
+      "a": "road-south",
+      "b": "glade",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 1, "monsters": ["wild-wolf", "wild-wolf"] }
+      ]
+    },
+    {
+      "a": "road-south",
+      "b": "clearing",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 1, "monsters": ["wild-wolf", "wild-wolf"] }
+      ]
+    },
+    { "a": "clearing", "b": "wayshrine" },
+    { "a": "wayshrine", "b": "trader" },
+    {
+      "a": "clearing",
+      "b": "fork",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 1, "monsters": ["venom-serpent", "goblin-archer"] }
+      ]
+    },
+    {
+      "a": "fork",
+      "b": "trader",
+      "chance": 30,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 1, "monsters": ["venom-serpent", "goblin-archer"] }
+      ]
+    },
+    {
+      "a": "fork",
+      "b": "side-path",
+      "chance": 40,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 1, "monsters": ["venom-serpent", "goblin-archer"] }
+      ],
+      "when": { "requires": ["lyra-joined"] }
+    },
+    {
+      "a": "side-path",
+      "b": "camp-gate",
+      "chance": 45,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin", "goblin-archer"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin-archer"] }
+      ]
+    },
+    {
+      "a": "camp-gate",
+      "b": "camp-yard",
+      "chance": 40,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin", "goblin-archer"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin-archer"] }
+      ],
+      "when": { "requires": ["camp-gate-cleared"] }
+    },
+    { "a": "camp-yard", "b": "grukk-tent", "when": { "requires": ["camp-gate-cleared"] } },
+    {
+      "a": "fork",
+      "b": "road-north",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 1, "monsters": ["venom-serpent", "goblin-archer"] }
+      ]
+    },
+    {
+      "a": "road-north",
+      "b": "north-gate",
+      "chance": 35,
+      "encounters": [
+        { "weight": 3, "monsters": ["goblin", "goblin"] },
+        { "weight": 2, "monsters": ["goblin-archer", "goblin"] },
+        { "weight": 2, "monsters": ["venom-serpent"] },
+        { "weight": 2, "monsters": ["goblin-shaman", "goblin"] },
+        { "weight": 1, "monsters": ["venom-serpent", "goblin-archer"] }
+      ],
+      "when": { "requires": ["grukk-defeated"] }
+    }
+  ]
+}

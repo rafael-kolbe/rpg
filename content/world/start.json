@@ -1,0 +1,6 @@
+{
+  "position": { "instance": "brookhollow", "node": "square" },
+  "party": ["taren"],
+  "crowns": 50,
+  "inventory": { "potion": 2 }
+}

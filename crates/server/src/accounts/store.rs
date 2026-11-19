@@ -3,8 +3,21 @@
 use sqlx::PgPool;
 
 /// Primary key of an account.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct AccountId(i64);
+
+impl AccountId {
+    /// The database value.
+    pub(crate) fn get(self) -> i64 {
+        self.0
+    }
+
+    /// An id without the database.
+    #[cfg(test)]
+    pub(crate) fn for_tests(id: i64) -> Self {
+        Self(id)
+    }
+}
 
 /// What a login needs from an account.
 pub(crate) struct LoginRow {
@@ -130,6 +143,20 @@ pub(crate) async fn insert_session(
     .execute(&mut *tx)
     .await?;
     tx.commit().await
+}
+
+/// Account of an unexpired session.
+pub(crate) async fn session_account(
+    db: &PgPool,
+    token_hash: &[u8],
+) -> sqlx::Result<Option<AccountId>> {
+    let id = sqlx::query_scalar!(
+        "SELECT account_id FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+        token_hash,
+    )
+    .fetch_optional(db)
+    .await?;
+    Ok(id.map(AccountId))
 }
 
 /// Username of the account of an unexpired session.

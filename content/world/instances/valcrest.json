@@ -1,0 +1,72 @@
+{
+  "region": "valcrest",
+  "terrain": "town",
+  "nodes": {
+    "south-gate": {
+      "x": 500,
+      "y": 910,
+      "kind": { "type": "exit", "to": { "instance": "thornwood", "node": "north-gate" } },
+      "event": { "dialogue": "arrive-valcrest", "when": { "forbids": ["valcrest-arrived"] } }
+    },
+    "plaza": { "x": 500, "y": 620, "label": "label-plaza", "kind": { "type": "path" } },
+    "temple": { "x": 260, "y": 680, "label": "label-temple", "kind": { "type": "temple" } },
+    "apothecary": {
+      "x": 760,
+      "y": 720,
+      "label": "label-apothecary",
+      "kind": { "type": "shop", "shop": "valcrest-apothecary" }
+    },
+    "armory": {
+      "x": 770,
+      "y": 520,
+      "label": "label-armory",
+      "kind": { "type": "shop", "shop": "valcrest-armory" }
+    },
+    "guild": {
+      "x": 250,
+      "y": 440,
+      "label": "label-guild",
+      "kind": {
+        "type": "npc",
+        "name": "npc-clerk",
+        "talks": [
+          { "dialogue": "guild-register", "when": { "forbids": ["guild-registered"] } },
+          { "dialogue": "guild-later" }
+        ]
+      }
+    },
+    "guard-post": {
+      "x": 500,
+      "y": 330,
+      "label": "label-guard-post",
+      "kind": {
+        "type": "npc",
+        "name": "npc-holt",
+        "talks": [
+          {
+            "dialogue": "holt-ending",
+            "when": { "requires": ["warden-defeated"], "forbids": ["arc-complete"] }
+          },
+          { "dialogue": "holt-after", "when": { "requires": ["arc-complete"] } },
+          { "dialogue": "holt-catacombs", "when": { "requires": ["mission-reported"] } },
+          { "dialogue": "holt-report" }
+        ]
+      }
+    },
+    "catacomb-gate": {
+      "x": 760,
+      "y": 170,
+      "label": "label-catacomb-gate",
+      "kind": { "type": "exit", "to": { "instance": "catacombs-1", "node": "entry" } }
+    }
+  },
+  "trails": [
+    { "a": "south-gate", "b": "plaza" },
+    { "a": "plaza", "b": "temple" },
+    { "a": "plaza", "b": "apothecary" },
+    { "a": "plaza", "b": "armory" },
+    { "a": "plaza", "b": "guild" },
+    { "a": "plaza", "b": "guard-post" },
+    { "a": "guard-post", "b": "catacomb-gate", "when": { "requires": ["mission-reported"] } }
+  ]
+}

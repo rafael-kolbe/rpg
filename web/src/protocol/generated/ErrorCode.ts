@@ -4,4 +4,4 @@
  * Errors that are not command refusals, for the client to translate
  * (`ui-error-<code>`).
  */
-export type ErrorCode = "bad-message" | "sandbox-disabled" | "unknown-scenario" | "invalid-speed";
+export type ErrorCode = "bad-message" | "sandbox-disabled" | "unknown-scenario" | "invalid-speed" | "not-logged-in" | "mode-locked" | "no-game" | "unavailable" | "opened-elsewhere" | "too-many-messages";

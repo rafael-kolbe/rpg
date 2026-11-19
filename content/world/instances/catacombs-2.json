@@ -1,0 +1,109 @@
+{
+  "region": "valcrest",
+  "terrain": "crypt",
+  "nodes": {
+    "stairs-up": {
+      "x": 500,
+      "y": 920,
+      "label": "label-stairs-up",
+      "kind": { "type": "exit", "to": { "instance": "catacombs-1", "node": "stairs-down" } }
+    },
+    "gallery": { "x": 500, "y": 760, "kind": { "type": "path" } },
+    "flooded-hall": {
+      "x": 780,
+      "y": 630,
+      "kind": { "type": "chest", "flag": "flooded-chest", "items": { "hi-potion": 2, "antidote": 2 } }
+    },
+    "web-tunnel": { "x": 260, "y": 620, "kind": { "type": "path" } },
+    "guard-room": {
+      "x": 300,
+      "y": 430,
+      "label": "label-guard-room",
+      "kind": {
+        "type": "battle",
+        "monsters": ["ghoul", "skeleton-archer"],
+        "flag": "jailers-defeated"
+      }
+    },
+    "cells": {
+      "x": 450,
+      "y": 250,
+      "label": "label-cells",
+      "kind": { "type": "path" },
+      "event": {
+        "dialogue": "free-corin",
+        "when": { "requires": ["jailers-defeated"], "forbids": ["corin-joined"] }
+      }
+    },
+    "stairs-down": {
+      "x": 700,
+      "y": 110,
+      "label": "label-stairs-down",
+      "kind": { "type": "exit", "to": { "instance": "catacombs-3", "node": "stairs-up" } }
+    }
+  },
+  "trails": [
+    {
+      "a": "stairs-up",
+      "b": "gallery",
+      "chance": 40,
+      "encounters": [
+        { "weight": 2, "monsters": ["ghoul"] },
+        { "weight": 3, "monsters": ["crypt-spider", "crypt-spider"] },
+        { "weight": 3, "monsters": ["skeleton-archer", "ghoul"] },
+        { "weight": 2, "monsters": ["crypt-spider", "skeleton-archer"] },
+        { "weight": 2, "monsters": ["ghoul", "crypt-spider", "skeleton"] }
+      ]
+    },
+    {
+      "a": "gallery",
+      "b": "flooded-hall",
+      "chance": 45,
+      "encounters": [
+        { "weight": 2, "monsters": ["ghoul"] },
+        { "weight": 3, "monsters": ["crypt-spider", "crypt-spider"] },
+        { "weight": 3, "monsters": ["skeleton-archer", "ghoul"] },
+        { "weight": 2, "monsters": ["crypt-spider", "skeleton-archer"] },
+        { "weight": 2, "monsters": ["ghoul", "crypt-spider", "skeleton"] }
+      ]
+    },
+    {
+      "a": "gallery",
+      "b": "web-tunnel",
+      "chance": 45,
+      "encounters": [
+        { "weight": 2, "monsters": ["ghoul"] },
+        { "weight": 3, "monsters": ["crypt-spider", "crypt-spider"] },
+        { "weight": 3, "monsters": ["skeleton-archer", "ghoul"] },
+        { "weight": 2, "monsters": ["crypt-spider", "skeleton-archer"] },
+        { "weight": 2, "monsters": ["ghoul", "crypt-spider", "skeleton"] }
+      ]
+    },
+    {
+      "a": "web-tunnel",
+      "b": "guard-room",
+      "chance": 45,
+      "encounters": [
+        { "weight": 2, "monsters": ["ghoul"] },
+        { "weight": 3, "monsters": ["crypt-spider", "crypt-spider"] },
+        { "weight": 3, "monsters": ["skeleton-archer", "ghoul"] },
+        { "weight": 2, "monsters": ["crypt-spider", "skeleton-archer"] },
+        { "weight": 2, "monsters": ["ghoul", "crypt-spider", "skeleton"] }
+      ]
+    },
+    { "a": "guard-room", "b": "cells", "when": { "requires": ["jailers-defeated"] } },
+    {
+      "a": "cells",
+      "b": "stairs-down",
+      "chance": 40,
+      "encounters": [
+        { "weight": 2, "monsters": ["ghoul"] },
+        { "weight": 3, "monsters": ["crypt-spider", "crypt-spider"] },
+        { "weight": 3, "monsters": ["skeleton-archer", "ghoul"] },
+        { "weight": 2, "monsters": ["crypt-spider", "skeleton-archer"] },
+        { "weight": 2, "monsters": ["ghoul", "crypt-spider", "skeleton"] }
+      ],
+      "when": { "requires": ["corin-joined"] }
+    }
+  ]
+}

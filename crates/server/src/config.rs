@@ -7,7 +7,7 @@
 //! | `WEB_DIR`      | `web/dist` | Built web client served as static files   |
 //! | `LOG_FORMAT`   | `text`     | `text` for terminals, `json` in containers |
 //! | `RUST_LOG`     | `info`     | Log filter (`tracing` env-filter syntax)  |
-//! | `CONTENT_DIR`  | `content`  | Game data (sandbox builds only)           |
+//! | `CONTENT_DIR`  | `content`  | Game data: actions, items, the world      |
 //! | `SANDBOX_DIR`  | `sandbox`  | Sandbox scenarios (sandbox builds only)   |
 
 use std::path::PathBuf;
@@ -21,7 +21,6 @@ pub(crate) struct Config {
     pub(crate) database_url: String,
     pub(crate) web_dir: PathBuf,
     pub(crate) log_format: LogFormat,
-    #[cfg(feature = "sandbox")]
     pub(crate) content_dir: PathBuf,
     #[cfg(feature = "sandbox")]
     pub(crate) sandbox_dir: PathBuf,
@@ -67,7 +66,6 @@ impl Config {
             database_url,
             web_dir,
             log_format,
-            #[cfg(feature = "sandbox")]
             content_dir: lookup("CONTENT_DIR")
                 .map_or_else(|| PathBuf::from("content"), PathBuf::from),
             #[cfg(feature = "sandbox")]

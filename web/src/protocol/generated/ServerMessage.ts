@@ -3,6 +3,8 @@ import type { BattleEvent } from "./BattleEvent";
 import type { BattleState } from "./BattleState";
 import type { Catalog } from "./Catalog";
 import type { ErrorCode } from "./ErrorCode";
+import type { GameError } from "./GameError";
+import type { GameView } from "./GameView";
 import type { RejectReason } from "./RejectReason";
 
 /**
@@ -10,9 +12,9 @@ import type { RejectReason } from "./RejectReason";
  */
 export type ServerMessage = { "type": "battle_started", 
 /**
- * Scenario name.
+ * Sandbox scenario name; `None` for a battle of the game.
  */
-scenario: string, 
+scenario: string | null, 
 /**
  * Seed in use (to replay the same battle).
  */
@@ -32,7 +34,15 @@ events: Array<BattleEvent>,
 /**
  * State after the events.
  */
-state: BattleState, } | { "type": "command_rejected", 
+state: BattleState, } | { "type": "game_update", 
+/**
+ * The view.
+ */
+view: GameView, } | { "type": "game_rejected", 
+/**
+ * Why.
+ */
+error: GameError, } | { "type": "command_rejected", 
 /**
  * Why.
  */

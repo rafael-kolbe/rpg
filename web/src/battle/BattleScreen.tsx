@@ -35,11 +35,20 @@ interface Props {
   rejection: RejectReason | null
   send: (message: ClientMessage) => void
   subscribe: BattleSocket['subscribe']
-  onRestart: () => void
+  /** The button under the outcome: restart (sandbox), continue (game). */
+  outcomeLabel: string
+  onOutcome: () => void
 }
 
 /** The battle screen: enemies left, party right, menus at the bottom. */
-export function BattleScreen({ battle, rejection, send, subscribe, onRestart }: Props) {
+export function BattleScreen({
+  battle,
+  rejection,
+  send,
+  subscribe,
+  outcomeLabel,
+  onOutcome,
+}: Props) {
   const { t } = useTranslation()
   const { state, catalog } = battle
   const [selected, setSelected] = useState<CombatantId | null>(null)
@@ -206,7 +215,9 @@ export function BattleScreen({ battle, rejection, send, subscribe, onRestart }: 
         {state.outcome !== null && (
           <div className="battle__outcome" data-testid="outcome">
             <p>{t(`ui-outcome-${state.outcome}`)}</p>
-            <Button onClick={onRestart}>{t('ui-outcome-restart')}</Button>
+            <Button onClick={onOutcome} testId="outcome-continue">
+              {outcomeLabel}
+            </Button>
           </div>
         )}
       </div>

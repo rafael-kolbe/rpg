@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT account_id FROM sessions WHERE token_hash = $1 AND expires_at > now()",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "account_id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "sessions",
+            "name": "account_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8a390a8625b99a91cfadc214a3a7cd02d297b4cfc0efd43d1cb7e37ef017f7ac"
+}

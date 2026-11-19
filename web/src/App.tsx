@@ -1,6 +1,7 @@
 import { LoginPage } from './account/LoginPage.tsx'
 import { RecoverPage } from './account/RecoverPage.tsx'
 import { SignUpPage } from './account/SignUpPage.tsx'
+import { PlayPage } from './game/PlayPage.tsx'
 import { HomePage } from './pages/HomePage.tsx'
 import { SandboxPage } from './sandbox/SandboxPage.tsx'
 
@@ -13,6 +14,8 @@ export function App() {
       return <LoginPage />
     case '/recover':
       return <RecoverPage />
+    case '/play':
+      return <PlayPage />
   }
   const sandbox = /^\/sandbox\/([a-z0-9-]+)\/?$/.exec(window.location.pathname)
   if (sandbox?.[1]) return <SandboxPage scenario={sandbox[1]} />

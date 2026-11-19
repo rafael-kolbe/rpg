@@ -43,7 +43,7 @@ export function RecoveryKeyNotice({ recoveryKey }: Props) {
           testId="recovery-key-saved"
         />
         <Button
-          onClick={() => window.location.assign('/')}
+          onClick={() => window.location.assign('/play')}
           disabled={!saved}
           testId="recovery-key-continue"
         >
