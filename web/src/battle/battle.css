@@ -9,7 +9,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  min-height: 320px;
+  /* Follows the screen's height, never shorter than two combatants per
+     column (each about 210px) need, so the battle keeps its size whatever
+     the number of enemies. */
+  height: clamp(440px, 58vh, 640px);
   padding: 16px 24px;
   border-radius: var(--radius);
   background: linear-gradient(180deg, #1d2a3a 0%, #22331f 100%);
@@ -18,18 +21,12 @@
 .battle__side {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
 }
 
-.battle__side--enemies {
-  align-items: flex-start;
-}
-
-.battle__side--party {
-  align-items: flex-end;
+/* A formation slot (`formation.ts`): the combatant is centered on it. */
+.battle__slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
 }
 
 .battle__outcome {

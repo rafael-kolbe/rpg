@@ -12,6 +12,7 @@ import { Button } from '../ui/Button.tsx'
 import { useStoredToggle } from '../ui/use-stored-toggle.ts'
 import { useMenuKeys, type MenuKey } from '../ui/use-menu-keys.ts'
 import { wrapIndex } from '../utils/wrap-index.ts'
+import { slotOf } from './formation.ts'
 import { CombatantView } from './CombatantView.tsx'
 import { repeatCommand } from './action-memory.ts'
 import { soundsOf } from './battle-sounds.ts'
@@ -193,18 +194,30 @@ export function BattleScreen({
   const intentText = ({ side, intent }: (typeof state.combatants)[number]): string | null =>
     side === 'enemies' && intent !== null ? t(intentMessage(intent)) : null
 
-  const view = (combatant: (typeof state.combatants)[number]) => (
-    <CombatantView
-      key={combatant.id}
-      combatant={combatant}
-      popups={popups.filter((p) => p.target === combatant.id)}
-      strikes={strikes.filter((s) => s.target === combatant.id)}
-      targetable={targets.includes(combatant)}
-      cursor={cursor === combatant}
-      intent={intentText(combatant)}
-      onTarget={() => current && command(current.kind, combatant.id)}
-    />
-  )
+  // Enemies keep the left side and the party the right; `depth` grows
+  // toward the middle of the field.
+  const view = (
+    combatant: (typeof state.combatants)[number],
+    index: number,
+    side: (typeof state.combatants)[number][],
+  ) => {
+    const { depth, height } = slotOf(side.length, index)
+    const left = combatant.side === 'enemies' ? depth : 100 - depth
+    const style = { left: `${left}%`, top: `${height}%` }
+    return (
+      <div key={combatant.id} className="battle__slot" style={style}>
+        <CombatantView
+          combatant={combatant}
+          popups={popups.filter((p) => p.target === combatant.id)}
+          strikes={strikes.filter((s) => s.target === combatant.id)}
+          targetable={targets.includes(combatant)}
+          cursor={cursor === combatant}
+          intent={intentText(combatant)}
+          onTarget={() => current && command(current.kind, combatant.id)}
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="battle">

@@ -43,6 +43,8 @@ test('M switches the action memory and the browser keeps the choice', async ({ p
   await page.goto(`${SCENARIO}?seed=42`)
   const toggle = page.getByTestId('action-memory')
   await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  // The keys answer once the battle is on screen.
+  await expect(page.getByTestId('combatant-3')).toBeVisible()
 
   await page.keyboard.press('m')
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
