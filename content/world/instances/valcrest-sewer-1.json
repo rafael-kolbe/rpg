@@ -40,77 +40,133 @@
       "a": "landing",
       "b": "tunnel-a",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "landing",
       "b": "tunnel-b",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "tunnel-a",
       "b": "junction",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "tunnel-b",
       "b": "junction",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "junction",
       "b": "slime-trail",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "junction",
       "b": "torn-grate",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {
       "a": "slime-trail",
       "b": "torn-grate",
       "chance": 40,
-      "monsters": [
-        {"monster": "sewer-rat", "weight": 4},
-        {"monster": "giant-rat", "weight": 2},
-        {"monster": "sewer-slime", "weight": 2},
-        {"monster": "giant-roach", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["sewer-rat"]},
+        {"weight": 3, "monsters": ["sewer-rat", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat"]},
+        {"weight": 2, "monsters": ["sewer-slime"]},
+        {"weight": 2, "monsters": ["sewer-rat", "sewer-slime"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-roach"]},
+        {"weight": 1, "monsters": ["sewer-rat", "sewer-rat", "sewer-rat"]},
+        {"weight": 1, "monsters": ["giant-rat", "sewer-slime", "sewer-rat"]},
+        {"weight": 2, "monsters": ["giant-rat", "sewer-rat", "sewer-rat", "sewer-slime"]},
+        {"weight": 1, "monsters": ["giant-roach", "sewer-rat", "sewer-rat", "giant-rat"]},
+        {"weight": 1, "monsters": ["sewer-slime", "sewer-slime", "sewer-rat", "sewer-rat"]}
       ]
     },
     {"a": "junction", "b": "stairs-down", "when": {"requires": ["clue-2"]}},

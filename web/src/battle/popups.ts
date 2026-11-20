@@ -7,7 +7,19 @@ import type { Element } from '../protocol/generated/Element.ts'
 export interface Popup {
   key: string
   target: CombatantId
-  kind: 'damage' | 'critical' | 'poison' | 'heal' | 'mp' | 'miss' | 'resist' | 'immune' | 'cover'
+  kind:
+    | 'damage'
+    | 'critical'
+    | 'poison'
+    | 'heal'
+    | 'mp'
+    | 'miss'
+    | 'resist'
+    | 'immune'
+    | 'cover'
+    | 'stolen'
+    | 'fled'
+    | 'recovered'
   amount?: number
   /** Element of the damage: picks the number's color. */
   element?: Element
@@ -71,6 +83,15 @@ export function effectsOf(
         break
       case 'covered':
         popups.push({ key, target: event.protector, kind: 'cover' })
+        break
+      case 'stole':
+        popups.push({ key, target: event.target, kind: 'stolen' })
+        break
+      case 'fled':
+        popups.push({ key, target: event.combatant, kind: 'fled' })
+        break
+      case 'recovered':
+        popups.push({ key, target: event.combatant, kind: 'recovered' })
         break
       case 'status_resisted':
         popups.push({ key, target: event.target, kind: 'resist' })

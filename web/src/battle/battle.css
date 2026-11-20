@@ -141,6 +141,11 @@
   filter: grayscale(1);
 }
 
+/* Ran off with its loot: gone from the field. */
+.combatant--fled {
+  visibility: hidden;
+}
+
 .combatant__name {
   font-size: 0.85rem;
 }
@@ -258,7 +263,10 @@
 .popup--miss,
 .popup--resist,
 .popup--immune,
-.popup--cover {
+.popup--cover,
+.popup--stolen,
+.popup--fled,
+.popup--recovered {
   color: #d9dce6;
   font-size: 1.05rem;
 }

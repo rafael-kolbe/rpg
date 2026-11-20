@@ -52,41 +52,55 @@
       "a": "south-edge",
       "b": "road-1",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ]
     },
     {
       "a": "road-1",
       "b": "hollow",
       "chance": 35,
-      "monsters": [
-        {"monster": "goblin", "weight": 2},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2},
-        {"monster": "bandit", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["forest-wolf", "forest-wolf"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 2, "monsters": ["bandit"]},
+        {"weight": 1, "monsters": ["bandit", "goblin"]},
+        {"weight": 1, "monsters": ["forest-wolf", "forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin-archer", "goblin", "goblin"]}
       ]
     },
     {
       "a": "road-1",
       "b": "road-2",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ]
     },
     {
       "a": "road-2",
       "b": "clearing",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ]
     },
     {"a": "road-2", "b": "spring"},
@@ -94,20 +108,26 @@
       "a": "clearing",
       "b": "fork",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ]
     },
     {
       "a": "fork",
       "b": "camp-path",
       "chance": 40,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "goblin-shaman", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 2, "monsters": ["goblin", "goblin", "goblin-archer"]},
+        {"weight": 2, "monsters": ["goblin-shaman"]},
+        {"weight": 2, "monsters": ["goblin-shaman", "goblin"]},
+        {"weight": 1, "monsters": ["goblin-shaman", "goblin", "goblin-archer"]}
       ],
       "when": {"requires": ["lyra-met"]}
     },
@@ -115,10 +135,12 @@
       "a": "camp-path",
       "b": "camp",
       "chance": 40,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "goblin-shaman", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 2, "monsters": ["goblin", "goblin", "goblin-archer"]},
+        {"weight": 2, "monsters": ["goblin-shaman"]},
+        {"weight": 2, "monsters": ["goblin-shaman", "goblin"]},
+        {"weight": 1, "monsters": ["goblin-shaman", "goblin", "goblin-archer"]}
       ],
       "when": {"requires": ["lyra-met"]}
     },
@@ -126,10 +148,14 @@
       "a": "fork",
       "b": "road-north",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ],
       "when": {"requires": ["camp-destroyed"]}
     },
@@ -137,10 +163,14 @@
       "a": "road-north",
       "b": "north-edge",
       "chance": 20,
-      "monsters": [
-        {"monster": "goblin", "weight": 3},
-        {"monster": "goblin-archer", "weight": 2},
-        {"monster": "forest-wolf", "weight": 2}
+      "encounters": [
+        {"weight": 4, "monsters": ["goblin"]},
+        {"weight": 2, "monsters": ["goblin-archer"]},
+        {"weight": 2, "monsters": ["forest-wolf"]},
+        {"weight": 3, "monsters": ["goblin", "goblin"]},
+        {"weight": 2, "monsters": ["goblin", "goblin-archer"]},
+        {"weight": 1, "monsters": ["forest-wolf", "goblin"]},
+        {"weight": 1, "monsters": ["goblin", "goblin", "goblin"]}
       ]
     }
   ]

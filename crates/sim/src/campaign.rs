@@ -407,7 +407,8 @@ impl Bot {
             "  battle vs {enemies:?}: {outcome:?} in {:.0}s, party {party:?}",
             f64::from(battle.tick()) / 10.0
         ));
-        self.game.finish_battle(outcome, &party, battle.inventory());
+        self.game
+            .finish_battle(outcome, &party, battle.inventory(), &battle.fled_enemies());
         if outcome == Outcome::Defeat {
             self.report.defeats += 1;
         }

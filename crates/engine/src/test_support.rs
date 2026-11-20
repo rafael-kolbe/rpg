@@ -66,8 +66,8 @@ fn action(category: ActionCategory, target: TargetRule, mp_cost: u16, effect: Ef
     }
 }
 
-/// Cover, Devour and Reanimate (into the `skeleton` form).
-fn guardian_actions() -> [(ActionId, ActionDef); 3] {
+/// Cover, Devour, Reanimate (into the `skeleton` form) and Steal.
+fn guardian_actions() -> [(ActionId, ActionDef); 4] {
     use ActionCategory as C;
     use TargetRule as T;
 
@@ -99,6 +99,10 @@ fn guardian_actions() -> [(ActionId, ActionDef); 3] {
                     into: "skeleton".to_owned(),
                 },
             ),
+        ),
+        (
+            ActionId::new("steal"),
+            action(C::Technic, T::SingleEnemy, 0, Effect::Steal),
         ),
     ]
 }

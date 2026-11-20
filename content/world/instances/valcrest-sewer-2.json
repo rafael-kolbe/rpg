@@ -28,50 +28,75 @@
       "a": "stairs-up",
       "b": "deep-1",
       "chance": 40,
-      "monsters": [
-        {"monster": "mutant-rat", "weight": 3},
-        {"monster": "giant-leech", "weight": 2},
-        {"monster": "sewer-crawler", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["mutant-rat", "mutant-rat"]},
+        {"weight": 2, "monsters": ["giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["sewer-crawler"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat"]},
+        {"weight": 2, "monsters": ["mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["giant-leech", "giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["mutant-rat", "mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat", "giant-leech", "mutant-rat"]}
       ]
     },
     {
       "a": "stairs-up",
       "b": "deep-2",
       "chance": 40,
-      "monsters": [
-        {"monster": "mutant-rat", "weight": 3},
-        {"monster": "giant-leech", "weight": 2},
-        {"monster": "sewer-crawler", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["mutant-rat", "mutant-rat"]},
+        {"weight": 2, "monsters": ["giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["sewer-crawler"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat"]},
+        {"weight": 2, "monsters": ["mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["giant-leech", "giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["mutant-rat", "mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat", "giant-leech", "mutant-rat"]}
       ]
     },
     {
       "a": "deep-1",
       "b": "deep-3",
       "chance": 40,
-      "monsters": [
-        {"monster": "mutant-rat", "weight": 3},
-        {"monster": "giant-leech", "weight": 2},
-        {"monster": "sewer-crawler", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["mutant-rat", "mutant-rat"]},
+        {"weight": 2, "monsters": ["giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["sewer-crawler"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat"]},
+        {"weight": 2, "monsters": ["mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["giant-leech", "giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["mutant-rat", "mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat", "giant-leech", "mutant-rat"]}
       ]
     },
     {
       "a": "deep-2",
       "b": "deep-3",
       "chance": 40,
-      "monsters": [
-        {"monster": "mutant-rat", "weight": 3},
-        {"monster": "giant-leech", "weight": 2},
-        {"monster": "sewer-crawler", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["mutant-rat", "mutant-rat"]},
+        {"weight": 2, "monsters": ["giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["sewer-crawler"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat"]},
+        {"weight": 2, "monsters": ["mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["giant-leech", "giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["mutant-rat", "mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat", "giant-leech", "mutant-rat"]}
       ]
     },
     {
       "a": "deep-3",
       "b": "dead-end",
       "chance": 40,
-      "monsters": [
-        {"monster": "mutant-rat", "weight": 3},
-        {"monster": "giant-leech", "weight": 2},
-        {"monster": "sewer-crawler", "weight": 1}
+      "encounters": [
+        {"weight": 3, "monsters": ["mutant-rat", "mutant-rat"]},
+        {"weight": 2, "monsters": ["giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["sewer-crawler"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat"]},
+        {"weight": 2, "monsters": ["mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["giant-leech", "giant-leech", "mutant-rat"]},
+        {"weight": 1, "monsters": ["mutant-rat", "mutant-rat", "mutant-rat", "giant-leech"]},
+        {"weight": 1, "monsters": ["sewer-crawler", "mutant-rat", "giant-leech", "mutant-rat"]}
       ]
     },
     {"a": "dead-end", "b": "hall"},

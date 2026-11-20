@@ -17,7 +17,7 @@ services:
     environment:
       DATABASE_URL: postgres://rpg:${POSTGRES_PASSWORD:?set it in .env}@db:5432/rpg
     ports:
-      - "127.0.0.1:${LOCAL_PORT:-8083}:3000"
+      - "127.0.0.1:${PORTA_LOCAL:-8083}:3000"
     depends_on:
       db:
         condition: service_healthy

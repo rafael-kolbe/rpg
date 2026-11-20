@@ -13,7 +13,7 @@ export function canTarget(
   const ownSide = action.target === 'single_ally' || action.target === 'all_allies'
   const side = ownSide ? actor.side : actor.side === 'party' ? 'enemies' : 'party'
   const knockedOut = target.hp === 0
-  return target.side === side && knockedOut === action.targetsKnockedOut
+  return target.side === side && !target.fled && knockedOut === action.targetsKnockedOut
 }
 
 /** Whether the command must name a target before it is sent. */

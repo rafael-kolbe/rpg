@@ -11,14 +11,19 @@ interface Props {
   scenario: string
 }
 
-/** URL options: `?seed=42&auto=1&speed=400`. */
+/**
+ * URL options: `?seed=42&auto=1&speed=400&level=8` (`level` sets the heroes
+ * of a campaign scenario).
+ */
 function readOptions() {
   const params = new URLSearchParams(window.location.search)
   const seed = params.get('seed')
+  const level = params.get('level')
   return {
     seed: seed === null || seed === '' ? null : Number(seed),
     auto: params.get('auto') === '1',
     speed: params.has('speed') ? Number(params.get('speed')) : null,
+    level: level === null || level === '' ? null : Number(level),
   }
 }
 
@@ -27,7 +32,13 @@ export function SandboxPage({ scenario }: Props) {
   const { t } = useTranslation()
   const [options] = useState(readOptions)
   const start = useMemo<ClientMessage>(
-    () => ({ type: 'start_sandbox', scenario, seed: options.seed, auto: options.auto }),
+    () => ({
+      type: 'start_sandbox',
+      scenario,
+      seed: options.seed,
+      auto: options.auto,
+      level: options.level,
+    }),
     [scenario, options],
   )
   const { connection, battle, rejection, error, send, subscribe } = useBattle(start)
@@ -41,7 +52,7 @@ export function SandboxPage({ scenario }: Props) {
   }, [battle, options.speed, send])
 
   const restart = (seed: number | null, auto: boolean) =>
-    send({ type: 'start_sandbox', scenario, seed, auto })
+    send({ type: 'start_sandbox', scenario, seed, auto, level: options.level })
 
   return (
     <main className="sandbox">

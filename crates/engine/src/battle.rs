@@ -261,6 +261,19 @@ impl Battle {
         self.items.get(id)
     }
 
+    /// Positions, among the enemies, of those that fled (a thief with its
+    /// loot): they give no reward.
+    #[must_use]
+    pub fn fled_enemies(&self) -> Vec<usize> {
+        self.combatants
+            .iter()
+            .filter(|c| c.side == Side::Enemies)
+            .enumerate()
+            .filter(|(_, c)| c.has_fled())
+            .map(|(index, _)| index)
+            .collect()
+    }
+
     /// Items left, by id (items reserved by queued actions excluded).
     #[must_use]
     pub fn inventory(&self) -> &BTreeMap<ItemId, u16> {
@@ -482,6 +495,7 @@ impl Battle {
             actor_side.opponent()
         };
         target.side == side
+            && !target.has_fled()
             && target.is_knocked_out() == def.effect.targets_knocked_out()
             && !(def.effect == Effect::Devour && target.id == actor)
     }
@@ -516,7 +530,7 @@ impl Battle {
     fn tick_statuses(&mut self, events: &mut Vec<BattleEvent>) {
         for index in 0..self.combatants.len() {
             let combatant = &mut self.combatants[index];
-            if combatant.is_knocked_out() {
+            if combatant.is_out() {
                 continue;
             }
 
@@ -590,7 +604,7 @@ impl Battle {
     fn fill_gauges(&mut self, events: &mut Vec<BattleEvent>) {
         for index in 0..self.combatants.len() {
             let combatant = &self.combatants[index];
-            if combatant.is_knocked_out() || combatant.state != TurnState::Charging {
+            if combatant.is_out() || combatant.state != TurnState::Charging {
                 continue;
             }
             if !combatant.player_controlled {
@@ -620,6 +634,15 @@ impl Battle {
                     status: StatusKind::Distracted,
                     reason: StatusEndReason::GaugeFull,
                 });
+            }
+            // A thief's next turn is its escape.
+            if !combatant.stolen.is_empty() {
+                combatant.reset_turn();
+                combatant.state = TurnState::Fled;
+                combatant.intent = None;
+                combatant.statuses.clear();
+                events.push(BattleEvent::Fled { combatant: id });
+                continue;
             }
             combatant.state = TurnState::AwaitingCommand;
             let player_controlled = combatant.player_controlled;
@@ -767,7 +790,15 @@ impl Battle {
         combatant.defending = false;
         combatant.intent = None;
         combatant.reset_turn();
+        let dropped = std::mem::take(&mut combatant.stolen);
         events.push(BattleEvent::KnockedOut { combatant: id });
+        for item in dropped {
+            *self.inventory.entry(item.clone()).or_insert(0) += 1;
+            events.push(BattleEvent::Recovered {
+                combatant: id,
+                item,
+            });
+        }
         self.cancel_queued(id, CancelReason::ActorKnockedOut, events);
     }
 
@@ -779,7 +810,7 @@ impl Battle {
             .find(|c| {
                 c.side == side
                     && c.id != protected
-                    && !c.is_knocked_out()
+                    && !c.is_out()
                     && c.has_status(StatusKind::Cover)
                     && !c.has_status(StatusKind::Sleep)
             })
@@ -791,11 +822,9 @@ impl Battle {
     fn side_out(&self, side: Side) -> bool {
         let members = || self.combatants.iter().filter(move |c| c.side == side);
         if members().any(|c| c.leader) {
-            members()
-                .filter(|c| c.leader)
-                .all(Combatant::is_knocked_out)
+            members().filter(|c| c.leader).all(Combatant::is_out)
         } else {
-            members().all(Combatant::is_knocked_out)
+            members().all(Combatant::is_out)
         }
     }
 
@@ -821,7 +850,7 @@ impl Battle {
         let standing: Vec<CombatantId> = self
             .combatants
             .iter()
-            .filter(|c| c.side == Side::Enemies && !c.is_knocked_out())
+            .filter(|c| c.side == Side::Enemies && !c.is_out())
             .map(|c| c.id)
             .collect();
         if outcome == Outcome::Victory {
@@ -1412,5 +1441,70 @@ mod tests {
         let raised = battle.combatant(zombie).unwrap();
         assert_eq!(raised.name(), "skeleton");
         assert_eq!(raised.hp(), 300);
+    }
+
+    /// A nimble thief that steals on every turn.
+    fn thief() -> CombatantSetup {
+        let mut thief = with_rule(
+            "thief",
+            Condition::Always,
+            "steal",
+            TargetPick::RandomOpponent,
+        );
+        thief.stats.attributes.dexterity = 200;
+        thief.stats.level = 60;
+        if let Some(ai) = thief.ai.as_mut() {
+            ai.phases[0].rules.truncate(1);
+        }
+        thief
+    }
+
+    #[test]
+    fn a_thief_runs_off_with_an_item_on_its_next_turn() {
+        let setup = catalog_setup(vec![fighter("hero")], vec![thief()]);
+        let mut battle = Battle::new(setup, 4, PartyControl::Player).unwrap();
+        let thief = CombatantId(1);
+
+        let events = run_until(&mut battle, |e| matches!(e, BattleEvent::Stole { .. }));
+        assert!(events.contains(&BattleEvent::Stole {
+            actor: thief,
+            target: HERO,
+            item: ItemId::new("potion"),
+        }));
+        assert_eq!(battle.inventory()[&ItemId::new("potion")], 1);
+
+        run_until(&mut battle, |e| {
+            *e == BattleEvent::Fled { combatant: thief }
+        });
+
+        assert!(battle.combatant(thief).unwrap().has_fled());
+        assert_eq!(battle.fled_enemies(), [0]);
+        assert_eq!(
+            battle.outcome(),
+            Some(Outcome::Victory),
+            "nobody left to fight"
+        );
+        assert_eq!(
+            battle.inventory()[&ItemId::new("potion")],
+            1,
+            "gone with it"
+        );
+    }
+
+    #[test]
+    fn a_thief_knocked_out_before_fleeing_drops_what_it_stole() {
+        let setup = catalog_setup(vec![fighter("hero")], vec![thief(), fighter("wolf")]);
+        let mut battle = Battle::new(setup, 4, PartyControl::Player).unwrap();
+        let thief = CombatantId(1);
+        run_until(&mut battle, |e| matches!(e, BattleEvent::Stole { .. }));
+
+        let mut events = Vec::new();
+        battle.knock_out(thief, &mut events);
+
+        assert!(events.contains(&BattleEvent::Recovered {
+            combatant: thief,
+            item: ItemId::new("potion"),
+        }));
+        assert_eq!(battle.inventory()[&ItemId::new("potion")], 2);
     }
 }

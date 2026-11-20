@@ -315,23 +315,24 @@ pub struct TrailDef {
     /// Chance of a battle when walking it, in percent.
     #[serde(default)]
     pub chance: u8,
-    /// Monsters met on it: each of the 1–3 enemies (up to the party's size
-    /// when it is larger) is drawn from here by weight.
+    /// The fixed groups met on it, by weight. Only groups of up to 3
+    /// monsters (up to the party's size when it is larger) can be drawn.
     #[serde(default)]
-    pub monsters: Vec<Weighted>,
+    pub encounters: Vec<EncounterGroup>,
     /// When it is open.
     #[serde(default)]
     pub when: Condition,
 }
 
-/// A monster a trail can throw at the party, and how often.
+/// Monsters met together on a trail: a combination chosen by hand, so a
+/// strong monster never comes in numbers the area's level cannot take.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
-pub struct Weighted {
-    /// The monster.
-    pub monster: MonsterId,
-    /// Relative chance among the trail's monsters.
+pub struct EncounterGroup {
+    /// Relative chance among the trail's groups.
     pub weight: u16,
+    /// The enemies, in order.
+    pub monsters: Vec<MonsterId>,
 }
 
 /// Something the story does: after a dialogue, a choice or a won fight.

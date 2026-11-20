@@ -156,7 +156,7 @@ RUNS     ?= 1
 SCENARIO ?= sandbox/battle-basic.json
 
 sim:
-	cargo run --quiet --release -p sim -- --scenario $(SCENARIO) --seed $(SEED) --runs $(RUNS)
+	cargo run --quiet --release -p sim -- --scenario $(SCENARIO) --seed $(SEED) --runs $(RUNS) $(if $(LEVEL),--level $(LEVEL))
 
 sim-campaign:
 	cargo run --quiet --release -p sim -- --campaign --seed $(SEED) --runs $(RUNS)

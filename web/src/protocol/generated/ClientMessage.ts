@@ -20,7 +20,12 @@ seed: number | null,
 /**
  * The engine plays the party too (auto-battle).
  */
-auto: boolean, } | { "type": "start_game", 
+auto: boolean, 
+/**
+ * Level of the heroes (not guests) in a campaign scenario; the
+ * scenario's own levels when absent.
+ */
+level: number | null, } | { "type": "start_game", 
 /**
  * Campaign or Multiplayer.
  */

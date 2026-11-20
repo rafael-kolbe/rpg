@@ -30,7 +30,8 @@ change.
 | Deterministic RNG | `crates/engine/src/rng.rs` |
 | Battle record and replay (resume a battle where it was) | `crates/engine/src/record.rs` |
 | Engine unit-test fixtures | `crates/engine/src/test_support.rs` |
-| Loading content and scenarios | `crates/content/src/lib.rs` |
+| Loading content | `crates/content/src/lib.rs` |
+| Sandbox scenarios: written battles and campaign battles by id | `crates/content/src/scenario.rs` |
 | Content validation (`content-check`) | `crates/content/src/validation.rs` |
 | Battle simulator CLI | `crates/sim/src/main.rs` |
 | Campaign bot (plays chapter 1, trains before bosses; balancing and the arc test) | `crates/sim/src/campaign.rs` |
@@ -94,11 +95,11 @@ nothing and anyone may use it.
 | `make check` | Everything that must pass before a task is done (starts the dev database: queries are checked against it) |
 | `make fmt` | Format Rust and web code |
 | `make dev-db` / `make dev-server` / `make dev-web` | Local development with hot reload (db on 5433, server on 3000, Vite on 5173) |
-| `make up` / `make up-d` / `make down` | Production-like stack on http://127.0.0.1:8083 (needs `.env`) |
+| `make up` / `make up-d` / `make down` | Production-like stack on http://127.0.0.1:8083 (`PORTA_LOCAL` in `.env`, the my-server convention) |
 | `make protocol-types` | Regenerate TS types after changing `crates/protocol` |
 | `make sqlx-prepare` | Refresh `.sqlx/` after adding or changing a query (needs the dev database, started for you) |
 | `make docs` | Build and open rustdoc for the whole workspace |
-| `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`) |
+| `make sim` / `make sim RUNS=1000` | AI-vs-AI battle log / balancing summary (`SEED`, `SCENARIO`, `LEVEL` for campaign scenarios) |
 | `make sim-campaign` / `RUNS=8` | A bot plays the campaign's first arc: full log / levels, defeats and battle time per seed |
 | `make e2e` | Build the client and run the Playwright browser tests (starts its own sandbox server) |
 | Sandbox in the browser | `make dev-server` + `make dev-web`, open `/sandbox/battle-basic` (`?seed=42&auto=1&speed=400`) |
@@ -226,6 +227,11 @@ Generic helpers live in **`crates/utils`** (Rust) and **`web/src/utils/`**
 - A new scenario is a JSON file in `sandbox/`; the server and `content-check`
   validate it at startup / check time. Prefer a scenario over manual setup when
   testing a mechanic.
+- Two kinds (`crates/content/src/scenario.rs`): written out (an engine
+  `Encounter`), or `{"campaign": …}` with campaign heroes and monsters by id,
+  so balance changes show at once. `?level=N` in the browser (`--level` in
+  `sim`) sets the heroes' level; guests keep theirs. `sandbox/ch1-*.json` cover
+  every chapter 1 fight.
 
 ## Content rules
 

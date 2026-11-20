@@ -1,0 +1,32 @@
+{
+  "campaign": {
+    "party": [
+      {
+        "hero": "tauryen",
+        "level": 10
+      },
+      {
+        "hero": "lyra",
+        "level": 10
+      },
+      {
+        "hero": "merrick",
+        "level": 20,
+        "guest": true
+      },
+      {
+        "hero": "tobin",
+        "level": 10,
+        "guest": true
+      }
+    ],
+    "enemies": [
+      "injured-lich",
+      "zombie"
+    ],
+    "inventory": {
+      "potion": 3,
+      "hi-potion": 2
+    }
+  }
+}

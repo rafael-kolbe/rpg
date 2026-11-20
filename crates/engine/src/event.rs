@@ -165,6 +165,27 @@ pub enum BattleEvent {
         /// Who was aimed at.
         protected: CombatantId,
     },
+    /// A thief took an item from the party's bag.
+    Stole {
+        /// The thief.
+        actor: CombatantId,
+        /// Who it was taken from.
+        target: CombatantId,
+        /// The item.
+        item: ItemId,
+    },
+    /// A thief ran off with what it stole.
+    Fled {
+        /// Who.
+        combatant: CombatantId,
+    },
+    /// A thief knocked out before fleeing dropped what it stole.
+    Recovered {
+        /// The thief.
+        combatant: CombatantId,
+        /// The item, back in the bag.
+        item: ItemId,
+    },
     /// HP reached 0. Statuses are cleared and queued actions cancelled.
     KnockedOut {
         /// Who.

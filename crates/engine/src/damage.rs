@@ -85,9 +85,30 @@ pub(crate) fn status_chance(accuracy: u8, target_luck: u16) -> u8 {
     clamp_to_u8(raw, MIN_STATUS_PERCENT, 100)
 }
 
+/// Chance of stealing an item, in percent: `40 + (thief Dexterity − target
+/// Dexterity) + 3 × (thief level − target level)`, clamped to 5..=80.
+pub(crate) fn steal_chance(
+    thief_dex: u16,
+    thief_level: u8,
+    target_dex: u16,
+    target_level: u8,
+) -> u8 {
+    let raw = 40 + i32::from(thief_dex) - i32::from(target_dex)
+        + 3 * (i32::from(thief_level) - i32::from(target_level));
+    clamp_to_u8(raw, 5, 80)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn stealing_grows_with_dexterity_and_level_within_5_and_80_percent() {
+        assert_eq!(steal_chance(20, 5, 20, 4), 43);
+        assert_eq!(steal_chance(20, 5, 20, 8), 31);
+        assert_eq!(steal_chance(20, 5, 40, 20), 5);
+        assert_eq!(steal_chance(90, 30, 20, 1), 80);
+    }
 
     #[test]
     fn physical_base_matches_the_formula() {

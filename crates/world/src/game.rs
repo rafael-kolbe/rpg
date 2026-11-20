@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::World;
 use crate::def::Slot;
-use crate::def::{Condition, NodeDef, NodeKind, QuestGoal, StoryEffect, TrailDef, Weighted};
+use crate::def::{Condition, EncounterGroup, NodeDef, NodeKind, QuestGoal, StoryEffect, TrailDef};
 use crate::ids::{DialogueId, EquipmentId, Flag, MonsterId, NodeId, Position, QuestId, ShopId};
 use crate::progression;
 use crate::save::{Checkpoint, GameMode, HeroState, Progress, Save, SavedBattle};
@@ -391,14 +391,16 @@ impl Game {
         }
     }
 
-    /// Applies the end of the battle [`Game::act`] ordered: each party
-    /// member's HP and MP (in party order), the inventory as it ended, and
-    /// who won. Ignored when no battle was ordered.
+    /// Applies the end of the battle [`Game::act`] ordered: who won, each
+    /// party member's HP and MP (in party order), the inventory as it ended,
+    /// and the enemies (by position) that fled: they give nothing. Ignored
+    /// when no battle was ordered.
     pub fn finish_battle(
         &mut self,
         outcome: Outcome,
         party: &[(u16, u16)],
         inventory: &BTreeMap<ItemId, u16>,
+        fled: &[usize],
     ) {
         if !self.in_battle() {
             return;
@@ -414,7 +416,17 @@ impl Game {
             .collect();
         match outcome {
             Outcome::Defeat => self.defeat(),
-            Outcome::Victory => self.victory(battle, party),
+            Outcome::Victory => {
+                let mut battle = battle;
+                battle.monsters = battle
+                    .monsters
+                    .into_iter()
+                    .enumerate()
+                    .filter(|(index, _)| !fled.contains(index))
+                    .map(|(_, monster)| monster)
+                    .collect();
+                self.victory(battle, party);
+            }
         }
     }
 
@@ -518,7 +530,7 @@ impl Game {
         if self.mode == GameMode::Multiplayer && !self.progress.explored.contains(&target) {
             return Err(GameError::Barrier);
         }
-        let (chance, pool) = (trail.chance, trail.monsters.clone());
+        let (chance, groups) = (trail.chance, trail.encounters.clone());
         // Saved one step before a boss ambush: a Game Over leaves the player
         // free to rest and train before walking in again.
         if self.boss_ambush_at(&target) {
@@ -527,12 +539,16 @@ impl Game {
         self.save.position = target;
         self.explore();
 
-        if !pool.is_empty() && self.rng.chance_percent(chance) {
-            let most = BASE_ENEMIES.max(self.save.party.len());
-            let count = 1 + self.rng.below(u64::try_from(most).unwrap_or(3));
-            let monsters: Vec<MonsterId> = (0..count)
-                .filter_map(|_| self.draw(&pool).cloned())
-                .collect();
+        let most = BASE_ENEMIES.max(self.save.party.len());
+        let fitting: Vec<EncounterGroup> = groups
+            .into_iter()
+            .filter(|group| group.monsters.len() <= most)
+            .collect();
+        if !fitting.is_empty() && self.rng.chance_percent(chance) {
+            let Some(monsters) = self.draw(&fitting).cloned() else {
+                self.arrive();
+                return Ok(None);
+            };
             let opening = if self.rng.chance_percent(ENEMY_AMBUSH_PERCENT) {
                 Opening::EnemyAmbush
             } else {
@@ -544,23 +560,24 @@ impl Game {
         Ok(None)
     }
 
-    /// One monster from a trail's pool, by weight.
-    fn draw<'a>(&mut self, pool: &'a [Weighted]) -> Option<&'a MonsterId> {
-        let total: u64 = pool.iter().map(|w| u64::from(w.weight)).sum();
+    /// One of a trail's groups, by weight.
+    fn draw<'a>(&mut self, groups: &'a [EncounterGroup]) -> Option<&'a Vec<MonsterId>> {
+        let total: u64 = groups.iter().map(|g| u64::from(g.weight)).sum();
         if total == 0 {
             return None;
         }
         let mut roll = self.rng.below(total);
-        pool.iter()
-            .find(|w| {
-                let weight = u64::from(w.weight);
+        groups
+            .iter()
+            .find(|g| {
+                let weight = u64::from(g.weight);
                 if roll < weight {
                     return true;
                 }
                 roll -= weight;
                 false
             })
-            .map(|w| &w.monster)
+            .map(|g| &g.monsters)
     }
 
     fn interact(&mut self, ambush: bool) -> Result<Option<BattleOrder>, GameError> {
@@ -1268,7 +1285,7 @@ mod tests {
             .map(|c| (c.hp(), c.mp()))
             .collect();
         let outcome = battle.outcome().unwrap();
-        game.finish_battle(outcome, &party, battle.inventory());
+        game.finish_battle(outcome, &party, battle.inventory(), &[]);
         outcome
     }
 
@@ -1279,7 +1296,7 @@ mod tests {
 
     fn finish(game: &mut Game, outcome: Outcome, party: &[(u16, u16)]) {
         let inventory = game.save.inventory.clone();
-        game.finish_battle(outcome, party, &inventory);
+        game.finish_battle(outcome, party, &inventory, &[]);
     }
 
     #[test]
@@ -1343,15 +1360,15 @@ mod tests {
         );
     }
 
-    #[test]
-    fn a_trail_brings_one_to_three_monsters() {
-        let mut game = new_game();
+    /// Sizes of the groups met walking back and forth from home.
+    fn group_sizes(game: &mut Game) -> std::collections::BTreeSet<usize> {
         let mut sizes = std::collections::BTreeSet::new();
-        for _ in 0..60 {
+        for _ in 0..80 {
             for node in ["road", "home"] {
-                if let Some(order) = walk(&mut game, node) {
+                if let Some(order) = walk(game, node) {
                     sizes.insert(order.setup.encounter.enemies.len());
-                    finish(&mut game, Outcome::Victory, &[(100, 10)]);
+                    let party = vec![(100, 10); game.save.party.len()];
+                    finish(game, Outcome::Victory, &party);
                     game.act(GameCommand::Next).unwrap();
                 }
                 while game.scene != Scene::Map {
@@ -1359,8 +1376,26 @@ mod tests {
                 }
             }
         }
+        sizes
+    }
 
-        assert_eq!(sizes, std::collections::BTreeSet::from([1, 2, 3]));
+    #[test]
+    fn a_trail_draws_only_the_groups_that_fit_the_party() {
+        let mut game = new_game();
+        assert_eq!(
+            group_sizes(&mut game),
+            [1, 2, 3].into(),
+            "a party of one: up to 3"
+        );
+
+        for hero in ["bea", "ann", "bea"] {
+            let joined = HeroState::new(&game.world, &crate::HeroId::new(hero), 1);
+            game.save.party.push(joined);
+        }
+        assert!(
+            group_sizes(&mut game).contains(&4),
+            "a party of four meets four"
+        );
     }
 
     #[test]
@@ -1468,6 +1503,23 @@ mod tests {
             "the pay comes with the rewards"
         );
         assert_eq!(scenes, 1, "the mission's scene plays once");
+    }
+
+    #[test]
+    fn an_enemy_that_fled_gives_nothing() {
+        let mut game = new_game();
+        let slimes = slimes_met(&walk(&mut game, "road").unwrap());
+        let all: Vec<usize> = (0..usize::try_from(slimes).unwrap()).collect();
+        let inventory = game.save.inventory.clone();
+
+        game.finish_battle(Outcome::Victory, &[(100, 10)], &inventory, &all);
+
+        assert_eq!(game.save.kalds, 100);
+        assert_eq!(game.save.party[0].xp, 0);
+        let SceneView::Victory { rewards } = game.view().scene else {
+            panic!("expected the rewards");
+        };
+        assert_eq!(rewards.xp, 0);
     }
 
     #[test]

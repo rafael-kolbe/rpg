@@ -23,6 +23,7 @@ function combatant(
     turn: 'charging',
     statuses: [],
     defending: false,
+    fled: false,
     playerControlled: side === 'party',
     intent: target && { command: { type: 'action', id: 'bite' }, target },
     attack: 'attack',
@@ -33,6 +34,7 @@ function combatant(
 describe('targetLines', () => {
   test('draws a line to each combatant an enemy will hit, none for itself', () => {
     const fallen = { ...combatant(2, 'party'), hp: 0 }
+    const gone = { ...combatant(7, 'party'), fled: true }
     const all = [
       combatant(0, 'party'),
       combatant(1, 'party'),
@@ -41,6 +43,7 @@ describe('targetLines', () => {
       combatant(4, 'enemies', { type: 'side', side: 'party' }),
       combatant(5, 'enemies', { type: 'user' }),
       combatant(6, 'party', { type: 'one', target: 3 }),
+      gone,
     ]
     expect(targetLines(all)).toEqual([
       { from: 3, to: 1 },

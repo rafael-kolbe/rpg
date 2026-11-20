@@ -1,0 +1,33 @@
+{
+  "campaign": {
+    "party": [
+      {
+        "hero": "tauryen",
+        "level": 6
+      },
+      {
+        "hero": "lyra",
+        "level": 6
+      },
+      {
+        "hero": "merrick",
+        "level": 20,
+        "guest": true
+      },
+      {
+        "hero": "tobin",
+        "level": 10,
+        "guest": true
+      }
+    ],
+    "enemies": [
+      "giant-rat",
+      "sewer-slime",
+      "giant-roach",
+      "sewer-rat"
+    ],
+    "inventory": {
+      "potion": 3
+    }
+  }
+}

@@ -93,6 +93,7 @@ action-cover = Proteger
 action-devour = Devorar
 action-raise-dead = Erguer os Mortos
 action-dark-bolt = Raio Sombrio
+action-steal = Furtar
 
 ## Equipamentos
 

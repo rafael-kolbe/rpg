@@ -228,5 +228,11 @@
     "mpCost": 12,
     "durationTicks": 14,
     "effect": {"type": "magical_damage", "power": 4, "element": "gravity"}
+  },
+  "steal": {
+    "category": "technic",
+    "target": "single_enemy",
+    "durationTicks": 10,
+    "effect": {"type": "steal"}
   }
 }

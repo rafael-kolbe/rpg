@@ -66,6 +66,8 @@ pub struct CombatantState {
     pub statuses: Vec<StatusState>,
     /// Halving damage with Defend.
     pub defending: bool,
+    /// Ran off (a thief with its loot): out of the battle.
+    pub fled: bool,
     /// Commands come from the player.
     pub player_controlled: bool,
     /// Engine-controlled only: its next action and who it will hit,
@@ -176,6 +178,7 @@ impl BattleState {
                     })
                     .collect(),
                 defending: c.is_defending(),
+                fled: c.has_fled(),
                 player_controlled: c.is_player_controlled(),
                 intent: battle.announced_intent(c.id()),
                 attack: c.attack_action().clone(),

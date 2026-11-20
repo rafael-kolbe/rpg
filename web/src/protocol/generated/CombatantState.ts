@@ -63,6 +63,10 @@ statuses: Array<StatusState>,
  */
 defending: boolean, 
 /**
+ * Ran off (a thief with its loot): out of the battle.
+ */
+fled: boolean, 
+/**
  * Commands come from the player.
  */
 playerControlled: boolean, 

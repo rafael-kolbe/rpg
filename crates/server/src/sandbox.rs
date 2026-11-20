@@ -6,20 +6,21 @@ use std::fs;
 use std::path::Path;
 
 use anyhow::{Context, bail};
-use content::{Content, load_encounter};
-use engine::{Battle, Encounter, PartyControl};
+use content::{Content, Scenario, load_scenario};
+use engine::{Battle, PartyControl};
 
 /// Content definitions plus every scenario in the sandbox directory.
 #[derive(Debug)]
 pub(crate) struct Sandbox {
     pub(crate) content: Content,
     /// By name: the file name without `.json`.
-    pub(crate) scenarios: BTreeMap<String, Encounter>,
+    pub(crate) scenarios: BTreeMap<String, Scenario>,
 }
 
 impl Sandbox {
     pub(crate) fn load(content_dir: &Path, sandbox_dir: &Path) -> anyhow::Result<Self> {
         let content = Content::load(content_dir)?;
+        let world = content.load_world(content_dir)?;
         let mut scenarios = BTreeMap::new();
 
         let entries = fs::read_dir(sandbox_dir)
@@ -32,14 +33,13 @@ impl Sandbox {
             let Some(name) = path.file_stem().and_then(|stem| stem.to_str()) else {
                 bail!("scenario file name is not UTF-8: {}", path.display());
             };
-            let encounter = load_encounter(&path)?;
-            Battle::new(
-                content.battle_setup(encounter.clone()),
-                0,
-                PartyControl::Player,
-            )
-            .with_context(|| format!("invalid scenario {}", path.display()))?;
-            scenarios.insert(name.to_owned(), encounter);
+            let scenario = load_scenario(&path)?;
+            let encounter = scenario
+                .encounter(&world, None)
+                .map_err(|error| anyhow::anyhow!("invalid scenario {}: {error}", path.display()))?;
+            Battle::new(content.battle_setup(encounter), 0, PartyControl::Player)
+                .with_context(|| format!("invalid scenario {}", path.display()))?;
+            scenarios.insert(name.to_owned(), scenario);
         }
 
         Ok(Self { content, scenarios })

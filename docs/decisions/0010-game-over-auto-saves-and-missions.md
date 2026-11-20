@@ -1,6 +1,6 @@
 # 0010 — Game Over with auto saves, a party of four, missions
 
-- **Status:** accepted
+- **Status:** accepted; encounters amended by [0011](0011-fixed-encounter-groups-steal-and-flee.md)
 - **Date:** 2026-11-19
 
 ## Context

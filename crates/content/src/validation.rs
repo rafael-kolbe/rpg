@@ -12,7 +12,7 @@ use fluent_syntax::ast::Entry;
 
 use utils::text::is_kebab_case;
 
-use crate::{Content, load_encounter};
+use crate::{Content, Scenario, load_scenario};
 
 /// What a successful check covered.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -59,15 +59,40 @@ pub fn check(root: &Path) -> Result<Summary, Vec<String>> {
         needed.insert(format!("item-{id}"));
     }
 
+    let world = match content.load_world(&root.join("content")) {
+        Ok(world) => Some(world),
+        Err(error) => {
+            problems.push(error.to_string());
+            None
+        }
+    };
+    if let Some(world) = &world {
+        check_world_ids(world, &mut problems);
+        problems.extend(world::validate::problems(world));
+        needed.extend(world::validate::message_ids(world));
+    }
+
     let scenarios = scenario_files(&root.join("sandbox"), &mut problems);
     for path in &scenarios {
         let name = path.display();
-        let encounter = match load_encounter(path) {
-            Ok(encounter) => encounter,
+        let scenario = match load_scenario(path) {
+            Ok(scenario) => scenario,
             Err(error) => {
                 problems.push(error.to_string());
                 continue;
             }
+        };
+        let encounter = match (&scenario, &world) {
+            (Scenario::Written(encounter), _) => encounter.clone(),
+            (Scenario::Campaign(_), Some(world)) => match scenario.encounter(world, None) {
+                Ok(encounter) => encounter,
+                Err(error) => {
+                    problems.push(format!("{name}: {error}"));
+                    continue;
+                }
+            },
+            // The world failed to load; that problem is already reported.
+            (Scenario::Campaign(_), None) => continue,
         };
         for member in encounter.party.iter().chain(&encounter.enemies) {
             needed.insert(member.name.clone());
@@ -83,19 +108,6 @@ pub fn check(root: &Path) -> Result<Summary, Vec<String>> {
                 problems.push(format!("{name}: {error}"));
             }
         }
-    }
-
-    let world = match content.load_world(&root.join("content")) {
-        Ok(world) => Some(world),
-        Err(error) => {
-            problems.push(error.to_string());
-            None
-        }
-    };
-    if let Some(world) = &world {
-        check_world_ids(world, &mut problems);
-        problems.extend(world::validate::problems(world));
-        needed.extend(world::validate::message_ids(world));
     }
 
     for (locale, ids) in &locales {

@@ -1,0 +1,22 @@
+{
+  "campaign": {
+    "party": [
+      {
+        "hero": "tauryen",
+        "level": 5
+      },
+      {
+        "hero": "lyra",
+        "level": 5
+      }
+    ],
+    "enemies": [
+      "goblin",
+      "hobgoblin",
+      "goblin"
+    ],
+    "inventory": {
+      "potion": 3
+    }
+  }
+}

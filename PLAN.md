@@ -593,10 +593,16 @@ simulador:
   "???"). Um node pode disparar uma cena ao chegar. Trilhas e nodes podem
   exigir ou proibir **flags** da história.
 - **Encontros ao andar:** cada trilha tem chance de 0–100% e uma lista de
-  monstros com peso. Cada encontro tem **de 1 a 3 inimigos**, sorteados; com
-  uma party maior que 3, o limite acompanha (party de 4: de 1 a 4). 5% dos
-  encontros são emboscada inimiga; em batalhas fixas o jogador pode tentar
-  **Emboscada** (efeito em 20%).
+  **grupos fixos** (combinações escolhidas à mão, com peso), montados pelo
+  nível médio da área: monstros fortes vêm em número limitado (ex.: no máximo
+  1 Goblin Xamã, 1 Saqueador ou 1 Rastejador por batalha). Só entram grupos de
+  **até 3 inimigos**, ou até o tamanho da party quando ela é maior (party de
+  4: grupos de 4). 5% dos encontros são emboscada inimiga; em batalhas fixas o
+  jogador pode tentar **Emboscada** (efeito em 20%).
+- **Furtar** (Saqueador): chance de `40% + (DES dele − DES do alvo) + 3 ×
+  (nível dele − nível do alvo)`, entre 5% e 80%, de levar 1 item aleatório da
+  mochila. No turno seguinte ele **foge** com o item; derrubá-lo antes devolve
+  o item. Quem foge não dá EXP, Kalds, itens nem conta para missões.
 - **Party:** até **4** heróis. A história pode pôr e tirar heróis; quem sai
   guarda nível e equipamento para quando voltar. **Convidados** agem pela
   própria IA (o jogador só comanda os fixos) e não ganham experiência.
@@ -648,8 +654,9 @@ simulador:
 **Calibragem** (`make sim-campaign RUNS=8`, a IA jogando pela party e
 treinando antes dos chefes como um jogador faria): chega a Valcrest no nível
 5, desce ao nível 2 do esgoto no 8, enfrenta o Lich no 10 e termina o
-capítulo no **12–13**; 1 a 22 derrotas (a maioria no Lich e no Hobgoblin),
-26 a 75 minutos de batalha.
+capítulo no **12** (10 a 13); 1 a 7 derrotas, 29 a 42 minutos de batalha.
+Cada luta do capítulo tem um cenário no sandbox (`sandbox/ch1-*.json`), com o
+nível escolhido pela URL.
 
 **Como a tela funciona:** depois do login, `/play` mostra a escolha de modo.
 No mapa, as setas andam até o vizinho naquela direção (ou clique no node),
@@ -1226,7 +1233,7 @@ services:
       PORT: "3000"                     # contrato com 13-rpg.conf
       DATABASE_URL: postgres://rpg:${POSTGRES_PASSWORD}@db:5432/rpg
     ports:
-      - "127.0.0.1:${LOCAL_PORT:-8083}:3000"
+      - "127.0.0.1:${PORTA_LOCAL:-8083}:3000"
     depends_on:
       db:
         condition: service_healthy

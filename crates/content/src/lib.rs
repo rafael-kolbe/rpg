@@ -8,12 +8,13 @@
 //! | `content/items.json` | Every item, by id ([`engine::ItemDef`]) |
 //! | `content/world/*.json` | The campaign world ([`world::WorldDef`]): `start`, `regions`, `classes`, `heroes`, `monsters`, `dialogues`, `shops`, `equipment` |
 //! | `content/world/instances/<id>.json` | One instance each ([`world::def::InstanceDef`]) |
-//! | `sandbox/<scenario>.json` | Test battles ([`engine::Encounter`]) |
+//! | `sandbox/<scenario>.json` | Test battles ([`Scenario`]: written out, or campaign heroes against campaign monsters) |
 //! | `locales/<locale>/*.ftl` | Display names of everything above |
 //!
 //! [`check`] validates all of it; the `content-check` binary runs it for
 //! `make check`.
 
+mod scenario;
 mod validation;
 
 use std::collections::BTreeMap;
@@ -24,6 +25,7 @@ use engine::{ActionDef, ActionId, BattleSetup, Encounter, ItemDef, ItemId};
 use serde::de::DeserializeOwned;
 use world::{InstanceId, World, WorldDef};
 
+pub use scenario::{CampaignBattle, Member, Scenario, load_scenario};
 pub use validation::{Summary, check};
 
 /// Why content could not be loaded.
@@ -130,15 +132,6 @@ impl Content {
     }
 }
 
-/// Loads a sandbox scenario.
-///
-/// # Errors
-///
-/// [`ContentError`] when the file is missing or malformed.
-pub fn load_encounter(path: &Path) -> Result<Encounter, ContentError> {
-    read_json(path)
-}
-
 fn read_json<T: DeserializeOwned>(path: &Path) -> Result<T, ContentError> {
     let text = fs::read_to_string(path).map_err(|source| ContentError::Read {
         path: path.to_owned(),
@@ -163,7 +156,11 @@ mod tests {
     fn basic_battle(seed: u64) -> Battle {
         let root = repo_root();
         let content = Content::load(&root.join("content")).unwrap();
-        let encounter = load_encounter(&root.join("sandbox/battle-basic.json")).unwrap();
+        let Scenario::Written(encounter) =
+            load_scenario(&root.join("sandbox/battle-basic.json")).unwrap()
+        else {
+            panic!("battle-basic is written out");
+        };
         Battle::new(content.battle_setup(encounter), seed, PartyControl::Ai).unwrap()
     }
 

@@ -135,6 +135,7 @@ impl Battle {
                 self.knock_out(target, events);
                 self.restore_hp(actor, u64::from(hp), events);
             }
+            Effect::Steal => self.steal(actor, target, events),
             Effect::Reanimate { into } => {
                 // Checked against the forms when the battle was set up.
                 let Some(form) = self.forms.get(into).cloned() else {
@@ -147,6 +148,44 @@ impl Battle {
                 events.push(BattleEvent::Revived { target, hp });
             }
         }
+    }
+
+    /// Takes one random item from the party's bag into the thief's hands
+    /// (only enemies steal: the bag is the party's).
+    fn steal(&mut self, actor: CombatantId, target: CombatantId, events: &mut Vec<BattleEvent>) {
+        let thief = &self.combatants[usize::from(actor.0)];
+        let victim = &self.combatants[usize::from(target.0)];
+        let chance = damage::steal_chance(
+            thief.stats.attributes.dexterity,
+            thief.stats.level,
+            victim.stats.attributes.dexterity,
+            victim.stats.level,
+        );
+        let held: Vec<_> = self
+            .inventory
+            .iter()
+            .filter(|&(_, &count)| count > 0)
+            .map(|(item, _)| item.clone())
+            .collect();
+        let robbing = thief.side == crate::ids::Side::Enemies;
+        if !robbing || held.is_empty() || !self.rng.chance_percent(chance) {
+            events.push(BattleEvent::Missed { target });
+            return;
+        }
+        let kinds = u64::try_from(held.len()).unwrap_or(u64::MAX);
+        let index = usize::try_from(self.rng.below(kinds)).unwrap_or(0);
+        let Some(item) = held.get(index).cloned() else {
+            return;
+        };
+        if let Some(count) = self.inventory.get_mut(&item) {
+            *count -= 1;
+        }
+        self.combatant_mut(actor).stolen.push(item.clone());
+        events.push(BattleEvent::Stole {
+            actor,
+            target,
+            item,
+        });
     }
 
     fn strike(

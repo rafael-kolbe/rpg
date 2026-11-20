@@ -1,0 +1,18 @@
+{
+  "campaign": {
+    "party": [
+      {
+        "hero": "tauryen",
+        "level": 1
+      }
+    ],
+    "enemies": [
+      "goblin",
+      "goblin-archer",
+      "goblin"
+    ],
+    "inventory": {
+      "potion": 3
+    }
+  }
+}

@@ -220,8 +220,11 @@ Regras de jogo que nascem da história. **Implementadas** (as regras valem no
   sair da party num MMO; os membros continuam amigos e podem voltar depois.
 - **Área trancada pela história:** durante um trecho, o jogador não pode sair
   de uma área (ex.: o esgoto de Valcrest).
-- **Inimigos por encontro:** de 1 a 3, sorteado; quando a party passa de 3
-  membros, o limite acompanha (party de 4: de 1 a 4).
+- **Inimigos por encontro:** grupos fixos por trilha, montados pelo nível
+  médio da área (no máximo 1 monstro forte, como o Goblin Xamã, por batalha);
+  até 3 inimigos, ou até 4 com a party de 4.
+- **Furtar** (Saqueador): leva 1 item aleatório da mochila e foge no turno
+  seguinte; derrubado antes, devolve o item.
 - **Convidados** (*guest*): membros temporários da party que agem sozinhos; o
   jogador só escolhe as ações dos membros fixos.
 - **Cover** (técnica): por 60 s, 70% de chance de receber no lugar de um

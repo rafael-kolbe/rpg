@@ -400,6 +400,9 @@ fn validate_action(id: &ActionId, action: &ActionDef) -> Result<(), SetupError> 
         Effect::Devour | Effect::Reanimate { .. } if action.target != TargetRule::SingleAlly => {
             invalid("devour and reanimate target a single ally")
         }
+        Effect::Steal if action.target != TargetRule::SingleEnemy => {
+            invalid("steal targets a single enemy")
+        }
         Effect::ApplyStatus { accuracy, .. } if !(1..=100).contains(accuracy) => {
             invalid("accuracy must be 1..=100")
         }

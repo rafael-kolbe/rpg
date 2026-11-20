@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::action::{Affinity, Element};
 use crate::ai::{AiProfile, Intent};
-use crate::ids::{ActionId, CombatantId, Side};
+use crate::ids::{ActionId, CombatantId, ItemId, Side};
 use crate::setup::CombatantSetup;
 use crate::stats::Stats;
 use crate::status::{ActiveStatus, StatusKind, StatusTimer};
@@ -23,6 +23,9 @@ pub enum TurnState {
     AwaitingCommand,
     /// A command was chosen and waits in the action queue.
     Queued,
+    /// Left the battle (a thief running off with its loot): out of reach,
+    /// no more turns, and no reward.
+    Fled,
 }
 
 /// A combatant in a battle. Read-only outside the engine.
@@ -50,6 +53,9 @@ pub struct Combatant {
     pub(crate) defending: bool,
     /// Engine-controlled only: the command chosen for its next turn.
     pub(crate) intent: Option<Intent>,
+    /// Items it stole: it flees with them on its next turn, or drops them
+    /// when knocked out first.
+    pub(crate) stolen: Vec<ItemId>,
 }
 
 impl Combatant {
@@ -78,6 +84,7 @@ impl Combatant {
             statuses: Vec::new(),
             defending: false,
             intent: None,
+            stolen: Vec::new(),
         }
     }
 
@@ -164,6 +171,18 @@ impl Combatant {
     #[must_use]
     pub fn is_knocked_out(&self) -> bool {
         self.hp == 0
+    }
+
+    /// Whether it fled the battle.
+    #[must_use]
+    pub fn has_fled(&self) -> bool {
+        self.state == TurnState::Fled
+    }
+
+    /// Whether it is no longer in the fight: knocked out or fled.
+    #[must_use]
+    pub fn is_out(&self) -> bool {
+        self.hp == 0 || self.has_fled()
     }
 
     /// Whether the player chooses its commands.

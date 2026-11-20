@@ -333,15 +333,15 @@ impl Battle {
         let opponents = || {
             self.combatants
                 .iter()
-                .filter(|c| c.side != me.side && !c.is_knocked_out())
+                .filter(|c| c.side != me.side && !c.is_out())
         };
         match condition {
             Condition::Always => true,
             Condition::UserHpBelow { percent } => me.hp_percent() < u16::from(percent),
             Condition::AllyHpBelow { percent } => allies()
-                .filter(|c| !c.is_knocked_out())
+                .filter(|c| !c.is_out())
                 .any(|c| c.hp_percent() < u16::from(percent)),
-            Condition::AllyKnockedOut => allies().any(Combatant::is_knocked_out),
+            Condition::AllyKnockedOut => allies().any(|c| c.is_knocked_out() && !c.has_fled()),
             Condition::OpponentHasStatus { status } => opponents().any(|c| c.has_status(status)),
             Condition::UserLacksStatus { status } => !me.has_status(status),
         }

@@ -30,6 +30,10 @@ pub enum ClientMessage {
         /// The engine plays the party too (auto-battle).
         #[serde(default)]
         auto: bool,
+        /// Level of the heroes (not guests) in a campaign scenario; the
+        /// scenario's own levels when absent.
+        #[serde(default)]
+        level: Option<u8>,
     },
     /// Opens the logged-in player's game in a mode (a new one the first
     /// time). Needs the session cookie on the WebSocket.

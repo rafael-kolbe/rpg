@@ -93,6 +93,7 @@ action-cover = Cover
 action-devour = Devour
 action-raise-dead = Raise Dead
 action-dark-bolt = Shadow Bolt
+action-steal = Steal
 
 ## Equipment
 

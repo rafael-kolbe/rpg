@@ -253,7 +253,8 @@ impl Connection {
                 scenario,
                 seed,
                 auto,
-            } => self.start_sandbox(state, scenario, seed, auto),
+                level,
+            } => self.start_sandbox(state, scenario, seed, auto, level),
             ClientMessage::Command { command } => {
                 let Some(session) = self.session.as_mut() else {
                     return vec![reject(RejectReason::NoBattle)];
@@ -320,7 +321,12 @@ impl Connection {
             .filter(|c| c.side() == Side::Party)
             .map(|c| (c.hp(), c.mp()))
             .collect();
-        game.finish_battle(outcome, &party, session.battle.inventory());
+        game.finish_battle(
+            outcome,
+            &party,
+            session.battle.inventory(),
+            &session.battle.fled_enemies(),
+        );
         let view = game.view();
         self.session = None;
         self.unsaved = true;
@@ -484,9 +490,18 @@ impl Connection {
         scenario: String,
         seed: Option<u32>,
         auto: bool,
+        level: Option<u8>,
     ) -> Vec<ServerMessage> {
-        let Some(encounter) = state.sandbox.scenarios.get(&scenario) else {
+        let Some(found) = state.sandbox.scenarios.get(&scenario) else {
             return vec![error(ErrorCode::UnknownScenario)];
+        };
+        let encounter = match found.encounter(&state.world, level) {
+            Ok(encounter) => encounter,
+            Err(problem) => {
+                // Checked at startup; this is a bug.
+                tracing::error!(%problem, %scenario, "cannot build sandbox battle");
+                return vec![error(ErrorCode::UnknownScenario)];
+            }
         };
         let seed = seed.unwrap_or_else(random_seed);
         let control = if auto {
@@ -494,7 +509,7 @@ impl Connection {
         } else {
             PartyControl::Player
         };
-        let setup = state.sandbox.content.battle_setup(encounter.clone());
+        let setup = state.sandbox.content.battle_setup(encounter);
         let battle = match Battle::new(setup, u64::from(seed), control) {
             Ok(battle) => battle,
             Err(setup_error) => {
@@ -524,6 +539,7 @@ impl Connection {
         _scenario: String,
         _seed: Option<u32>,
         _auto: bool,
+        _level: Option<u8>,
     ) -> Vec<ServerMessage> {
         vec![error(ErrorCode::SandboxDisabled)]
     }
@@ -665,6 +681,7 @@ mod tests {
                     scenario: "battle-basic".to_owned(),
                     seed: Some(42),
                     auto: false,
+                    level: None,
                 },
             )
             .await
@@ -695,6 +712,7 @@ mod tests {
                     scenario: "nope".to_owned(),
                     seed: None,
                     auto: false,
+                    level: None,
                 },
             )
             .await;

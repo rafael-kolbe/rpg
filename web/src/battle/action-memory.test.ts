@@ -54,6 +54,7 @@ function combatant(id: number, side: 'party' | 'enemies', hp = 100): CombatantSt
     turn: 'charging',
     statuses: [],
     defending: false,
+    fled: false,
     playerControlled: side === 'party',
     intent: null,
     attack: 'attack',

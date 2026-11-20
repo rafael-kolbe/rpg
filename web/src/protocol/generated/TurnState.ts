@@ -3,4 +3,4 @@
 /**
  * Where a combatant is in its turn cycle.
  */
-export type TurnState = "charging" | "awaiting_command" | "queued";
+export type TurnState = "charging" | "awaiting_command" | "queued" | "fled";

@@ -20,7 +20,7 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use clap::Parser;
-use content::{Content, load_encounter};
+use content::{Content, load_scenario};
 use engine::{Battle, BattleEvent, CombatantId, Outcome, PartyControl, Side, TICK_MS};
 
 #[derive(Debug, Parser)]
@@ -44,6 +44,9 @@ struct Args {
     /// Play the campaign's first arc with a bot instead of a scenario.
     #[arg(long)]
     campaign: bool,
+    /// Level of the heroes (not guests) in a campaign scenario.
+    #[arg(long)]
+    level: Option<u8>,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -57,7 +60,10 @@ fn main() -> anyhow::Result<()> {
         }
         return Ok(());
     }
-    let encounter = load_encounter(&args.scenario)?;
+    let world = content.load_world(&args.content)?;
+    let encounter = load_scenario(&args.scenario)?
+        .encounter(&world, args.level)
+        .map_err(|problem| anyhow::anyhow!("{}: {problem}", args.scenario.display()))?;
     let new_battle = |seed| {
         Battle::new(
             content.battle_setup(encounter.clone()),
@@ -108,6 +114,23 @@ fn name(battle: &Battle, id: CombatantId) -> String {
     battle
         .combatant(id)
         .map_or_else(|| id.to_string(), |c| format!("{} {id}", c.name()))
+}
+
+/// The log line of a thief's event.
+fn describe_theft(battle: &Battle, event: &BattleEvent) -> Option<String> {
+    let n = |id| name(battle, id);
+    Some(match event {
+        BattleEvent::Stole {
+            actor,
+            target,
+            item,
+        } => format!("  {} steals {item} from {}", n(*actor), n(*target)),
+        BattleEvent::Fled { combatant } => format!("{} flees", n(*combatant)),
+        BattleEvent::Recovered { combatant, item } => {
+            format!("  {} drops the stolen {item}", n(*combatant))
+        }
+        _ => return None,
+    })
 }
 
 /// One log line per event worth reading; gauge and queue bookkeeping is skipped.
@@ -176,6 +199,9 @@ fn describe(battle: &Battle, event: &BattleEvent) -> Option<String> {
             protector,
             protected,
         } => format!("  {} covers {}", n(*protector), n(*protected)),
+        BattleEvent::Stole { .. } | BattleEvent::Fled { .. } | BattleEvent::Recovered { .. } => {
+            describe_theft(battle, event)?
+        }
         BattleEvent::StatusResisted { target, status } => {
             format!("  {} resists {status:?}", n(*target))
         }

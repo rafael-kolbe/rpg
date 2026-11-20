@@ -268,6 +268,30 @@ impl Checker<'_> {
             for piece in def.weapon.iter().chain(&def.armor) {
                 self.piece(&owner, piece);
             }
+            let learns = self
+                .world
+                .map
+                .classes
+                .get(&def.class)
+                .map_or_else(Vec::new, |class| class.learns.clone());
+            for learn in learns {
+                let cost = self
+                    .world
+                    .actions
+                    .get(&learn.action)
+                    .map_or(0, |a| a.mp_cost);
+                let state = HeroState::new(self.world, id, learn.level);
+                let mp = self
+                    .world
+                    .hero_stats(&state)
+                    .map_or(0, |stats| stats.max_mp);
+                if cost > mp {
+                    self.report(format!(
+                        "{owner}: learns `{}` at level {} for {cost} MP, but has {mp} there",
+                        learn.action, learn.level
+                    ));
+                }
+            }
             for level in [1, MAX_LEVEL] {
                 let state = HeroState::new(self.world, id, level);
                 if let Some(setup) = self.world.hero_setup(&state) {
@@ -297,6 +321,17 @@ impl Checker<'_> {
             for drop in &def.drops {
                 self.item(&owner, &drop.item);
             }
+            // The AI skips what it cannot pay for: such an action never shows.
+            for action in &def.battle.actions {
+                if let Some(cost) = self.world.actions.get(action).map(|a| a.mp_cost)
+                    && cost > def.battle.stats.max_mp
+                {
+                    self.report(format!(
+                        "{owner}: `{action}` costs {cost} MP, but it has {}",
+                        def.battle.stats.max_mp
+                    ));
+                }
+            }
             self.can_fight(&owner, vec![party.clone()], def.battle.clone());
         }
     }
@@ -316,8 +351,8 @@ impl Checker<'_> {
                 if trail.chance > 100 {
                     self.report(format!("{owner}: trail chance above 100%"));
                 }
-                for weighted in &trail.monsters {
-                    self.fight(&owner, std::slice::from_ref(&weighted.monster));
+                for group in &trail.encounters {
+                    self.fight(&owner, &group.monsters);
                 }
             }
             for (node_id, node) in &instance.nodes {
@@ -412,5 +447,56 @@ impl Checker<'_> {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use engine::{ActionCategory, ActionDef, ActionId, Effect, TargetRule};
+
+    use super::*;
+    use crate::test_world::world;
+
+    #[test]
+    fn an_action_too_expensive_for_its_user_is_a_problem() {
+        let mut world = (*world()).clone();
+        let blast = ActionId::new("blast");
+        world.actions.insert(
+            blast.clone(),
+            ActionDef {
+                category: ActionCategory::Magic,
+                target: TargetRule::SingleEnemy,
+                mp_cost: 50,
+                duration_ticks: 8,
+                effect: Effect::MagicalDamage {
+                    power: 8,
+                    element: None,
+                },
+            },
+        );
+        for monster in world.map.monsters.values_mut() {
+            monster.battle.actions.push(blast.clone());
+        }
+        for class in world.map.classes.values_mut() {
+            class.learns.push(crate::def::Learn {
+                level: 2,
+                action: blast.clone(),
+            });
+        }
+
+        let found = problems(&world);
+
+        assert!(
+            found
+                .iter()
+                .any(|p| p.contains("`blast` costs 50 MP, but it has 0"))
+        );
+        assert!(
+            found
+                .iter()
+                .any(|p| p.contains("learns `blast` at level 2 for 50 MP"))
+        );
+        let clean = problems(&crate::test_world::world());
+        assert!(!clean.iter().any(|p| p.contains(" MP")), "{clean:?}");
     }
 }

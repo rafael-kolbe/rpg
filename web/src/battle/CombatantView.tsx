@@ -39,6 +39,7 @@ export function CombatantView({
     'combatant',
     `combatant--${combatant.side}`,
     combatant.hp === 0 && 'combatant--knocked-out',
+    combatant.fled && 'combatant--fled',
     distracted && 'combatant--distracted',
     targetable && 'combatant--targetable',
     cursor && 'combatant--cursor',

@@ -17,9 +17,10 @@ use engine::{
 
 use crate::World;
 use crate::def::{
-    ChoiceDef, ClassDef, Condition, DialogueDef, EquipmentDef, EventDef, HeroDef, InstanceDef,
-    Learn, MonsterDef, NodeDef, NodeKind, Priced, QuestDef, QuestEvent, QuestGoal, Rank, RegionDef,
-    ShopDef, Slot, StartDef, StatLine, StoryEffect, TalkDef, Terrain, TrailDef, Weighted, WorldDef,
+    ChoiceDef, ClassDef, Condition, DialogueDef, EncounterGroup, EquipmentDef, EventDef, HeroDef,
+    InstanceDef, Learn, MonsterDef, NodeDef, NodeKind, Priced, QuestDef, QuestEvent, QuestGoal,
+    Rank, RegionDef, ShopDef, Slot, StartDef, StatLine, StoryEffect, TalkDef, Terrain, TrailDef,
+    WorldDef,
 };
 use crate::ids::{
     ClassId, DialogueId, EquipmentId, Flag, HeroId, InstanceId, MonsterId, NodeId, Position,
@@ -63,10 +64,12 @@ fn trail(a: &str, b: &str, chance: u8) -> TrailDef {
         a: NodeId::new(a),
         b: NodeId::new(b),
         chance,
-        monsters: vec![Weighted {
-            monster: MonsterId::new("slime"),
-            weight: 1,
-        }],
+        encounters: (1..=4)
+            .map(|count| EncounterGroup {
+                weight: 1,
+                monsters: vec![MonsterId::new("slime"); count],
+            })
+            .collect(),
         when: Condition::default(),
     }
 }

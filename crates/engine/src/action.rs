@@ -151,6 +151,10 @@ pub enum Effect {
         /// Key of the form in [`crate::Encounter::forms`].
         into: String,
     },
+    /// Takes one random item from the party's bag. Chance: 40% + (user
+    /// Dexterity − target Dexterity) + 3 × (user level − target level),
+    /// within 5–80%. A thief flees on its next turn with what it took.
+    Steal,
 }
 
 fn full_accuracy() -> u8 {
@@ -178,7 +182,8 @@ impl Effect {
             | Self::ApplyStatus { .. }
             | Self::RemoveStatus { .. }
             | Self::Devour
-            | Self::Reanimate { .. } => None,
+            | Self::Reanimate { .. }
+            | Self::Steal => None,
         }
     }
 }

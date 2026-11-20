@@ -22,7 +22,7 @@ export function targetLines(combatants: CombatantState[]): TargetLine[] {
         return [{ from: id, to: target.target }]
       case 'side':
         return combatants
-          .filter((c) => c.side === target.side && c.hp > 0)
+          .filter((c) => c.side === target.side && c.hp > 0 && !c.fled)
           .map((c) => ({ from: id, to: c.id }))
       case 'user':
         return []

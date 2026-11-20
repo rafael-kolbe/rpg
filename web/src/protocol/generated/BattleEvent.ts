@@ -193,7 +193,31 @@ protector: CombatantId,
 /**
  * Who was aimed at.
  */
-protected: CombatantId, } | { "type": "knocked_out", 
+protected: CombatantId, } | { "type": "stole", 
+/**
+ * The thief.
+ */
+actor: CombatantId, 
+/**
+ * Who it was taken from.
+ */
+target: CombatantId, 
+/**
+ * The item.
+ */
+item: ItemId, } | { "type": "fled", 
+/**
+ * Who.
+ */
+combatant: CombatantId, } | { "type": "recovered", 
+/**
+ * The thief.
+ */
+combatant: CombatantId, 
+/**
+ * The item, back in the bag.
+ */
+item: ItemId, } | { "type": "knocked_out", 
 /**
  * Who.
  */
